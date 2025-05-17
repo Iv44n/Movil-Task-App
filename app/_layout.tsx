@@ -1,7 +1,13 @@
+import { initDatabase } from '@/database'
 import { Slot } from 'expo-router'
+import { useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 
 export default function Layout() {
+  useEffect(() => {
+    initDatabase()
+  }, [])
+
   return (
     <View style={styles.container}>
       <Slot/>
