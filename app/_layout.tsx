@@ -1,7 +1,8 @@
 import { initDatabase } from '@/database'
-import { Slot } from 'expo-router'
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Layout() {
   useEffect(() => {
@@ -9,17 +10,13 @@ export default function Layout() {
   }, [])
 
   return (
-    <View style={styles.container}>
-      <Slot/>
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
+      <StatusBar style='inverted' />
+      <Stack
+        screenOptions={{
+          headerShown: false
+        }}
+      />
+    </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-})
