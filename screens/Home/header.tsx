@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { Colors } from '@/constants/colors'
 
 export default function HomeHeader() {
   return (
@@ -13,7 +14,7 @@ export default function HomeHeader() {
         <Ionicons
           name='mail-outline'
           size={24}
-          color='white'
+          color={Colors.textPrimary}
         />
       </View>
     </View>
@@ -27,15 +28,15 @@ const styles = StyleSheet.create({
     marginBottom: 24
   },
   subText: {
-    color: '#D1D5DB',
+    color: Colors.textSecondary,
     fontSize: 14
   },
   title: {
-    color: 'white',
+    color: Colors.textPrimary,
     fontSize: 28
   },
   titleUnderline: {
-    color: 'white',
+    color: Colors.textPrimary,
     fontSize: 30,
     fontWeight: 'bold',
     textDecorationLine: 'underline'
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     borderRadius: 99999,
     borderWidth: 1,
-    borderColor: '#2b2b2b',
+    borderColor: Colors.border,
     padding: 12,
     height: 50
   }
