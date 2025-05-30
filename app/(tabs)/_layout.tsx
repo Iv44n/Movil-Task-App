@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router'
 import { Dimensions, StyleSheet, View } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Colors } from '@/constants/colors'
+import HomeIcon from '@/components/icons/HomeIcon'
+import UserIcon from '@/components/icons/UserIcon'
 
 export default function TabsLayout() {
   const SCREEN_WIDTH = Dimensions.get('window').width
@@ -10,16 +12,17 @@ export default function TabsLayout() {
 
   return (
     <Tabs
-      screenOptions={({ route }) => ({
+      screenOptions={{
+        tabBarActiveTintColor: Colors.textBlack,
+        tabBarInactiveTintColor: Colors.textSecondary,
         headerShown: false,
-        tabBarActiveTintColor: '#000',
         tabBarStyle: {
           height: TAB_BAR_HEIGHT,
-          backgroundColor: '#242424',
+          backgroundColor: Colors.card,
           borderRadius: 50,
           position: 'absolute',
           bottom: 30,
-          borderColor: '#2b2b2b',
+          borderColor: Colors.border,
           borderWidth: 1,
           borderTopWidth: 1,
           paddingBottom: 0,
@@ -32,27 +35,29 @@ export default function TabsLayout() {
           width: '100%',
           height: '100%',
           fontWeight: 'bold'
-        },
-        tabBarIcon: ({ focused, color }) => (
-          <View style={[styles.iconContainer, focused && styles.iconActive]}>
-            <Ionicons
-              name={
-                route.name === 'index'
-                  ? 'home-outline'
-                  : route.name === 'profile'
-                    ? 'person-outline'
-                    : 'ellipse'
-
-              }
-              size={24}
-              color={color}
-            />
-          </View>
-        )
-      })}
+        }
+      }}
     >
-      <Tabs.Screen name='index' options={{ title: 'Home' }} />
-      <Tabs.Screen name='profile' options={{ title: 'Profile' }} />
+      <Tabs.Screen
+        name='index' options={{
+          title: 'Home',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.iconContainer, focused && styles.iconActive]}>
+              <HomeIcon color={color} />
+            </View>
+          )
+        }}
+      />
+      <Tabs.Screen
+        name='profile' options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.iconContainer, focused && styles.iconActive]}>
+              <UserIcon color={color} />
+            </View>
+          )
+        }}
+      />
     </Tabs>
   )
 }
@@ -66,6 +71,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   iconActive: {
-    backgroundColor: '#f1e053'
+    backgroundColor: Colors.yellow
   }
 })
