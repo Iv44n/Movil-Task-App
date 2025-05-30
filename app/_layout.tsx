@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/colors'
 import { initDatabase } from '@/database'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
@@ -10,13 +11,11 @@ export default function Layout() {
   }, [])
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
       <StatusBar style='inverted' />
-      <Stack
-        screenOptions={{
-          headerShown: false
-        }}
-      />
+      <Stack>
+        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+      </Stack>
     </SafeAreaView>
   )
 }
