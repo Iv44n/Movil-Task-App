@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Colors } from '@/constants/colors'
+import { fontFamily } from '@/constants/fontFamily'
 
 export default function HomeHeader() {
   return (
@@ -29,17 +30,19 @@ const styles = StyleSheet.create({
   },
   subText: {
     color: Colors.textSecondary,
-    fontSize: 14
+    fontSize: 14,
+    fontFamily: fontFamily.regular
   },
   title: {
     color: Colors.textPrimary,
-    fontSize: 28
+    fontSize: 28,
+    fontFamily: fontFamily.regular
   },
   titleUnderline: {
     color: Colors.textPrimary,
     fontSize: 30,
-    fontWeight: 'bold',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    fontFamily: fontFamily.semiBold
   },
   iconContainer: {
     borderRadius: 99999,
