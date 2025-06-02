@@ -1,9 +1,13 @@
-import { SQLiteDatabase } from 'expo-sqlite'
+import { getDb } from './Connection'
 
-export async function runMigrations(db: SQLiteDatabase) {
-  try {
+export async function runMigrations() {
+  const db = await getDb()
 
-    await db.execAsync(`
+  await db.execAsync(`
+      PRAGMA foreign_keys = ON;
+    `)
+
+  await db.execAsync(`
       CREATE TABLE IF NOT EXISTS User (
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
@@ -13,7 +17,7 @@ export async function runMigrations(db: SQLiteDatabase) {
       );
     `)
 
-    await db.execAsync(`
+  await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Project (
         project_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
@@ -26,7 +30,7 @@ export async function runMigrations(db: SQLiteDatabase) {
       );
     `)
 
-    await db.execAsync(`
+  await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Priority (
         priority_id INTEGER PRIMARY KEY AUTOINCREMENT,
         level TEXT NOT NULL UNIQUE,
@@ -34,7 +38,7 @@ export async function runMigrations(db: SQLiteDatabase) {
       );
     `)
 
-    await db.execAsync(`
+  await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Tag (
         tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
@@ -42,7 +46,7 @@ export async function runMigrations(db: SQLiteDatabase) {
       );
     `)
 
-    await db.execAsync(`
+  await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Task (
         task_id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
@@ -71,7 +75,7 @@ export async function runMigrations(db: SQLiteDatabase) {
       );
     `)
 
-    await db.execAsync(`
+  await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Task_Tag (
         task_id INTEGER NOT NULL,
         tag_id INTEGER NOT NULL,
@@ -88,7 +92,7 @@ export async function runMigrations(db: SQLiteDatabase) {
       );
     `)
 
-    await db.execAsync(`
+  await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Recurrence (
         recurrence_id INTEGER PRIMARY KEY AUTOINCREMENT,
         task_id INTEGER NOT NULL,
@@ -103,9 +107,4 @@ export async function runMigrations(db: SQLiteDatabase) {
       );
     `)
 
-    console.log('Migrations completed successfully')
-
-  } catch (error) {
-    console.error('Error initializing migrations:', error)
-  }
 }
