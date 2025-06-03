@@ -9,5 +9,8 @@ export async function getDb() {
   }
 
   dbInstance = await Sqlite.openDatabaseAsync(dbName)
+  await dbInstance.execAsync('PRAGMA foreign_keys = ON;')
+  await dbInstance.execAsync('PRAGMA journal_mode = WAL;')
+
   return dbInstance
 }
