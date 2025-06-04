@@ -12,7 +12,7 @@ export async function getDb() {
     await dbInstance.execAsync('PRAGMA journal_mode = WAL;')
 
   } catch (error) {
-    throw new Error(`Failed to open database: ${error}`)
+    throw error
   }
   return dbInstance
 }
