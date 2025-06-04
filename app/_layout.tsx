@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors'
-import { initDatabase } from '@/database'
+import { initDatabase } from '@/database/init'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
@@ -34,7 +34,7 @@ export default function Layout() {
     }
 
     prepare()
-  }, [fontError, fontsLoaded])
+  }, [fontError])
 
   if (!fontsLoaded && !fontError) {
     return null
