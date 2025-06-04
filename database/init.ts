@@ -7,6 +7,10 @@ export async function initDatabase() {
   if (initialized) return
   initialized = true
 
-  const db = await getDb()
-  await runMigrations(db)
+  try {
+    const db = await getDb()
+    await runMigrations(db)
+  } catch (error) {
+    console.error('Failed to initialize database:', error)
+  }
 }
