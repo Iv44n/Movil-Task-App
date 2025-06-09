@@ -2,12 +2,15 @@ import { StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Colors } from '@/constants/colors'
 import { fontFamily } from '@/constants/fontFamily'
+import { useUserStore } from '@/store/userStore'
 
 export default function HomeHeader() {
+  const user = useUserStore((state) => state.user)
+
   return (
     <View style={styles.header}>
       <View>
-        <Text style={styles.subText}>Hi, Arip!</Text>
+        <Text style={styles.subText}>Hi, {user?.username}</Text>
         <Text style={styles.title}>You Have</Text>
         <Text style={styles.titleUnderline}>4 Projects</Text>
       </View>

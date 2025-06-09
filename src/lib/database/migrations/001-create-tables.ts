@@ -7,11 +7,11 @@ export default {
 
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS users (
-        user_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-        name        TEXT    NOT NULL UNIQUE,
-        password    TEXT    NOT NULL,
-        created_at  DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-        updated_at  DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+        user_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+        username       TEXT    NOT NULL UNIQUE,
+        hashedPassword TEXT    NOT NULL,
+        created_at     DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        updated_at     DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP)
       );
     `)
 

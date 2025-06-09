@@ -1,17 +1,20 @@
 import ArrowRightIcon from '@/components/icons/ArrowRight'
 import { Colors } from '@/constants/colors'
 import { fontFamily } from '@/constants/fontFamily'
-import { router, Stack } from 'expo-router'
+import { useRouter } from 'expo-router'
+import { Storage } from 'expo-sqlite/kv-store'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 export default function Welcome() {
+  const router = useRouter()
+
+  const finishWelcome = async () => {
+    await Storage.setItem('welcomeDone', 'true')
+    router.replace('(protected)', { withAnchor: true })
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: false
-        }}
-      />
 
       {/*Need Welcome Image/SVG */}
 
@@ -24,7 +27,7 @@ export default function Welcome() {
         Manage projects and standalone tasks—from daily routines and habits to complex workflows. Define start and due dates, break down work into subtasks, and track progress at a glance.
       </Text>
 
-      <Pressable style={styles.button} onPress={() => router.push('/userLogin')}>
+      <Pressable style={styles.button} onPress={finishWelcome}>
         <Text style={styles.buttonText}>Get Started</Text>
         <View style={styles.iconWrapper}>
           <ArrowRightIcon color={Colors.textPrimary} />

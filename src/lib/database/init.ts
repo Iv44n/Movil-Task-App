@@ -1,4 +1,4 @@
-import { getDb } from './Connection'
+import { getDb } from '../database/Connection'
 import { runMigrations } from './MigrationsManager'
 
 let initialized = false

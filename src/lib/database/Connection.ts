@@ -43,6 +43,7 @@ async function openDatabaseWithRecovery(): Promise<Sqlite.SQLiteDatabase> {
 async function openAndConfigureDatabase(): Promise<Sqlite.SQLiteDatabase> {
   const db = await Sqlite.openDatabaseAsync(DB_NAME, undefined, DB_DIR)
   await db.execAsync('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;')
+
   return db
 }
 
