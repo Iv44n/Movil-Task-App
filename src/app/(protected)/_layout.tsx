@@ -1,8 +1,8 @@
-import { useAuth } from '@/hooks/useAuth'
+import useBoundStore from '@/store/useBoundStore'
 import { Redirect, Stack } from 'expo-router'
 
 export default function ProtectedLayout() {
-  const { isAuthenticated } = useAuth()
+  const isAuthenticated = useBoundStore((state) => state.isAuthenticated)
 
   if (!isAuthenticated) {
     return <Redirect href='/login' />
