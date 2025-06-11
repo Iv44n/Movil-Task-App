@@ -14,13 +14,14 @@ import { Colors } from '@/constants/colors'
 import { fontFamily } from '@/constants/fontFamily'
 import EyeIcon from '@/components/icons/EyeIcon'
 import EyeOffIcon from '@/components/icons/EyeOffIcon'
-import { useAuth } from '@/hooks/useAuth'
+import useBoundStore from '@/store/useBoundStore'
+import { ValidationError } from '@/errors/AppError'
 
 export default function UserRegister() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const { register, isLoadingAuth, errorAuth, setErrorAuth, isAuthenticated } = useAuth()
+  const { register, isLoadingAuth, errorAuth, setErrorAuth, isAuthenticated } = useBoundStore()
   const router = useRouter()
 
   useEffect(() => {
@@ -30,14 +31,33 @@ export default function UserRegister() {
   }, [isAuthenticated, isLoadingAuth, router])
 
   const finishRegister = async () => {
-    if (!username || !password) {
-      setErrorAuth({ message: 'Please enter username and password.', errorCode: 'INVALID_CREDENTIALS' })
-      return
+    const errors = []
+
+    if(!username) errors.push('username')
+    if(!password) errors.push('password')
+
+    if(errors.length > 0) {
+      const message = errors.length === 2
+        ? 'Please enter username and password.'
+        : errors[0] === 'username'
+          ? 'Username are required'
+          : 'Password are required'
+
+      setErrorAuth(new ValidationError(message, errors))
     }
+
     await register({ username, password })
   }
 
-  const isButtonDisabled = !username || !password || isLoadingAuth
+  const getFieldError = (field: string) => {
+    if(!(errorAuth instanceof ValidationError)) return null
+
+    const fields = Array.isArray(errorAuth.field)
+      ? errorAuth.field
+      : [errorAuth.field]
+
+    return fields.includes(field) ? errorAuth.message : null
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -53,12 +73,12 @@ export default function UserRegister() {
           }]}
           value={username}
           onChangeText={(text) => {
-            if (errorAuth) setErrorAuth(null)
+            if (getFieldError('username')) setErrorAuth(null)
             setUsername(text)
           }}
           autoCapitalize='none'
         />
-        <Text style={styles.errorText}>{errorAuth?.message}</Text>
+        <Text style={styles.errorText}>{getFieldError('username')}</Text>
 
         <Text style={[styles.label, { marginTop: 8 }]}>Password</Text>
         <View style={styles.inputWrapper}>
@@ -68,7 +88,7 @@ export default function UserRegister() {
             style={[styles.input, { flex: 1 }]}
             value={password}
             onChangeText={(text) => {
-              if (errorAuth) setErrorAuth(null)
+              if (getFieldError('password')) setErrorAuth(null)
               setPassword(text)
             }}
             secureTextEntry={!showPassword}
@@ -81,12 +101,12 @@ export default function UserRegister() {
             )}
           </Pressable>
         </View>
-        <Text style={styles.errorText}>{errorAuth?.message && errorAuth.errorCode !== 'USER_ALREADY_EXISTS'}</Text>
+        <Text style={styles.errorText}>{getFieldError('password')}</Text>
 
         <Pressable
           style={styles.loginButton}
           onPress={finishRegister}
-          disabled={isButtonDisabled}
+          disabled={isLoadingAuth}
         >
           <Text style={styles.loginButtonText}>
             {isLoadingAuth ? 'Registering...' : 'Register'}
@@ -95,7 +115,10 @@ export default function UserRegister() {
       </KeyboardAvoidingView>
 
       <Pressable
-        onPress={() => router.replace('/login')}
+        onPress={() => {
+          setErrorAuth(null)
+          router.replace('/login')
+        }}
         style={styles.registerButton}
       >
         <Text style={styles.registerButtonText}>
