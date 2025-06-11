@@ -14,13 +14,20 @@ import { Colors } from '@/constants/colors'
 import { fontFamily } from '@/constants/fontFamily'
 import EyeIcon from '@/components/icons/EyeIcon'
 import EyeOffIcon from '@/components/icons/EyeOffIcon'
-import { useAuth } from '@/hooks/useAuth'
+import useBoundStore from '@/store/useBoundStore'
+import { ValidationError } from '@/errors/AppError'
 
 export default function UserLogin() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const { login, isLoadingAuth, errorAuth, setErrorAuth, isAuthenticated } = useAuth()
+  const {
+    login,
+    setErrorAuth,
+    isAuthenticated,
+    isLoadingAuth,
+    errorAuth
+  } = useBoundStore()
   const router = useRouter()
 
   useEffect(() => {
@@ -30,11 +37,32 @@ export default function UserLogin() {
   }, [isAuthenticated, isLoadingAuth, router])
 
   const finishLogin = async () => {
-    if (!username || !password) {
-      setErrorAuth({ message: 'Please enter username and password.', errorCode: 'INVALID_CREDENTIALS' })
-      return
+    const errors = []
+
+    if(!username) errors.push('username')
+    if(!password) errors.push('password')
+
+    if(errors.length > 0) {
+      const message = errors.length === 2
+        ? 'Please enter username and password.'
+        : errors[0] === 'username'
+          ? 'Username are required'
+          : 'Password are required'
+
+      setErrorAuth(new ValidationError(message, errors))
     }
+
     await login({ username, password })
+  }
+
+  const getFieldError = (field: string) => {
+    if (!(errorAuth instanceof ValidationError)) return null
+
+    const fields = Array.isArray(errorAuth.field)
+      ? errorAuth.field
+      : [errorAuth.field]
+
+    return fields.includes(field) ? errorAuth.message : null
   }
 
   return (
@@ -56,12 +84,12 @@ export default function UserLogin() {
           }]}
           value={username}
           onChangeText={(text) => {
-            if (errorAuth) setErrorAuth(null)
+            if (getFieldError('username')) setErrorAuth(null)
             setUsername(text)
           }}
           autoCapitalize='none'
         />
-        <Text style={styles.errorText}>{errorAuth?.message}</Text>
+        <Text style={styles.errorText}>{getFieldError('username')}</Text>
 
         <Text style={[styles.label, { marginTop: 8 }]}>Password</Text>
         <View style={styles.inputWrapper}>
@@ -71,7 +99,7 @@ export default function UserLogin() {
             style={[styles.input, { flex: 1 }]}
             value={password}
             onChangeText={(text) => {
-              if (errorAuth) setErrorAuth(null)
+              if (getFieldError('password')) setErrorAuth(null)
               setPassword(text)
             }}
             secureTextEntry={!showPassword}
@@ -84,18 +112,22 @@ export default function UserLogin() {
             )}
           </Pressable>
         </View>
-        <Text style={styles.errorText}>{errorAuth?.message}</Text>
+        <Text style={styles.errorText}>{getFieldError('password')}</Text>
 
         <Pressable
           style={styles.loginButton}
           onPress={finishLogin}
+          disabled={isLoadingAuth}
         >
           <Text style={styles.loginButtonText}>{isLoadingAuth ? 'Loading...' : 'Login'}</Text>
         </Pressable>
       </KeyboardAvoidingView>
 
       <Pressable
-        onPress={() => router.replace('/register')}
+        onPress={() => {
+          setErrorAuth(null)
+          router.replace('/register')
+        }}
         style={styles.registerButton}
       >
         <Text style={styles.registerButtonText}>Don&apos;t have an account?
