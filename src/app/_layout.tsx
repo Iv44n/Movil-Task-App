@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { fontFamily } from '@/constants/fontFamily'
 import Storage from 'expo-sqlite/kv-store'
-import { useAuth } from '@/hooks/useAuth'
+import useBoundStore from '@/store/useBoundStore'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -22,7 +22,8 @@ export default function Layout() {
     [fontFamily.extraBold]: require('../../assets/fonts/Manrope-ExtraBold.ttf')
   })
   const [initialRoute, setInitialRoute] = useState<string | null>(null)
-  const { isReady } = useAuth()
+  const checkAuth = useBoundStore((state) => state.checkAuth)
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -34,6 +35,12 @@ export default function Layout() {
 
     initializeApp()
   }, [])
+
+  useEffect(() => {
+    checkAuth().then(() => {
+      setIsReady(true)
+    })
+  }, [checkAuth])
 
   useEffect(() => {
     if ((fontsLoaded || fontError) && initialRoute !== null && isReady) {
