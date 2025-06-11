@@ -2,10 +2,10 @@ import { StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Colors } from '@/constants/colors'
 import { fontFamily } from '@/constants/fontFamily'
-import { useUserStore } from '@/store/userStore'
+import useBoundStore from '@/store/useBoundStore'
 
 export default function HomeHeader() {
-  const user = useUserStore((state) => state.user)
+  const user = useBoundStore((state) => state.user)
 
   return (
     <View style={styles.header}>
