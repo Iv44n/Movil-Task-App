@@ -1,12 +1,12 @@
 import { RegisterData, User, UserProfile } from '@/types/user'
 import { getDb } from '../database/Connection'
-import AppError from '@/utils/AppError'
+import { DatabaseError } from '@/errors/AppError'
+import { UserAlreadyExistsError, UserNotFoundError } from '@/errors/AuthErrors'
 
 export const UserRepository = {
   createUser: async ({ username, password }: RegisterData): Promise<UserProfile> => {
-    const db = await getDb()
-
     try {
+      const db = await getDb()
       const user = await db.getFirstAsync<UserProfile>(`
         INSERT INTO users (username, hashedPassword)
         VALUES (?, ?)
@@ -14,33 +14,34 @@ export const UserRepository = {
       `, [username, password])
 
       if(!user){
-        throw new AppError('User not found after creation', 'USER_NOT_FOUND')
+        throw new DatabaseError('Failed to create user')
       }
 
       return user
     } catch (error: any) {
-      if (typeof error.message === 'string' && error.message.includes('UNIQUE constraint failed: users.username')) {
-        throw new AppError('User already exists', 'USER_ALREADY_EXISTS')
+      if (error.message.includes('UNIQUE constraint failed')) {
+        throw new UserAlreadyExistsError()
       }
-
-      throw new AppError('Failed to create user', 'USER_CREATION_FAILED')
+      throw new DatabaseError(error.message)
     }
-
   },
-  getUserByUsername: async (username: string): Promise<User | null> => {
+  getUserByUsername: async (username: string): Promise<User> => {
     try {
       const db = await getDb()
       const user = await db.getFirstAsync<User>(`
         SELECT * FROM users WHERE username = ?;
       `, [username])
 
+      if (!user) {
+        throw new UserNotFoundError()
+      }
+
       return user
     } catch (error: any) {
-      console.log('ERRO_CODE', error.code)
-      throw new Error(`Failed to retrieve user by name: ${error.message || error}`)
+      throw new DatabaseError(error.message)
     }
   },
-  getUserById: async (id: number): Promise<UserProfile | null> => {
+  getUserById: async (id: number): Promise<UserProfile> => {
     try {
       const db = await getDb()
       const user = await db.getFirstAsync<UserProfile>(`
@@ -49,26 +50,12 @@ export const UserRepository = {
       `, [id])
 
       if (!user) {
-        console.log(`User with id "${id}" not found.`)
+        throw new UserNotFoundError()
       }
 
       return user
     } catch (error: any) {
-      console.log('ERRO_CODE', error.code)
-      throw new Error(`Failed to retrieve user by id: ${error.message || error}`)
-    }
-  },
-  existsUserByUsername: async (username: string): Promise<boolean> => {
-    try {
-      const db = await getDb()
-      const row = await db.getFirstAsync<{ user_exists: number }>(`
-        SELECT EXISTS(SELECT 1 FROM users WHERE username = ?) AS user_exists;
-      `, [username])
-
-      return row?.user_exists === 1
-    } catch (error: any) {
-      console.error('existsUserByUsername error:', error)
-      throw new AppError('Failed to check if user exists', 'USER_EXISTS_CHECK_FAILED')
+      throw new DatabaseError(error.message)
     }
   }
 }
