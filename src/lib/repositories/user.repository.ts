@@ -1,6 +1,6 @@
 import { RegisterData, User, UserProfile } from '@/types/user'
 import { getDb } from '../database/Connection'
-import { DatabaseError } from '@/errors/AppError'
+import { AppError, DatabaseError } from '@/errors/AppError'
 import { UserAlreadyExistsError, UserNotFoundError } from '@/errors/AuthErrors'
 
 export const UserRepository = {
@@ -38,6 +38,9 @@ export const UserRepository = {
 
       return user
     } catch (error: any) {
+      if (error instanceof AppError) {
+        throw error
+      }
       throw new DatabaseError(error.message)
     }
   },
@@ -55,6 +58,9 @@ export const UserRepository = {
 
       return user
     } catch (error: any) {
+      if (error instanceof AppError) {
+        throw error
+      }
       throw new DatabaseError(error.message)
     }
   }
