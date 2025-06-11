@@ -1,9 +1,10 @@
 import { Colors } from '@/constants/colors'
-import { useAuth } from '@/hooks/useAuth'
+import useBoundStore from '@/store/useBoundStore'
 import { Button, ScrollView, Text } from 'react-native'
 
 export default function Profile() {
-  const { logout } = useAuth()
+  const logout = useBoundStore((state) => state.logout)
+
   return (
     <ScrollView style={{ padding: 16, backgroundColor: Colors.background }}>
       <Text style={{ color: '#fff', fontSize: 24 }}>Profile Screen</Text>
