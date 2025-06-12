@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useState } from 'react'
 import { useRouter } from 'expo-router'
 import {
   View,
@@ -17,26 +17,14 @@ import EyeOffIcon from '@/components/icons/EyeOffIcon'
 import useBoundStore from '@/store/useBoundStore'
 import { ValidationError } from '@/errors/AppError'
 
-export default function UserLogin() {
+export default function UserRegister() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const {
-    login,
-    setErrorAuth,
-    isAuthenticated,
-    isLoadingAuth,
-    errorAuth
-  } = useBoundStore()
+  const { register, isLoadingAuth, errorAuth, setErrorAuth } = useBoundStore()
   const router = useRouter()
 
-  useEffect(() => {
-    if (isAuthenticated && !isLoadingAuth) {
-      router.replace('(protected)', { withAnchor: true })
-    }
-  }, [isAuthenticated, isLoadingAuth, router])
-
-  const finishLogin = async () => {
+  const finishRegister = async () => {
     const errors = []
 
     if(!username) errors.push('username')
@@ -52,14 +40,14 @@ export default function UserLogin() {
       setErrorAuth(new ValidationError(message, errors))
     }
 
-    await login({
+    await register({
       username: username.trim(),
       password: password.trim()
     })
   }
 
   const getFieldError = (field: string) => {
-    if (!(errorAuth instanceof ValidationError)) return null
+    if(!(errorAuth instanceof ValidationError)) return null
 
     const fields = Array.isArray(errorAuth.field)
       ? errorAuth.field
@@ -69,16 +57,11 @@ export default function UserLogin() {
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-    >
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-      >
+    <ScrollView contentContainerStyle={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}>
         <Text style={styles.label}>Username</Text>
         <TextInput
-          placeholder='Enter your username'
+          placeholder='Choose a username'
           placeholderTextColor={Colors.textSecondary}
           style={[styles.input, {
             backgroundColor: Colors.card,
@@ -97,7 +80,7 @@ export default function UserLogin() {
         <Text style={[styles.label, { marginTop: 8 }]}>Password</Text>
         <View style={styles.inputWrapper}>
           <TextInput
-            placeholder='Enter your password'
+            placeholder='Choose a secure password'
             placeholderTextColor={Colors.textSecondary}
             style={[styles.input, { flex: 1 }]}
             value={password}
@@ -119,22 +102,25 @@ export default function UserLogin() {
 
         <Pressable
           style={styles.loginButton}
-          onPress={finishLogin}
+          onPress={finishRegister}
           disabled={isLoadingAuth}
         >
-          <Text style={styles.loginButtonText}>{isLoadingAuth ? 'Loading...' : 'Login'}</Text>
+          <Text style={styles.loginButtonText}>
+            {isLoadingAuth ? 'Registering...' : 'Register'}
+          </Text>
         </Pressable>
       </KeyboardAvoidingView>
 
       <Pressable
         onPress={() => {
           setErrorAuth(null)
-          router.replace('/register')
+          router.replace('/login')
         }}
         style={styles.registerButton}
       >
-        <Text style={styles.registerButtonText}>Don&apos;t have an account?
-          <Text style={styles.registerButtonTextBold}> Register.</Text>
+        <Text style={styles.registerButtonText}>
+          Already have an account?
+          <Text style={styles.registerButtonTextBold}> Log in.</Text>
         </Text>
       </Pressable>
     </ScrollView>
