@@ -52,7 +52,10 @@ export default function UserLogin() {
       setErrorAuth(new ValidationError(message, errors))
     }
 
-    await login({ username, password })
+    await login({
+      username: username.trim(),
+      password: password.trim()
+    })
   }
 
   const getFieldError = (field: string) => {

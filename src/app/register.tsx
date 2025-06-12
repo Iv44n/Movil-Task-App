@@ -46,7 +46,10 @@ export default function UserRegister() {
       setErrorAuth(new ValidationError(message, errors))
     }
 
-    await register({ username, password })
+    await register({
+      username: username.trim(),
+      password: password.trim()
+    })
   }
 
   const getFieldError = (field: string) => {
