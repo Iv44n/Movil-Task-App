@@ -3,7 +3,7 @@ import { Colors } from '@/constants/colors'
 import { fontFamily } from '@/constants/fontFamily'
 import { useRouter } from 'expo-router'
 import { Storage } from 'expo-sqlite/kv-store'
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 export default function Welcome() {
   const router = useRouter()
@@ -14,8 +14,7 @@ export default function Welcome() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-
+    <View style={styles.container}>
       {/*Need Welcome Image/SVG */}
 
       <Text style={styles.appTitle}>
@@ -33,7 +32,7 @@ export default function Welcome() {
           <ArrowRightIcon color={Colors.textPrimary} />
         </View>
       </Pressable>
-    </ScrollView>
+    </View>
   )
 }
 
