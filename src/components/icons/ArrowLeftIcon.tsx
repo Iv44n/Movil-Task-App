@@ -1,6 +1,6 @@
 import Svg, { Path } from 'react-native-svg'
 
-export default function ArrowLeft({ color }: { color: string }) {
+export default function ArrowLeftIcon({ color }: { color: string }) {
   return (
     <Svg
       width={22}
