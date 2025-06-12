@@ -3,7 +3,7 @@ import { initDatabase } from '@/lib/database/init'
 import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { fontFamily } from '@/constants/fontFamily'
 import Storage from 'expo-sqlite/kv-store'
@@ -21,45 +21,47 @@ export default function Layout() {
     [fontFamily.bold]: require('../../assets/fonts/Manrope-Bold.ttf'),
     [fontFamily.extraBold]: require('../../assets/fonts/Manrope-ExtraBold.ttf')
   })
-  const [initialRoute, setInitialRoute] = useState<string | null>(null)
+
+  const initialRouteRef = useRef<string | null>(null)
   const checkAuth = useBoundStore((state) => state.checkAuth)
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
+    let mounted = true
     const initializeApp = async () => {
-      await initDatabase()
 
-      const welcomeDone = await Storage.getItem('welcomeDone')
-      setInitialRoute(welcomeDone === 'true' ? '(protected)' : 'welcome')
+      const [welcomeDone] = await Promise.all([
+        Storage.getItem('welcomeDone'),
+        initDatabase(),
+        checkAuth()
+      ])
+
+      initialRouteRef.current = welcomeDone === 'true'
+        ? '(protected)'
+        : 'welcome'
+
+      if (mounted) setIsReady(true)
     }
 
     initializeApp()
-  }, [])
 
-  useEffect(() => {
-    checkAuth().then(() => {
-      setIsReady(true)
-    })
+    return () => {
+      mounted = false
+    }
   }, [checkAuth])
 
   useEffect(() => {
-    if ((fontsLoaded || fontError) && initialRoute !== null && isReady) {
+    if ((fontsLoaded || fontError) && initialRouteRef.current && isReady) {
       SplashScreen.hideAsync()
     }
-  }, [fontsLoaded, fontError, initialRoute, isReady])
+  }, [fontsLoaded, fontError, isReady])
 
-  if ((!fontsLoaded && !fontError) || initialRoute === null || !isReady) {
-    return null
-  }
+  if ((!fontsLoaded && !fontError) || !initialRouteRef.current || !isReady) return null
 
   return (
-    <SafeAreaView style={{
-      flex: 1,
-      backgroundColor: Colors.background
-    }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
       <StatusBar style='inverted' />
-      <Stack initialRouteName={initialRoute}>
+      <Stack initialRouteName={initialRouteRef.current}>
         <Stack.Screen
           name='welcome'
           options={{
@@ -70,21 +72,14 @@ export default function Layout() {
           name='(protected)'
           options={{
             headerShown: false,
-            animation: 'none'
+            animation: 'simple_push'
           }}
         />
         <Stack.Screen
-          name='login'
+          name='(auth)'
           options={{
             headerShown: false,
-            animation: 'none'
-          }}
-        />
-        <Stack.Screen
-          name='register'
-          options={{
-            headerShown: false,
-            animation: 'none'
+            animation: 'fade_from_bottom'
           }}
         />
       </Stack>
