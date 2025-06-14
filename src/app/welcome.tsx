@@ -1,9 +1,10 @@
-import ArrowRightIcon from '@/components/icons/ArrowRight'
-import { Colors } from '@/constants/colors'
-import { fontFamily } from '@/constants/fontFamily'
+import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
+import ScreenWrapper from '@/components/ScreenWrapper'
+import Typo from '@/components/Typo'
+import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { useRouter } from 'expo-router'
 import { Storage } from 'expo-sqlite/kv-store'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 
 export default function Welcome() {
   const router = useRouter()
@@ -14,72 +15,50 @@ export default function Welcome() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={{ justifyContent: 'center' }}>
       {/*Need Welcome Image/SVG */}
 
-      <Text style={styles.appTitle}>
-        <Text style={styles.titleHighlight}>Organize</Text>{'\n'}
+      <Typo size={30} fontWeight='semiBold'>
+        <Typo size={30} fontWeight='extraBold' color={Colors.green}>Organize</Typo>{'\n'}
         your projects and tasks
-      </Text>
+      </Typo>
 
-      <Text style={styles.appDescription}>
+      <Typo
+        size={16}
+        color={Colors.textSecondary}
+        style={{
+          marginTop: Sizes.spacing.s7,
+          marginBottom: Sizes.spacing.s21
+        }}
+      >
         Manage projects and standalone tasks—from daily routines and habits to complex workflows. Define start and due dates, break down work into subtasks, and track progress at a glance.
-      </Text>
+      </Typo>
 
       <Pressable style={styles.button} onPress={finishWelcome}>
-        <Text style={styles.buttonText}>Get Started</Text>
+        <Typo size={16} color={Colors.textBlack} fontWeight='medium'>Get Started</Typo>
         <View style={styles.iconWrapper}>
           <ArrowRightIcon color={Colors.textPrimary} />
         </View>
       </Pressable>
-    </View>
+    </ScreenWrapper>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    backgroundColor: Colors.background,
-    padding: 24
-  },
-  appTitle: {
-    fontSize: 30,
-    color: Colors.textPrimary,
-    fontFamily: fontFamily.semiBold,
-    marginBottom: 14
-  },
-  titleHighlight: {
-    color: Colors.green,
-    fontFamily: fontFamily.extraBold
-  },
-  appDescription: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontFamily: fontFamily.regular,
-    marginBottom: 24,
-    lineHeight: 25
-  },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 15,
     backgroundColor: Colors.yellow,
-    paddingVertical: 4,
-    paddingRight: 5,
-    paddingLeft: 24,
-    borderRadius: 50,
+    paddingVertical: Sizes.spacing.s5,
+    paddingRight: Sizes.spacing.s5,
+    paddingLeft: Sizes.spacing.s21,
+    borderRadius: Shapes.rounded.large,
     alignSelf: 'flex-start'
   },
-  buttonText: {
-    fontSize: 16,
-    color: Colors.textBlack,
-    fontWeight: '600',
-    fontFamily: fontFamily.medium
-  },
   iconWrapper: {
+    marginLeft: Sizes.spacing.s15,
     backgroundColor: Colors.background,
-    padding: 12,
-    borderRadius: 999
+    padding: Sizes.spacing.s11,
+    borderRadius: Shapes.rounded.full
   }
 })
