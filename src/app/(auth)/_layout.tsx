@@ -1,8 +1,7 @@
-import { Colors } from '@/constants/colors'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import useBoundStore from '@/store/useBoundStore'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect } from 'react'
-import { View } from 'react-native'
 
 export default function AuthLayout () {
   const isAuthenticated = useBoundStore((state) => state.isAuthenticated)
@@ -15,21 +14,16 @@ export default function AuthLayout () {
   }, [isAuthenticated, router])
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <ScreenWrapper>
       <Stack
         screenOptions={{
-          headerShown: false
+          headerShown: false,
+          animation: 'none'
         }}
       >
-        <Stack.Screen
-          name='login'
-          options={{ animation: 'fade_from_bottom' }}
-        />
-        <Stack.Screen
-          name='register'
-          options={{ animation: 'fade_from_bottom' }}
-        />
+        <Stack.Screen name='login'/>
+        <Stack.Screen name='register'/>
       </Stack>
-    </View>
+    </ScreenWrapper>
   )
 }

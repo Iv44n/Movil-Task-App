@@ -1,11 +1,10 @@
-import { Colors } from '@/constants/colors'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import HomeScreen from '@/screens/Home'
-import { ScrollView } from 'react-native'
 
 export default function Index() {
   return (
-    <ScrollView style={{ padding: 16, backgroundColor: Colors.background }}>
+    <ScreenWrapper paddingHorizontal={0} isScrollable={true}>
       <HomeScreen />
-    </ScrollView>
+    </ScreenWrapper>
   )
 }

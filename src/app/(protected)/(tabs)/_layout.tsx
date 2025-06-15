@@ -1,13 +1,13 @@
 import { Tabs } from 'expo-router'
 import { Dimensions, StyleSheet, View } from 'react-native'
-import { Colors } from '@/constants/colors'
+import { Colors, Shapes, Sizes } from '@/constants/theme'
 import HomeIcon from '@/components/icons/HomeIcon'
 import UserIcon from '@/components/icons/UserIcon'
 
 export default function TabsLayout() {
   const SCREEN_WIDTH = Dimensions.get('window').width
-  const TAB_BAR_WIDTH = 120
-  const TAB_BAR_HEIGHT = 60
+  const TAB_BAR_WIDTH = Sizes.width.w131
+  const TAB_BAR_HEIGHT = Sizes.height.h57
   const horizontalOffset = (SCREEN_WIDTH - TAB_BAR_WIDTH) / 2
 
   return (
@@ -19,9 +19,9 @@ export default function TabsLayout() {
         tabBarStyle: {
           height: TAB_BAR_HEIGHT,
           backgroundColor: Colors.card,
-          borderRadius: 50,
+          borderRadius: Shapes.rounded.large,
           position: 'absolute',
-          bottom: 30,
+          bottom: Sizes.spacing.s17,
           borderColor: Colors.border,
           borderWidth: 1,
           borderTopWidth: 1,
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: '100%',
     height: '100%',
-    borderRadius: 999,
+    borderRadius: Shapes.rounded.full,
     justifyContent: 'center',
     alignItems: 'center'
   },

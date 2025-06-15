@@ -1,25 +1,23 @@
-import { Colors } from '@/constants/colors'
 import { initDatabase } from '@/lib/database/init'
 import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { fontFamily } from '@/constants/fontFamily'
 import Storage from 'expo-sqlite/kv-store'
 import useBoundStore from '@/store/useBoundStore'
+import { Typography } from '@/constants/theme'
+import LayoutBase from '@/components/LayoutBase'
 
 SplashScreen.preventAutoHideAsync()
 
 export default function Layout() {
   const [fontsLoaded, fontError] = useFonts({
-    [fontFamily.extraLight]: require('../../assets/fonts/Manrope-ExtraLight.ttf'),
-    [fontFamily.light]: require('../../assets/fonts/Manrope-Light.ttf'),
-    [fontFamily.regular]: require('../../assets/fonts/Manrope-Regular.ttf'),
-    [fontFamily.medium]: require('../../assets/fonts/Manrope-Medium.ttf'),
-    [fontFamily.semiBold]: require('../../assets/fonts/Manrope-SemiBold.ttf'),
-    [fontFamily.bold]: require('../../assets/fonts/Manrope-Bold.ttf'),
-    [fontFamily.extraBold]: require('../../assets/fonts/Manrope-ExtraBold.ttf')
+    [Typography.fontFamily.extraLight]: require('../../assets/fonts/Manrope-ExtraLight.ttf'),
+    [Typography.fontFamily.light]: require('../../assets/fonts/Manrope-Light.ttf'),
+    [Typography.fontFamily.regular]: require('../../assets/fonts/Manrope-Regular.ttf'),
+    [Typography.fontFamily.medium]: require('../../assets/fonts/Manrope-Medium.ttf'),
+    [Typography.fontFamily.semiBold]: require('../../assets/fonts/Manrope-SemiBold.ttf'),
+    [Typography.fontFamily.bold]: require('../../assets/fonts/Manrope-Bold.ttf'),
+    [Typography.fontFamily.extraBold]: require('../../assets/fonts/Manrope-ExtraBold.ttf')
   })
 
   const initialRouteRef = useRef<string | null>(null)
@@ -59,8 +57,7 @@ export default function Layout() {
   if ((!fontsLoaded && !fontError) || !initialRouteRef.current || !isReady) return null
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
-      <StatusBar style='inverted' />
+    <LayoutBase>
       <Stack initialRouteName={initialRouteRef.current}>
         <Stack.Screen
           name='welcome'
@@ -72,17 +69,17 @@ export default function Layout() {
           name='(protected)'
           options={{
             headerShown: false,
-            animation: 'simple_push'
+            animation: 'fade'
           }}
         />
         <Stack.Screen
           name='(auth)'
           options={{
             headerShown: false,
-            animation: 'fade_from_bottom'
+            animation: 'fade'
           }}
         />
       </Stack>
-    </SafeAreaView>
+    </LayoutBase>
   )
 }

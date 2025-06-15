@@ -1,3 +1,4 @@
+import ScreenWrapper from '@/components/ScreenWrapper'
 import useBoundStore from '@/store/useBoundStore'
 import { Redirect, Stack } from 'expo-router'
 
@@ -9,11 +10,13 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen
-        name='(tabs)'
-        options={{ headerShown: false }}
-      />
-    </Stack>
+    <ScreenWrapper>
+      <Stack>
+        <Stack.Screen
+          name='(tabs)'
+          options={{ headerShown: false }}
+        />
+      </Stack>
+    </ScreenWrapper>
   )
 }
