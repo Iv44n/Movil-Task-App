@@ -1,13 +1,18 @@
 import Svg, { G, Path } from 'react-native-svg'
+import { IconProps } from '.'
+import { Colors } from '@/constants/theme'
 
-export default function HomeIcon({ color }: { color: string }) {
+export default function HomeIcon({
+  color = Colors.textPrimary,
+  size = 25
+}: IconProps) {
   return (
     <Svg
-      width={24}
-      height={24}
+      width={size}
+      height={size}
       fill='none'
       stroke={color}
-      viewBox='0 0 24 24'
+      viewBox='1 0 23 23'
       strokeWidth={0.5}
     >
       <G fill={color}>

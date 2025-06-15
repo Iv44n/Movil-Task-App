@@ -1,12 +1,17 @@
 import Svg, { Path } from 'react-native-svg'
+import { IconProps } from '.'
+import { Colors } from '@/constants/theme'
 
-export default function ArrowRightUpIcon({ color }: { color: string }) {
+export default function ArrowRightUpIcon({
+  color = Colors.textPrimary,
+  size = 25
+}: IconProps) {
   return (
     <Svg
-      width={24}
-      height={24}
+      width={size}
+      height={size}
       fill='none'
-      viewBox='0 0 24 24'
+      viewBox='1 0 23 23'
     >
       <Path
         fill={color}

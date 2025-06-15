@@ -1,11 +1,16 @@
 import Svg, { G, Path } from 'react-native-svg'
+import { IconProps } from '.'
+import { Colors } from '@/constants/theme'
 
-export default function ProgressIcon ({ color }: { color: string }) {
+export default function ProgressIcon ({
+  color = Colors.textPrimary,
+  size = 25
+}: IconProps) {
   return(
     <Svg
-      width={30}
-      height={30}
-      viewBox='0.5 -0.5 24 24'
+      width={size}
+      height={size}
+      viewBox='1 0 23 23'
       fill='none'
     >
       <G
