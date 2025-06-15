@@ -16,9 +16,9 @@ function generateSizes<T extends readonly number[], P extends string>(
 
 // ==== Bases ====
 
-const spacingBase = [3, 5, 7, 9, 11, 13, 15, 17, 21] as const
-const widthBase = [31, 225] as const
-const heightBase = [5, 191] as const
+const spacingBase = [3, 5, 7, 9, 11, 13, 15, 17, 21, 71] as const
+const widthBase = [31, 131, 225] as const
+const heightBase = [5, 57, 191] as const
 
 // ==== Colors ====
 
