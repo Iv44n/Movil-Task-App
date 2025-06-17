@@ -20,11 +20,16 @@ export default {
         project_id    INTEGER  PRIMARY KEY AUTOINCREMENT,
         name          TEXT     NOT NULL UNIQUE,
         description   TEXT     NULL,
+        bg_color      TEXT     NOT NULL DEFAULT '#fff',
         created_date  DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        updated_date  DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
         user_id       INTEGER  NOT NULL,
+        category_id   INTEGER  NOT NULL,
         FOREIGN KEY (user_id)
           REFERENCES users (user_id)
-          ON DELETE CASCADE
+          ON DELETE CASCADE,
+        FOREIGN KEY (category_id)
+          REFERENCES categories (category_id)
       );
     `)
 
@@ -37,10 +42,9 @@ export default {
     `)
 
     await db.execAsync(`
-      CREATE TABLE IF NOT EXISTS tags (
-        tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name   TEXT    NOT NULL UNIQUE,
-        color  TEXT    NOT NULL
+      CREATE TABLE IF NOT EXISTS categories (
+        category_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        category_name TEXT    NOT NULL UNIQUE
       );
     `)
 
@@ -74,18 +78,18 @@ export default {
     `)
 
     await db.execAsync(`
-      CREATE TABLE IF NOT EXISTS task_tags (
-        task_id INTEGER NOT NULL,
-        tag_id  INTEGER NOT NULL,
+      CREATE TABLE IF NOT EXISTS project_categories (
+        project_id   INTEGER NOT NULL,
+        category_id  INTEGER NOT NULL,
 
-        PRIMARY KEY (task_id, tag_id),
+        PRIMARY KEY (project_id, category_id),
 
-        FOREIGN KEY (task_id)
-          REFERENCES tasks (task_id)
+        FOREIGN KEY (project_id)
+          REFERENCES projects (project_id)
           ON DELETE CASCADE,
 
-        FOREIGN KEY (tag_id)
-          REFERENCES tags (tag_id)
+        FOREIGN KEY (category_id)
+          REFERENCES categories (category_id)
           ON DELETE CASCADE
       );
     `)
