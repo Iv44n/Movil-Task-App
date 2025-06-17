@@ -18,4 +18,12 @@ export interface AuthSlice {
   setErrorAuth: (error: AppError | null) => void
 }
 
-export type RootState = UserSlice & AuthSlice
+export interface ProjectSlice {
+  projects: Project[] | []
+  isLoadingProjects: boolean
+  errorProjects: AppError | null
+  getProjects: () => Promise<void>
+  deleteProjectById: (projectId: number) => Promise<void>
+}
+
+export type RootState = UserSlice & AuthSlice & ProjectSlice
