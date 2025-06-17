@@ -5,6 +5,7 @@ import Typo from '@/components/Typo'
 
 export default function HomeHeader() {
   const user = useBoundStore((state) => state.user)
+  const projectsLength = useBoundStore((state) => state.projects.length)
 
   return (
     <View style={styles.header}>
@@ -24,7 +25,7 @@ export default function HomeHeader() {
           fontWeight='semiBold'
           style={{ textDecorationLine: 'underline' }}
         >
-          4 Projects
+          {projectsLength} Projects
         </Typo>
       </View>
       {/*       <View style={styles.iconContainer}>

@@ -1,21 +1,19 @@
 import ArrowRightUpIcon from '@/components/icons/ArrowRightUpIcon'
 import Typo from '@/components/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { Project } from '@/types/project'
 import { Link } from 'expo-router'
 import { Pressable, StyleSheet, View } from 'react-native'
 
-interface ProjectCardTypes {
-  title: string
-  category: string
-  progress: number
-  color: string
-}
+export default function ProjectCard({ category, bgColor, ...info }: Project) {
+  const [first, ...rest] = info.name.split(' ')
 
-export default function ProjectCard(project: ProjectCardTypes) {
-  const [first, ...rest] = project.title.split(' ')
+  const progressPercentage = !info.details?.totalTasks || info.details?.totalTasks === 0
+    ? 0
+    : (info.details?.completedTasks / info.details?.totalTasks) * 100
 
   return(
-    <View style={[styles.mainCard, { backgroundColor: project.color }]}>
+    <View style={[styles.mainCard, { backgroundColor: bgColor }]}>
       <View>
         <Typo
           size={11}
@@ -29,7 +27,7 @@ export default function ProjectCard(project: ProjectCardTypes) {
             <View
               style={[
                 styles.progressBarFill,
-                { width: `${project.progress}%` }
+                { width: `${progressPercentage}%` }
               ]}
             />
           </View>
@@ -39,37 +37,43 @@ export default function ProjectCard(project: ProjectCardTypes) {
             color={Colors.textBlack}
             style={{ marginBottom: Sizes.spacing.s3 }}
           >
-            {project.progress}%
+            {progressPercentage}%
           </Typo>
         </View>
       </View>
 
       <View style={styles.footerCard}>
         <View style={styles.projectInfo}>
-          <Typo
-            size={23}
-            fontWeight='bold'
-            color={Colors.textBlack}
-            style={{ maxWidth: '80%' }}
-            textProps={{ ellipsizeMode: 'tail', numberOfLines: 2 }}
-          >
+          <View>
             <Typo
               color={Colors.textBlack}
               size={23}
             >
               {first}
-            </Typo> {rest.join(' ')}
-          </Typo>
+            </Typo>
+            <Typo
+              size={23}
+              fontWeight='bold'
+              color={Colors.textBlack}
+              style={{ maxWidth: Sizes.width.w225 - 100 }}
+              textProps={{ ellipsizeMode: 'tail', numberOfLines: 1 }}
+            >
+              {rest.join(' ')}
+            </Typo>
+          </View>
           <Typo
             size={15}
             color={Colors.textSecondary}
             fontWeight='medium'
             textProps={{ ellipsizeMode: 'tail', numberOfLines: 1 }}
           >
-            {project.category}
+            {category.name}
           </Typo>
         </View>
-        <Link href='project' asChild>
+        <Link
+          href={`project/${info.projectId}`}
+          asChild
+        >
           <Pressable style={styles.arrowButton}>
             <ArrowRightUpIcon color={Colors.textPrimary} />
           </Pressable>
