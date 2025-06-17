@@ -1,5 +1,5 @@
 import { AppError } from '@/errors/AppError'
-import { AuthService } from '@/lib/services/auth.sevice'
+import { AuthService } from '@/lib/services/auth.service'
 import { StateCreator } from 'zustand'
 import { AuthSlice, RootState } from '../types'
 
@@ -63,6 +63,7 @@ export const authSlice: StateCreatorType = (set, get) => ({
   checkAuth: async () => {
     set({ isLoadingAuth: true, errorAuth: null })
 
+    console.log('check auth')
     try {
       const userData = await AuthService.getSession()
       get().setUser(userData)
