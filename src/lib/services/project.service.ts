@@ -2,7 +2,6 @@ import { AppError } from '@/errors/AppError'
 import { ProjectRepository } from '../repositories/project.repository'
 import { Project } from '@/types/project'
 import { TaskService } from './task.service'
-import { Task } from '@/types/task'
 
 export const ProjectService = {
   getProjects: async (userId: number): Promise<Project[]> => {

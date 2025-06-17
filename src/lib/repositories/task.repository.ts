@@ -15,15 +15,14 @@ export const TaskRepository = {
           t.status,
           t.due_date AS dueDate,
           t.created_date AS createdDate,
-          t.updated_date AS updatedDate,
           t.project_id AS projectId,
           t.assigned_user_id AS assignedUserId,
           t.is_recurring AS isRecurring,
           t.project_id AS projectId,
           json_object(
             'id', p.priority_id,
-            'name', p.priority_name,
-            'level', p.level
+            'name', p.level,
+            'color', p.color
           ) AS priority
         FROM tasks AS t
         LEFT JOIN priorities AS p ON p.priority_id = t.priority_id
