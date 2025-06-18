@@ -14,7 +14,16 @@ export default function ProtectedLayout() {
       <Stack>
         <Stack.Screen
           name='(tabs)'
-          options={{ headerShown: false }}
+          options={{
+            headerShown: false,
+            animation: 'fade'
+          }}
+        />
+        <Stack.Screen
+          name='project/[id]'
+          options={{
+            animation: 'fade'
+          }}
         />
       </Stack>
     </ScreenWrapper>
