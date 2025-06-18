@@ -1,4 +1,4 @@
-import { Colors, Sizes } from '@/constants/theme'
+import { Colors } from '@/constants/theme'
 import React from 'react'
 import {
   ScrollView,
@@ -18,12 +18,10 @@ interface ScreenWrapperProps {
 export default function ScreenWrapper({
   children,
   isScrollable = false,
-  style,
-  paddingHorizontal = Sizes.spacing.s9
+  style
 }: ScreenWrapperProps) {
   const containerStyle: StyleProp<ViewStyle> = [
     styles.base,
-    { paddingHorizontal },
     style
   ]
 
@@ -31,7 +29,7 @@ export default function ScreenWrapper({
     return (
       <ScrollView
         style={styles.scrollBackground}
-        contentContainerStyle={[{ flexGrow: 1, paddingHorizontal }, style]}
+        contentContainerStyle={[{ flexGrow: 1 }, style]}
         keyboardShouldPersistTaps='handled'
         showsVerticalScrollIndicator={false}
       >
