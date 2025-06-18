@@ -58,27 +58,16 @@ export default function Layout() {
 
   return (
     <LayoutBase>
-      <Stack initialRouteName={initialRouteRef.current}>
-        <Stack.Screen
-          name='welcome'
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name='(protected)'
-          options={{
-            headerShown: false,
-            animation: 'fade'
-          }}
-        />
-        <Stack.Screen
-          name='(auth)'
-          options={{
-            headerShown: false,
-            animation: 'fade'
-          }}
-        />
+      <Stack
+        initialRouteName={initialRouteRef.current}
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: 'transparent' }
+        }}
+      >
+        <Stack.Screen name='welcome' options={{ animation: 'fade' }}/>
+        <Stack.Screen name='(protected)' options={{ animation: 'fade' }} />
+        <Stack.Screen name='(auth)' options={{ animation: 'fade' }}/>
       </Stack>
     </LayoutBase>
   )

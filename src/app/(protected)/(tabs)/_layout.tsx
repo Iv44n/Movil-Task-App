@@ -10,11 +10,13 @@ export default function TabsLayout() {
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
-        headerShown: false
+        headerShown: false,
+        sceneStyle: { backgroundColor: 'transparent' }
       }}
     >
       <Tabs.Screen
-        name='index' options={{
+        name='index'
+        options={{
           title: 'Home',
           tabBarIcon: ({ color, focused, size }) => (
             <View style={[styles.iconContainer, focused && styles.iconActive]}>

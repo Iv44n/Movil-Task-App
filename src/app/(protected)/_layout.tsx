@@ -1,4 +1,3 @@
-import ScreenWrapper from '@/components/ScreenWrapper'
 import useBoundStore from '@/store/useBoundStore'
 import { Redirect, Stack } from 'expo-router'
 
@@ -10,22 +9,27 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <ScreenWrapper>
-      <Stack>
-        <Stack.Screen
-          name='(tabs)'
-          options={{
-            headerShown: false,
-            animation: 'fade'
-          }}
-        />
-        <Stack.Screen
-          name='project/[id]'
-          options={{
-            animation: 'fade'
-          }}
-        />
-      </Stack>
-    </ScreenWrapper>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: 'transparent' }
+      }}
+    >
+      <Stack.Screen
+        name='(tabs)'
+        options={{ animation: 'fade' }}
+      />
+      <Stack.Screen
+        name='project/[id]'
+        options={{ animation: 'fade' }}
+      />
+      <Stack.Screen
+        name='project/create'
+        options={{
+          animation: 'fade_from_bottom',
+          presentation: 'modal'
+        }}
+      />
+    </Stack>
   )
 }

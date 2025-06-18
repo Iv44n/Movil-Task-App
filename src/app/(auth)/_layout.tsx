@@ -1,4 +1,3 @@
-import ScreenWrapper from '@/components/ScreenWrapper'
 import useBoundStore from '@/store/useBoundStore'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect } from 'react'
@@ -14,16 +13,15 @@ export default function AuthLayout () {
   }, [isAuthenticated, router])
 
   return (
-    <ScreenWrapper>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: 'none'
-        }}
-      >
-        <Stack.Screen name='login'/>
-        <Stack.Screen name='register'/>
-      </Stack>
-    </ScreenWrapper>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'none',
+        contentStyle: { backgroundColor: 'transparent' }
+      }}
+    >
+      <Stack.Screen name='login'/>
+      <Stack.Screen name='register'/>
+    </Stack>
   )
 }
