@@ -1,49 +1,24 @@
 import { Tabs } from 'expo-router'
-import { Dimensions, StyleSheet, View } from 'react-native'
-import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { StyleSheet, View } from 'react-native'
+import { Colors, Shapes } from '@/constants/theme'
 import HomeIcon from '@/components/icons/HomeIcon'
 import UserIcon from '@/components/icons/UserIcon'
+import TabBar from '@/components/TabBar'
 
 export default function TabsLayout() {
-  const SCREEN_WIDTH = Dimensions.get('window').width
-  const TAB_BAR_WIDTH = Sizes.width.w131
-  const TAB_BAR_HEIGHT = Sizes.height.h57
-  const horizontalOffset = (SCREEN_WIDTH - TAB_BAR_WIDTH) / 2
-
   return (
     <Tabs
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: Colors.textBlack,
-        tabBarInactiveTintColor: Colors.textSecondary,
-        headerShown: false,
-        tabBarStyle: {
-          height: TAB_BAR_HEIGHT,
-          backgroundColor: Colors.card,
-          borderRadius: Shapes.rounded.large,
-          position: 'absolute',
-          bottom: Sizes.spacing.s17,
-          borderColor: Colors.border,
-          borderWidth: 1,
-          borderTopWidth: 1,
-          paddingBottom: 0,
-          alignContent: 'center',
-          marginHorizontal: horizontalOffset
-        },
-        tabBarShowLabel: false,
-        tabBarIconStyle: {
-          alignSelf: 'center',
-          width: '100%',
-          height: '100%',
-          fontWeight: 'bold'
-        }
+        headerShown: false
       }}
     >
       <Tabs.Screen
         name='index' options={{
           title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color, focused, size }) => (
             <View style={[styles.iconContainer, focused && styles.iconActive]}>
-              <HomeIcon color={color} />
+              <HomeIcon color={color} size={size}/>
             </View>
           )
         }}
@@ -51,9 +26,9 @@ export default function TabsLayout() {
       <Tabs.Screen
         name='profile' options={{
           title: 'Profile',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color, focused, size }) => (
             <View style={[styles.iconContainer, focused && styles.iconActive]}>
-              <UserIcon color={color} />
+              <UserIcon color={color} size={size}/>
             </View>
           )
         }}
@@ -71,6 +46,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   iconActive: {
+    borderRadius: Shapes.rounded.full,
     backgroundColor: Colors.yellow
   }
 })
