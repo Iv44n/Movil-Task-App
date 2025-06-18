@@ -7,7 +7,7 @@ export default function HorizontalDotMenuIcon({
   color = Colors.textPrimary
 }: IconProps) {
   const radius = 2
-  const centerY = 15
+  const centerY = 12.25
 
   return (
     <Svg width={size} height={size} viewBox='0 0 23 23' fill='none'>
