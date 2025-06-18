@@ -20,9 +20,8 @@ export interface AuthSlice {
 
 export interface ProjectSlice {
   projects: Project[] | []
-  isLoadingProjects: boolean
-  errorProjects: AppError | null
-  getProjects: () => Promise<void>
+  getProjects: () => Promise<void>,
+  getProjectWithTasksById: (projectId: number) => Promise<Project>,
   deleteProjectById: (projectId: number) => Promise<void>
 }
 

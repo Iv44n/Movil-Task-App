@@ -11,15 +11,26 @@ const SCREEN_WIDTH = Dimensions.get('window').width
 
 export default function ProjectsSlider() {
   const [showAddButton, setShowAddButton] = useState<boolean>(false)
-  const { projects, isLoading, getProjects } = useBoundStore(useShallow(state => ({
+  const { projects, getProjects } = useBoundStore(useShallow(state => ({
     projects: state.projects,
-    isLoading: state.isLoadingProjects,
     getProjects: state.getProjects
   })))
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const scrollRef = React.useRef<ScrollView>(null)
 
   useEffect(() => {
-    getProjects()
+    const fetchProjects = async () => {
+      setIsLoading(true)
+      try {
+        await getProjects()
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProjects()
   }, [getProjects])
 
   useEffect(() => {
