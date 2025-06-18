@@ -25,7 +25,8 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "^4.11.1",
     "react-native-svg": "15.11.2",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.5",
+    "expo-blur": "~14.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
