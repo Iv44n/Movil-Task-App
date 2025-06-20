@@ -22,7 +22,7 @@ export default function FormField({
       <Typo
         size={15}
         fontWeight='medium'
-        style={{ marginLeft: Sizes.spacing.s7, marginBottom: Sizes.spacing.s5 }}
+        style={{ marginLeft: 1, marginBottom: Sizes.spacing.s7 }}
       >
         {label}
       </Typo>
