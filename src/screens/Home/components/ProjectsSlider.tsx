@@ -6,6 +6,7 @@ import Typo from '@/components/Typo'
 import useBoundStore from '@/store/useBoundStore'
 import { useShallow } from 'zustand/shallow'
 import { Project } from '@/types/project'
+import { Link } from 'expo-router'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 
@@ -79,9 +80,15 @@ export default function ProjectsSlider() {
             onScrollEndDrag={handleScrollEnd}
           >
             {showAddButton && (
-              <Pressable style={styles.addButton}>
-                <Typo size={29} fontWeight='medium'>+</Typo>
-              </Pressable>
+              <Link
+                href='/project/create'
+                style={styles.addButton}
+                asChild
+              >
+                <Pressable>
+                  <Typo size={29} fontWeight='medium'>+</Typo>
+                </Pressable>
+              </Link>
             )}
             {
               projects.map((project: Project) => (
@@ -93,34 +100,38 @@ export default function ProjectsSlider() {
             }
           </Animated.ScrollView>
         ) : (
-          <Pressable
+          <Link
+            href='/project/create'
             style={{
               height: Sizes.height.h191,
-              alignItems: 'center',
-              justifyContent: 'center',
               borderColor: Colors.border,
               borderWidth: 1,
+              borderRadius: Shapes.rounded.medium,
               backgroundColor: Colors.card,
-              borderRadius: Shapes.rounded.medium
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
+            asChild
           >
-            <Typo
-              size={17}
-              fontWeight='medium'
-              color={Colors.textSecondary}
-              style={{ marginBottom: Sizes.spacing.s3 }}
-            >
-              You have no projects
-            </Typo>
-            <Typo
-              size={15}
-              fontWeight='regular'
-              color={Colors.textPrimary}
-              style={{ textDecorationLine: 'underline' }}
-            >
-              Tap to create one
-            </Typo>
-          </Pressable>
+            <Pressable>
+              <Typo
+                size={17}
+                fontWeight='medium'
+                color={Colors.textSecondary}
+                style={{ marginBottom: Sizes.spacing.s3 }}
+              >
+                You have no projects
+              </Typo>
+              <Typo
+                size={15}
+                fontWeight='regular'
+                color={Colors.textPrimary}
+                style={{ textDecorationLine: 'underline' }}
+              >
+                Tap to create one
+              </Typo>
+            </Pressable>
+          </Link>
 
         )
       }
