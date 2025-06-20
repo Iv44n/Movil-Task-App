@@ -48,7 +48,7 @@ function Typo({
   const fontFamily = getFontFamilyFromWeight(fontWeight)
 
   const textStyle: TextStyle = {
-    fontSize: moderateScale(size || 16),
+    fontSize: moderateScale(size || 15),
     color,
     fontFamily,
     ...style
