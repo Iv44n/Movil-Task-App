@@ -28,9 +28,10 @@ export default function Layout() {
     let mounted = true
     const initializeApp = async () => {
 
+      await initDatabase()
+
       const [welcomeDone] = await Promise.all([
         Storage.getItem('welcomeDone'),
-        initDatabase(),
         checkAuth()
       ])
 
