@@ -63,7 +63,6 @@ export const authSlice: StateCreatorType = (set, get) => ({
   checkAuth: async () => {
     set({ isLoadingAuth: true, errorAuth: null })
 
-    console.log('check auth')
     try {
       const userData = await AuthService.getSession()
       get().setUser(userData)
