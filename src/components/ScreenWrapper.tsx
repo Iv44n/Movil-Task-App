@@ -1,6 +1,7 @@
-import { Colors } from '@/constants/theme'
+import { Colors, Sizes } from '@/constants/theme'
 import React from 'react'
 import {
+  Platform,
   ScrollView,
   StyleProp,
   StyleSheet,
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background
   },
   scrollBackground: {
+    paddingHorizontal: Platform.OS === 'ios' ? Sizes.spacing.s9 : 0,
     backgroundColor: Colors.background
   }
 })
