@@ -6,6 +6,8 @@ import Storage from 'expo-sqlite/kv-store'
 import useBoundStore from '@/store/useBoundStore'
 import { Typography } from '@/constants/theme'
 import LayoutBase from '@/components/LayoutBase'
+import { View } from 'react-native'
+import OverlayHost from '@/components/OverlayHost'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -58,18 +60,21 @@ export default function Layout() {
   if ((!fontsLoaded && !fontError) || !initialRouteRef.current || !isReady) return null
 
   return (
-    <LayoutBase>
-      <Stack
-        initialRouteName={initialRouteRef.current}
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' }
-        }}
-      >
-        <Stack.Screen name='welcome' options={{ animation: 'fade' }}/>
-        <Stack.Screen name='(protected)' options={{ animation: 'fade' }} />
-        <Stack.Screen name='(auth)' options={{ animation: 'fade' }}/>
-      </Stack>
-    </LayoutBase>
+    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+      <OverlayHost />
+      <LayoutBase>
+        <Stack
+          initialRouteName={initialRouteRef.current}
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: 'transparent' }
+          }}
+        >
+          <Stack.Screen name='welcome' options={{ animation: 'fade' }}/>
+          <Stack.Screen name='(protected)' options={{ animation: 'fade' }} />
+          <Stack.Screen name='(auth)' options={{ animation: 'fade' }}/>
+        </Stack>
+      </LayoutBase>
+    </View>
   )
 }
