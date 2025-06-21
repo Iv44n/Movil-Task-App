@@ -20,9 +20,21 @@ export interface AuthSlice {
 
 export interface ProjectSlice {
   projects: Project[] | []
+  createProject: (project: Omit<NewProject, 'userId'>) => Promise<Project>,
   getProjects: () => Promise<void>,
   getProjectWithTasksById: (projectId: number) => Promise<Project>,
   deleteProjectById: (projectId: number) => Promise<void>
 }
 
-export type RootState = UserSlice & AuthSlice & ProjectSlice
+export interface CategorySlice {
+  categories: Category[] | []
+  getCategories: () => Promise<void>
+}
+
+export interface OverlaySlice {
+  overlayContent: React.ReactNode | null
+  showOverlay: (content: React.ReactNode) => void
+  hideOverlay: () => void
+}
+
+export type RootState = UserSlice & AuthSlice & ProjectSlice & CategorySlice & OverlaySlice
