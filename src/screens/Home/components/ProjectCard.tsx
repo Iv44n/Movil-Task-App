@@ -2,11 +2,19 @@ import ArrowRightUpIcon from '@/components/icons/ArrowRightUpIcon'
 import Typo from '@/components/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { Project } from '@/types/project'
+import { CapitalizeWords } from '@/utils/utils'
 import { Link } from 'expo-router'
 import { Pressable, StyleSheet, View } from 'react-native'
 
 export default function ProjectCard({ category, bgColor, ...info }: Project) {
-  const [first, ...rest] = info.name.split(' ')
+  const words = info.name.trim().split(' ').filter(Boolean).map(CapitalizeWords) || []
+
+  let [firstWord = '', ...rest] = words
+
+  if (rest.length > 0 && rest[0].length < 4) {
+    firstWord = `${firstWord} ${rest[0]}`
+    rest = rest.slice(1)
+  }
 
   const progressPercentage = !info.details?.totalTasks || info.details?.totalTasks === 0
     ? 0
@@ -49,7 +57,7 @@ export default function ProjectCard({ category, bgColor, ...info }: Project) {
               color={Colors.textBlack}
               size={23}
             >
-              {first}
+              {firstWord}
             </Typo>
             <Typo
               size={23}
