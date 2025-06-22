@@ -1,9 +1,19 @@
 import { AppError } from '@/errors/AppError'
 import { ProjectRepository } from '../repositories/project.repository'
-import { Project } from '@/types/project'
+import { NewProject, Project } from '@/types/project'
 import { TaskService } from './task.service'
 
 export const ProjectService = {
+  createProject: async (project: NewProject): Promise<Project> => {
+    try {
+      return await ProjectRepository.createProject(project)
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        throw error
+      }
+      throw new AppError(error.message, 'CreateProjectError', 'CREATE_PROJECT_ERROR')
+    }
+  },
   getProjects: async (userId: number): Promise<Project[]> => {
     try {
 
