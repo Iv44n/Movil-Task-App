@@ -1,13 +1,15 @@
 import useBoundStore from '@/store/useBoundStore'
-import { StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 
 export default function OverlayHost() {
   const overlayContent = useBoundStore((state) => state.overlayContent)
+  const hideOverlay = useBoundStore((state) => state.hideOverlay)
 
   if (!overlayContent) return null
 
   return (
     <View style={styles.container}>
+      <Pressable style={styles.backdrop} onPress={hideOverlay} />
       {overlayContent}
     </View>
   )
@@ -24,5 +26,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1000,
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject
   }
 })
