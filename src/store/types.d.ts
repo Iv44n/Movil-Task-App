@@ -28,7 +28,9 @@ export interface ProjectSlice {
 
 export interface CategorySlice {
   categories: Category[] | []
+  createCategory: (name: string) => Promise<Category>
   getCategories: () => Promise<void>
+  deleteCategoryById: (categoryId: number) => Promise<void>
 }
 
 export interface OverlaySlice {
