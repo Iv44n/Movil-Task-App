@@ -28,3 +28,11 @@ export interface Project extends ProjectEntity {
   },
   tasks?: Task[]
 }
+
+export interface NewProject {
+  name: string
+  description: string | null
+  bgColor: string | null
+  userId: number
+  categoryId: number
+}
