@@ -12,7 +12,7 @@ export default memo(function TabBar({ state, descriptors, navigation }: BottomTa
   const { width: SCREEN_WIDTH } = useWindowDimensions()
 
   const TAB_BAR_HEIGHT = Sizes.height.h57 + Sizes.spacing.s5
-  const TAB_BAR_WIDTH  = Sizes.width.w131 - Sizes.spacing.s7
+  const TAB_BAR_WIDTH  = Sizes.width.w131 - Sizes.spacing.s11
 
   const tabs = useMemo(() => state.routes.map((route, index) => {
     const isFocused = state.index === index

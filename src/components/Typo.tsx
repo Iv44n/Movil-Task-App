@@ -6,7 +6,7 @@ import { Text, TextProps, TextStyle } from 'react-native'
 
 type fontWeightType = 'extraLight' | 'light' | 'regular' | 'medium' | 'semiBold' | 'bold' | 'extraBold' | undefined
 
-interface TypoProps {
+export interface TypoProps {
   size?: number
   fontWeight?: fontWeightType
   color?: string
