@@ -44,8 +44,10 @@ export default {
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS categories (
         category_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-        category_name TEXT    NOT NULL UNIQUE,
+        category_name TEXT    NOT NULL,
         user_id       INTEGER NOT NULL,
+
+        UNIQUE(category_name, user_id),
 
         FOREIGN KEY (user_id) 
           REFERENCES users(user_id)
