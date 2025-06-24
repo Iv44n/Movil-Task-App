@@ -44,7 +44,12 @@ export default {
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS categories (
         category_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-        category_name TEXT    NOT NULL UNIQUE
+        category_name TEXT    NOT NULL UNIQUE,
+        user_id       INTEGER NOT NULL,
+
+        FOREIGN KEY (user_id) 
+          REFERENCES users(user_id)
+          ON DELETE CASCADE
       );
     `)
 
@@ -107,6 +112,23 @@ export default {
           REFERENCES tasks (task_id)
           ON DELETE CASCADE
       );
+    `)
+
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS colors (
+        color_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id  INTEGER NOT NULL,
+        color    TEXT NOT NULL,
+        
+        UNIQUE(user_id, color),
+        
+        FOREIGN KEY (user_id)
+          REFERENCES users(user_id)
+          ON DELETE CASCADE
+      );
+
+      -- Create index for faster lookups
+      CREATE INDEX IF NOT EXISTS idx_colors_user_id ON colors(user_id);
     `)
   }
 }
