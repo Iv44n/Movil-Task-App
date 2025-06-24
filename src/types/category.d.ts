@@ -4,5 +4,6 @@ export interface Category {
 }
 
 export interface NewCategory {
-  name: string
+  name: string,
+  userId: number
 }

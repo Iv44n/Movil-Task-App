@@ -4,10 +4,13 @@ import { CategoryService } from '@/lib/services/category.service'
 
 type StateCreatorType = StateCreator<RootState, [], [], CategorySlice>
 
-export const categorySlice: StateCreatorType = (set) => ({
+export const categorySlice: StateCreatorType = (set, get) => ({
   categories: [],
   createCategory: async (name) => {
-    const newCategory = await CategoryService.create({ name })
+    const userId = get().user?.user_id
+    if (!userId) return
+
+    const newCategory = await CategoryService.create({ name, userId })
 
     set((state) => ({
       categories: [newCategory, ...state.categories]
@@ -15,11 +18,17 @@ export const categorySlice: StateCreatorType = (set) => ({
     return newCategory
   },
   getCategories: async () => {
-    const categories = await CategoryService.getAllCategories()
+    const userId = get().user?.user_id
+    if (!userId) return
+
+    const categories = await CategoryService.getAllCategories(userId)
     set({ categories })
   },
   deleteCategoryById: async (categoryId) => {
-    await CategoryService.deleteCategoryById(categoryId)
+    const userId = get().user?.user_id
+    if (!userId) return
+
+    await CategoryService.deleteCategoryById(categoryId, userId)
 
     set((state) => ({
       categories: state.categories.filter((category) => category.id !== categoryId)

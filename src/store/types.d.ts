@@ -1,4 +1,6 @@
 import type { AppError } from '@/errors/AppError'
+import { NewCategory } from '@/types/category'
+import { NewProject } from '@/types/project'
 import type { LoginCredentials, RegisterData, UserProfile } from '@/types/user'
 
 export interface UserSlice {
