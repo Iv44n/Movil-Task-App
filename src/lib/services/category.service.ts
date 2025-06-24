@@ -3,9 +3,9 @@ import { CategoryRepository } from '../repositories/category.repository'
 import { AppError } from '@/errors/AppError'
 
 export const CategoryService = {
-  create: async ({ name }: NewCategory): Promise<Category> => {
+  create: async (newCategory: NewCategory): Promise<Category> => {
     try {
-      return await CategoryRepository.create({ name })
+      return await CategoryRepository.create(newCategory)
     } catch (error: any) {
       if (error instanceof AppError) {
         throw error
@@ -13,9 +13,9 @@ export const CategoryService = {
       throw new AppError(error.message, 'CreateProjectError', 'CREATE_PROJECT_ERROR')
     }
   },
-  getAllCategories: async (): Promise<Category[]> => {
+  getAllCategories: async (userId: number): Promise<Category[]> => {
     try {
-      return await CategoryRepository.getAllCategories()
+      return await CategoryRepository.getAllCategories(userId)
     } catch (error: any) {
       if (error instanceof AppError) {
         throw error
@@ -23,9 +23,9 @@ export const CategoryService = {
       throw new AppError(error.message, 'CreateProjectError', 'CREATE_PROJECT_ERROR')
     }
   },
-  deleteCategoryById: async (categoryId: number): Promise<void> => {
+  deleteCategoryById: async (categoryId: number, userId: number): Promise<void> => {
     try {
-      await CategoryRepository.deleteById(categoryId)
+      await CategoryRepository.deleteById(categoryId, userId)
     } catch (error: any) {
       if (error instanceof AppError) {
         throw error
