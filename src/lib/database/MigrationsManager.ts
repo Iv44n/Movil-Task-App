@@ -5,6 +5,7 @@ interface Migration {
   version: number
   description: string
   up: (db: SQLiteDatabase) => Promise<void>
+  down?: (db: SQLiteDatabase) => Promise<void>
 }
 
 const migrations: Migration[] = [migration1]
@@ -34,6 +35,14 @@ export async function runMigrations(db: SQLiteDatabase) {
           await db.execAsync(`PRAGMA user_version = ${migration.version};`)
         })
       } catch (mError) {
+        if (migration.down) {
+          try {
+            await migration.down(db)
+            console.log(`⏪ Rolled back migration ${migration.version}`)
+          } catch (rollbackError) {
+            console.error(`❌ Failed to rollback migration ${migration.version}:`, rollbackError)
+          }
+        }
         console.error(`❌ Migration ${migration.version} failed:`, mError)
         throw mError
       }
