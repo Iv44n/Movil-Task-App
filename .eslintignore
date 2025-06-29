@@ -1,3 +1,6 @@
 .expo 
 node_modules
 assets
+
+#drizzle output
+src/drizzle
