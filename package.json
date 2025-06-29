@@ -10,6 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@clerk/clerk-expo": "^2.14.0",
     "babel-plugin-inline-import": "^3.0.0",
     "drizzle-orm": "^0.44.2",
     "expo": "^53.0.13",
@@ -24,7 +25,8 @@
     "expo-sqlite": "~15.2.12",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.4",
+    "react-hook-form": "^7.59.0",
+    "react-native": "^0.79.4",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "^4.11.1",
