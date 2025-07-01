@@ -24,6 +24,7 @@
     "expo-secure-store": "~14.2.3",
     "expo-sqlite": "~15.2.12",
     "expo-status-bar": "~2.2.3",
+    "expo-web-browser": "~14.2.0",
     "react": "19.0.0",
     "react-hook-form": "^7.59.0",
     "react-native": "^0.79.4",
