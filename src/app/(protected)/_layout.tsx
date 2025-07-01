@@ -1,10 +1,21 @@
-import useBoundStore from '@/store/useBoundStore'
+import { useAuth, useSignUp } from '@clerk/clerk-expo'
 import { Redirect, Stack } from 'expo-router'
+import { Storage } from 'expo-sqlite/kv-store'
 
 export default function ProtectedLayout() {
-  const isAuthenticated = useBoundStore((state) => state.isAuthenticated)
+  const { signUp, isLoaded: isSignUpLoaded } = useSignUp()
+  const { isSignedIn, isLoaded: isAuthLoaded } = useAuth()
+  const signUpParam = Storage.getItemSync('signUp')
 
-  if (!isAuthenticated) {
+  if (!isAuthLoaded || !isSignUpLoaded) return null
+
+  const needsToCompleteSignUp = signUpParam === 'true' && signUp.status === 'missing_requirements' && signUp.missingFields.length > 0
+
+  if (needsToCompleteSignUp) {
+    return <Redirect href='/complete-auth' />
+  }
+
+  if (!isSignedIn) {
     return <Redirect href='/login' />
   }
 
