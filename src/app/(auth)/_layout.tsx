@@ -1,16 +1,12 @@
-import useBoundStore from '@/store/useBoundStore'
-import { Stack, useRouter } from 'expo-router'
-import { useEffect } from 'react'
+import { useAuth } from '@clerk/clerk-expo'
+import { Redirect, Stack } from 'expo-router'
 
 export default function AuthLayout () {
-  const isAuthenticated = useBoundStore((state) => state.isAuthenticated)
-  const router = useRouter()
+  const { isSignedIn } = useAuth()
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('(protected)', { withAnchor: true })
-    }
-  }, [isAuthenticated, router])
+  if (isSignedIn) {
+    return <Redirect href='(protected)' />
+  }
 
   return (
     <Stack
@@ -22,6 +18,8 @@ export default function AuthLayout () {
     >
       <Stack.Screen name='login'/>
       <Stack.Screen name='register'/>
+      <Stack.Screen name='verify-email' options={{ animation: 'fade' }}/>
+      <Stack.Screen name='complete-auth' options={{ animation: 'fade' }}/>
     </Stack>
   )
 }
