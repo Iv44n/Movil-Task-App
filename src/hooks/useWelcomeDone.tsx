@@ -1,4 +1,3 @@
-// hooks/useWelcomeDone.ts
 import { useState, useEffect } from 'react'
 import { Storage } from 'expo-sqlite/kv-store'
 
