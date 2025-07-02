@@ -19,7 +19,6 @@ export default function AuthLayout () {
       <Stack.Screen name='login'/>
       <Stack.Screen name='register'/>
       <Stack.Screen name='verify-email' options={{ animation: 'fade' }}/>
-      <Stack.Screen name='complete-auth' options={{ animation: 'fade' }}/>
     </Stack>
   )
 }
