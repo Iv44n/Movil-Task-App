@@ -1,10 +1,10 @@
-import { useAuth } from '@clerk/clerk-expo'
+import { useSessionContext } from '@/contexts/SessionContext'
 import { Redirect, Stack } from 'expo-router'
 
 export default function AuthLayout () {
-  const { isSignedIn } = useAuth()
+  const { session } = useSessionContext()
 
-  if (isSignedIn) {
+  if (session) {
     return <Redirect href='(protected)' />
   }
 
