@@ -1,25 +1,23 @@
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import LayoutBase from '@/components/LayoutBase'
 import { SQLiteProvider } from 'expo-sqlite'
 import { DrizzleDbProvider } from '@/contexts/DrizzleDbContext'
 import { Stack } from 'expo-router'
-import { View } from 'react-native'
-import { Colors } from '@/constants/theme'
-import { ClerkProvider } from '@clerk/clerk-expo'
-import { tokenCache } from '@clerk/clerk-expo/token-cache'
+import SessionContextProvider from '@/contexts/SessionContext'
 
 export default function Layout() {
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <SQLiteProvider
-        databaseName='task-test'
-        options={{
-          enableChangeListener: true,
-          useNewConnection: true
-        }}
-      >
-        <ClerkProvider tokenCache={tokenCache}>
-          <DrizzleDbProvider>
-            <LayoutBase>
+    <GestureHandlerRootView>
+      <LayoutBase>
+        <SQLiteProvider
+          databaseName='task-test'
+          options={{
+            enableChangeListener: true,
+            useNewConnection: true
+          }}
+        >
+          <SessionContextProvider>
+            <DrizzleDbProvider>
               <Stack
                 screenOptions={{
                   headerShown: false,
@@ -31,10 +29,10 @@ export default function Layout() {
                 <Stack.Screen name='(auth)' options={{ animation: 'fade' }}/>
                 <Stack.Screen name='(protected)' options={{ animation: 'fade' }} />
               </Stack>
-            </LayoutBase>
-          </DrizzleDbProvider>
-        </ClerkProvider>
-      </SQLiteProvider>
-    </View>
+            </DrizzleDbProvider>
+          </SessionContextProvider>
+        </SQLiteProvider>
+      </LayoutBase>
+    </GestureHandlerRootView>
   )
 }
