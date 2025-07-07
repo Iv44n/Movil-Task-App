@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "task-app",
-    "slug": "task-app",
+    "name": "kron",
+    "slug": "kron",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "scheme": "task-app",
+    "scheme": "kron",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -22,7 +22,7 @@
         "backgroundColor": "#1A1A1A"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.taskapp"
+      "package": "com.app.kron"
     },
     "web": {
       "favicon": "./assets/favicon.png"
