@@ -4,7 +4,7 @@ import { IconProps } from '.'
 
 export default function HorizontalDotMenuIcon({
   size = 25,
-  color = Colors.textPrimary
+  color = Colors.primary
 }: IconProps) {
   const radius = 2
   const centerY = 12.25

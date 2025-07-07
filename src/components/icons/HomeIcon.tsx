@@ -3,7 +3,7 @@ import { IconProps } from '.'
 import { Colors } from '@/constants/theme'
 
 export default function HomeIcon({
-  color = Colors.textPrimary,
+  color = Colors.primary,
   size = 25
 }: IconProps) {
   return (

@@ -4,7 +4,7 @@ import { Colors } from '@/constants/theme'
 
 export default function ArrowRightIcon ({
   size = 25,
-  color = Colors.textPrimary
+  color = Colors.primary
 }: IconProps) {
   return (
     <Svg
