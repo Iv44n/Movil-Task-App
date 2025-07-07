@@ -23,14 +23,17 @@ const heightBase = [5, 25, 31, 33, 47, 57, 99, 131, 191, 255, 355] as const
 // ==== Colors ====
 
 const Colors = {
+  primary: '#fcfcfc',
+  secondary: '#B3B3B3',
+  black: '#000',
   background: '#1A1A1A',
   card: '#242424',
-  textPrimary: '#fcfcfc',
-  textSecondary: '#B3B3B3',
-  textBlack: '#000',
+  border: '#333333',
+
   green: '#b3fedc',
   yellow: '#Fdf485',
-  border: '#333333'
+
+  error: '#FF8080'
 }
 
 // ==== Typography ====
@@ -52,20 +55,24 @@ const Typography = {
 const Sizes = {
   width: generateSizes(widthBase, moderateScale, 'w'),
   height: generateSizes(heightBase, moderateVerticalScale, 'h'),
-  spacing: generateSizes(spacingBase, scale, 's')
+  spacing: generateSizes(spacingBase, scale, 's'),
+  text: generateSizes(spacingBase, scale, 't')
 }
 
 // ==== Shapes ====
 
 const Shapes = {
   rounded: {
-    full: 999,
-    small: 9,
-    semi: 15,
-    medium: 21,
-    big: 31,
-    large: 51
+    none: 0,
+    xs: 5,
+    sm: 11,
+    base: 15,
+    md: 21,
+    lg: 35,
+    xl: 39,
+    xxl: 55,
+    circle: 999
   }
 }
 
-export { Colors, Typography, Sizes, Shapes }
+export { Colors, Sizes, Shapes, Typography }

@@ -3,11 +3,13 @@ import { AuthSession, AuthUser } from '@supabase/supabase-js'
 import { createContext, useEffect, useRef, useState, ReactNode } from 'react'
 import NetInfo from '@react-native-community/netinfo'
 import { AppState, AppStateStatus } from 'react-native'
+import * as QueryParams from 'expo-auth-session/build/QueryParams'
 
 interface SessionContextType {
   session: AuthSession | null
   user: AuthUser | null
-  isLoaded: boolean
+  isLoaded: boolean,
+  createdSessionFromUrl: (url: string) => Promise<AuthSession | undefined | null>
 }
 
 const EVENTS = {
@@ -18,7 +20,8 @@ const EVENTS = {
 export const AuthContext = createContext<SessionContextType>({
   session: null,
   user: null,
-  isLoaded: false
+  isLoaded: false,
+  createdSessionFromUrl: async () => undefined
 })
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
@@ -96,8 +99,32 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const createdSessionFromUrl = async (url: string) => {
+    const { params, errorCode } = QueryParams.getQueryParams(url)
+
+    if (errorCode) {
+      console.error(errorCode)
+      return
+    }
+
+    const { access_token, refresh_token } = params
+
+    if (!access_token) return
+
+    const { data, error } = await supabase.auth.setSession({
+      access_token,
+      refresh_token
+    })
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    return data.session
+  }
+
   return (
-    <AuthContext.Provider value={{ session, user, isLoaded }}>
+    <AuthContext.Provider value={{ session, user, isLoaded, createdSessionFromUrl }}>
       {children}
     </AuthContext.Provider>
   )

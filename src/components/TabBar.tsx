@@ -19,7 +19,7 @@ export default memo(function TabBar({ state, descriptors, navigation }: BottomTa
     const { options } = descriptors[route.key]
     const icon = options.tabBarIcon?.({
       focused: isFocused,
-      color: isFocused ? Colors.textBlack : Colors.textPrimary,
+      color: isFocused ? Colors.black : Colors.primary,
       size: 23
     })
 
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     flexDirection: 'row',
     alignSelf: 'center',
-    borderRadius: Shapes.rounded.large,
+    borderRadius: Shapes.rounded.xl,
     borderWidth: 1,
     borderColor: Colors.border,
     overflow: 'hidden'
