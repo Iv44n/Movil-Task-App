@@ -1,12 +1,12 @@
-import Typo from '@/components/Typo'
+import Typo from '@/components/shared/Typo'
 import { useRouter } from 'expo-router'
 import { useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
-import { useDrizzleDbContext } from '@/contexts/DrizzleDbContext'
 import { useFonts } from 'expo-font'
 import { Colors, Typography } from '@/constants/theme'
 import { useWelcomeDone } from '@/hooks/useWelcomeDone'
+import { useAuth } from '@/hooks/auth/useAuth'
 
 export default function Index() {
   const [fontsLoaded] = useFonts({
@@ -20,28 +20,23 @@ export default function Index() {
   })
 
   const router = useRouter()
-  const { success } = useDrizzleDbContext()
   const { welcomeDone, isLoading } = useWelcomeDone()
+  const { isLoaded } = useAuth()
 
   useEffect(() => {
-    if (success === undefined || !fontsLoaded || isLoading || welcomeDone === null) return
+    if (!fontsLoaded || isLoading || welcomeDone === null || isLoaded === false) return
 
-    console.log('✅ All migrations completed successfully.')
+    const route = welcomeDone ? '(protected)' : 'welcome'
+    router.replace(route, { withAnchor: true })
 
-    const t = setTimeout(() => {
-      const route = success && welcomeDone ? '(protected)' : 'welcome'
-      router.replace(route, { withAnchor: true })
-    }, 1200)
-
-    return () => clearTimeout(t)
-  }, [router, success, fontsLoaded, welcomeDone, isLoading])
+  }, [router, fontsLoaded, welcomeDone, isLoading, isLoaded])
 
   return (
     <View style={styles.container}>
       <Animated.View
-        entering={FadeInDown.duration(1200)}
+        entering={FadeInDown.duration(450)}
       >
-        <Typo size={25} fontWeight='bold'>
+        <Typo size={25} weight='700'>
           Loading...
         </Typo>
       </Animated.View>
