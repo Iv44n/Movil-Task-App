@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { StyleSheet, View, FlatList, ListRenderItem, Pressable } from 'react-native'
 import ProgressIcon from '@/components/icons/ProgressIcon'
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
 import CircleIcon from '@/components/icons/CircleIcon'
 import Svg, { Circle } from 'react-native-svg'
-import Typo from '@/components/Typo'
+import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 
 const PRIORITY_TASKS: string[] = [
@@ -32,22 +32,20 @@ const PriorityItem = ({ label }: { label: string }) => {
         <View>
           {
             checked
-              ? <CheckCircleIcon size={19} color={Colors.textSecondary} />
-              : <CircleIcon size={19} color={Colors.textPrimary}/>
+              ? <CheckCircleIcon size={19} color={Colors.secondary} />
+              : <CircleIcon size={19} color={Colors.primary}/>
           }
         </View>
         <Typo
           size={13}
-          color={checked ? Colors.textSecondary : Colors.textPrimary}
+          color={checked ? 'secondary' : 'primary'}
           style={{
             textDecorationLine: checked ? 'line-through' : 'none',
             maxWidth: '85%',
             marginLeft: Sizes.spacing.s7
           }}
-          textProps={{
-            ellipsizeMode: 'tail',
-            numberOfLines: 1
-          }}
+          ellipsizeMode='tail'
+          numberOfLines={1}
         >
           {label}
         </Typo>
@@ -75,7 +73,7 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
     <View style={styles.progressSummary}>
       <View style={styles.circleProgressPlaceholder}>
         {useIcon ? (
-          <ProgressIcon color={Colors.textPrimary} />
+          <ProgressIcon color={Colors.primary} />
         ) : (
           <>
             <Svg height={radius * 2} width={radius * 2}>
@@ -101,19 +99,19 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
               />
             </Svg>
             <View style={styles.circleTextWrapper}>
-              <Typo size={11} fontWeight='bold'>{`${percent}%`}</Typo>
+              <Typo size={11} weight='700'>{`${percent}%`}</Typo>
             </View>
           </>
         )}
       </View>
       <View>
-        <Typo size={13} fontWeight='medium' color={Colors.textSecondary}>{label}</Typo>
-        <Typo size={15} fontWeight='extraBold'>
+        <Typo size={13} weight='500' color='secondary'>{label}</Typo>
+        <Typo size={15} weight='800'>
           {
             useIcon ? (
-              <>{count} <Typo size={11} fontWeight='medium'>Task</Typo></>
+              <>{count} <Typo size={11} weight='500'>Task</Typo></>
             ) : (
-              <>{count}/{total} <Typo size={11} fontWeight='medium'>Tasks</Typo></>
+              <>{count}/{total} <Typo size={11} weight='500'>Tasks</Typo></>
             )
           }
         </Typo>
@@ -132,13 +130,13 @@ export default function ProgressInfo () {
 
   return (
     <View style={styles.container}>
-      <Typo size={19} fontWeight='medium'>Your Progress</Typo>
+      <Typo size={19} weight='500'>Your Progress</Typo>
       <View style={styles.content}>
         {/* Priority tasks */}
         <View style={styles.card}>
           <Typo
             size={15}
-            fontWeight='semiBold'
+            weight='600'
             style={{ marginBottom: Sizes.spacing.s9 }}
           >
             Priority Tasks
@@ -184,7 +182,7 @@ const styles = StyleSheet.create({
     width: '49%',
     backgroundColor: Colors.card,
     padding: Sizes.spacing.s13,
-    borderRadius: Shapes.rounded.medium,
+    borderRadius: Shapes.rounded.md,
     borderWidth: 1,
     borderColor: Colors.border
   },
@@ -203,7 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     paddingHorizontal: Sizes.spacing.s13,
     paddingVertical: Sizes.spacing.s17,
-    borderRadius: Shapes.rounded.medium,
+    borderRadius: Shapes.rounded.md,
     borderWidth: 1,
     borderColor: Colors.border,
     alignItems: 'center'

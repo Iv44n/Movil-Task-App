@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { Colors, Sizes, Shapes } from '@/constants/theme'
 import Typo, { TypoProps } from './Typo'
-import AltArrowDownIcon from './icons/AltArrowDownIcon'
+import AltArrowDownIcon from '../icons/AltArrowDownIcon'
 
 // PickerItem interface
 interface PickerItemProps {
@@ -46,11 +46,12 @@ const ItemOption = memo<PickerItemProps & {
 }>(({ label, value, style, icon, textProps, textStyle, typoProps, isSelected, iconPosition = 'left', onSelect, handleIconPress }) => {
       const defaultTypo: Omit<TypoProps, 'children'> = {
         size: 15,
-        color: Colors.textPrimary,
-        textProps: { ellipsizeMode: 'tail', numberOfLines: 1 }
+        color: 'primary',
+        ellipsizeMode: 'tail',
+        numberOfLines: 1
       }
 
-      const finalTypo = { ...defaultTypo, ...typoProps, textProps: { ...defaultTypo.textProps, ...textProps } }
+      const finalTypo = { ...defaultTypo, ...typoProps, textProps: { ...defaultTypo, ...textProps } }
 
       const handlePress = useCallback(() => {
         if (onSelect) onSelect(value)
@@ -119,15 +120,16 @@ const Picker: PickerComponent = ({
       >
         <Typo
           size={15}
-          style={{ color: selectedValue ? Colors.textPrimary : Colors.textSecondary }}
-          textProps={{ ellipsizeMode: 'tail', numberOfLines: 1 }}
+          color={selectedValue ? 'primary' : 'secondary'}
+          ellipsizeMode='tail'
+          numberOfLines={1}
         >
           {selectedValue || placeholder}
         </Typo>
         {triggerIcon ?? (
           <AltArrowDownIcon
             size={20}
-            color={selectedValue ? Colors.textPrimary : Colors.textSecondary}
+            color={selectedValue ? Colors.primary : Colors.primary}
           />
         )}
       </Pressable>
@@ -174,7 +176,7 @@ export default Picker
 const styles = StyleSheet.create({
   trigger: {
     height: Sizes.height.h47,
-    borderRadius: Shapes.rounded.small,
+    borderRadius: Shapes.rounded.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -186,10 +188,10 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderWidth: 1,
     backgroundColor: Colors.background,
-    borderRadius: Shapes.rounded.small
+    borderRadius: Shapes.rounded.sm
   },
   option: {
-    borderRadius: Shapes.rounded.small,
+    borderRadius: Shapes.rounded.sm,
     paddingVertical: Sizes.spacing.s7,
     paddingHorizontal: Sizes.spacing.s15,
     flexDirection: 'row',

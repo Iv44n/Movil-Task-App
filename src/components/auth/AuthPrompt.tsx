@@ -1,7 +1,6 @@
-// components/AuthPrompt.tsx
 import { View, StyleSheet } from 'react-native'
-import Typo from '@/components/Typo'
-import { Colors, Sizes } from '@/constants/theme'
+import Typo from '@/components/shared/Typo'
+import { Sizes } from '@/constants/theme'
 
 interface AuthPromptProps {
   promptText: string
@@ -12,13 +11,13 @@ interface AuthPromptProps {
 export default function AuthPrompt({ promptText, actionText, onAction }: AuthPromptProps) {
   return (
     <View style={styles.container}>
-      <Typo size={15} fontWeight='medium' color={Colors.textSecondary}>
+      <Typo size={15} weight='500' color='secondary'>
         {promptText}
         <Typo
           size={15}
-          color={Colors.yellow}
-          fontWeight='bold'
-          textProps={{ onPress: onAction }}
+          color='yellow'
+          weight='700'
+          onPress={onAction}
         >
           {'  '}{actionText}
         </Typo>

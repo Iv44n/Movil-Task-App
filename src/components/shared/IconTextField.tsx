@@ -1,11 +1,11 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { View, Pressable, StyleSheet, TextInput, TextInputProps, StyleProp, ViewStyle } from 'react-native'
 import { Colors, Shapes, Sizes, Typography } from '@/constants/theme'
-import Typo from '@/components/Typo'
+import Typo from './Typo'
 import { moderateScale } from '@/utils/styling'
 
 interface IconTextFieldProps extends TextInputProps {
-  label: string
+  label?: string
   icon: ReactNode
   onIconPress?: () => void
   error?: string | null
@@ -22,21 +22,25 @@ export default function IconTextField({
   ...inputProps
 }: IconTextFieldProps) {
   return (
-    <View style={containerStyle}>
-      <Typo
-        size={15}
-        fontWeight='medium'
-        style={{
-          marginLeft: Sizes.spacing.s7,
-          marginBottom: Sizes.spacing.s5
-        }}
-      >
-        {label}
-      </Typo>
+    <View style={[containerStyle, { marginBottom: Sizes.spacing.s15 }]}>
+      {
+        label && (
+          <Typo
+            size={15}
+            weight='500'
+            style={{
+              marginLeft: Sizes.spacing.s7,
+              marginBottom: Sizes.spacing.s5
+            }}
+          >
+            {label}
+          </Typo>
+        )
+      }
 
       <View style={styles.wrapper}>
         <TextInput
-          placeholderTextColor={Colors.textSecondary}
+          placeholderTextColor={Colors.secondary}
           style={[styles.input, style]}
           {...inputProps}
         />
@@ -45,17 +49,21 @@ export default function IconTextField({
         </Pressable>
       </View>
 
-      <Typo
-        size={13}
-        color='#FF8080'
-        fontWeight='medium'
-        style={{
-          marginLeft: Sizes.spacing.s5,
-          marginTop: Sizes.spacing.s3
-        }}
-      >
-        {error}
-      </Typo>
+      {
+        error && (
+          <Typo
+            size={13}
+            color='error'
+            weight='500'
+            style={{
+              marginLeft: Sizes.spacing.s5,
+              marginTop: Sizes.spacing.s3
+            }}
+          >
+            {error}
+          </Typo>
+        )
+      }
     </View>
   )
 }
@@ -65,19 +73,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.card,
-    borderRadius: Shapes.rounded.small
+    borderRadius: Shapes.rounded.base,
+    borderColor: Colors.border,
+    borderWidth: 1
   },
   input: {
     flex: 1,
     backgroundColor: Colors.card,
-    borderRadius: Shapes.rounded.small,
+    borderRadius: Shapes.rounded.base,
     fontFamily: Typography.fontFamily.regular,
-    fontSize: moderateScale(15),
-    color: Colors.textPrimary,
-    paddingHorizontal: Sizes.spacing.s13,
-    paddingVertical: Sizes.spacing.s11
+    fontSize: moderateScale(14),
+    color: Colors.primary,
+    padding: Sizes.spacing.s13
   },
   iconWrapper: {
-    padding: Sizes.spacing.s11
+    paddingHorizontal: Sizes.spacing.s11
   }
 })
