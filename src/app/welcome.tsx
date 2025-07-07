@@ -1,16 +1,16 @@
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
 import ScreenWrapper from '@/components/ScreenWrapper'
-import Typo from '@/components/Typo'
+import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { useRouter } from 'expo-router'
-import { Storage } from 'expo-sqlite/kv-store'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Pressable, StyleSheet, View } from 'react-native'
 
 export default function Welcome() {
   const router = useRouter()
 
   const finishWelcome = async () => {
-    await Storage.setItem('welcomeDone', 'true')
+    await AsyncStorage.setItem('welcomeDone', 'true')
     router.replace('(protected)', { withAnchor: true })
   }
 
@@ -18,14 +18,14 @@ export default function Welcome() {
     <ScreenWrapper style={{ justifyContent: 'center' }}>
       {/*Need Welcome Image/SVG */}
 
-      <Typo size={30} fontWeight='semiBold'>
-        <Typo size={30} fontWeight='extraBold' color={Colors.green}>Organize</Typo>{'\n'}
+      <Typo size={30} weight='600'>
+        <Typo size={30} weight='800' color='green'>Organize</Typo>{'\n'}
         your projects and tasks
       </Typo>
 
       <Typo
         size={16}
-        color={Colors.textSecondary}
+        color='secondary'
         style={{
           marginTop: Sizes.spacing.s7,
           marginBottom: Sizes.spacing.s21
@@ -35,9 +35,9 @@ export default function Welcome() {
       </Typo>
 
       <Pressable style={styles.button} onPress={finishWelcome}>
-        <Typo size={16} color={Colors.textBlack} fontWeight='medium'>Get Started</Typo>
+        <Typo size={16} color='black' weight='500'>Get Started</Typo>
         <View style={styles.iconWrapper}>
-          <ArrowRightIcon color={Colors.textPrimary} />
+          <ArrowRightIcon color={Colors.primary} />
         </View>
       </Pressable>
     </ScreenWrapper>
@@ -52,13 +52,13 @@ const styles = StyleSheet.create({
     paddingVertical: Sizes.spacing.s5,
     paddingRight: Sizes.spacing.s5,
     paddingLeft: Sizes.spacing.s21,
-    borderRadius: Shapes.rounded.large,
+    borderRadius: Shapes.rounded.xl,
     alignSelf: 'flex-start'
   },
   iconWrapper: {
     marginLeft: Sizes.spacing.s15,
     backgroundColor: Colors.background,
     padding: Sizes.spacing.s11,
-    borderRadius: Shapes.rounded.full
+    borderRadius: Shapes.rounded.circle
   }
 })
