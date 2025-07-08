@@ -103,7 +103,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     const { params, errorCode } = QueryParams.getQueryParams(url)
 
     if (errorCode) {
-      console.error(errorCode)
+      console.error({ 'ERROR_ON_GET_QUERY_PARAMS': errorCode })
       return
     }
 
@@ -116,7 +116,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
       refresh_token
     })
     if (error) {
-      console.error(error)
+      console.error({ 'ERROR_AFTER_SESSION_SET': error })
       return
     }
 
