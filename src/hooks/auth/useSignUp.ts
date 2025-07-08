@@ -12,7 +12,7 @@ interface SignUpCreateParams {
   emailAddress: string
 }
 
-const redirectUri = makeRedirectUri({ path: 'login' })
+const redirectUri = makeRedirectUri()
 
 export default function useSignUp() {
   const [signUpLoading, setSignUpLoading] = useState(false)
