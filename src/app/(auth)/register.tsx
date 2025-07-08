@@ -1,17 +1,17 @@
 import ScreenWrapper from '@/components/ScreenWrapper'
-import RegisterFields from '@/modules/auth/components/RegisterFields'
-import SocialAuth from '@/modules/auth/components/SocialAuth'
-import { Colors, Sizes } from '@/constants/theme'
+import RegisterFields from '@/components/auth/RegisterFields'
+import SocialAuth from '@/components/auth/SocialAuth'
+import { Sizes } from '@/constants/theme'
 import { View } from 'react-native'
-import Typo from '@/components/Typo'
+import Typo from '@/components/shared/Typo'
 
 export default function register(){
   return(
     <ScreenWrapper style={{ justifyContent: 'center', paddingHorizontal: Sizes.spacing.s15 }}>
       <View style={{ marginBottom: Sizes.spacing.s33 }}>
-        <Typo size={25} fontWeight='bold' color={Colors.yellow}>Create an account</Typo>
+        <Typo size={25} weight='700' color='yellow'>Create an account</Typo>
 
-        <Typo size={15} color={Colors.textSecondary}>
+        <Typo size={15} color='secondary'>
           Start building your own projects. Sign up to continue.
         </Typo>
       </View>
