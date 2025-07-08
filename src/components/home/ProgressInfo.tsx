@@ -194,13 +194,13 @@ const styles = StyleSheet.create({
   },
   indicatorContainer: {
     width: '49%',
+    gap: Sizes.spacing.s9,
     justifyContent: 'space-between'
   },
   progressSummary: {
     flexDirection: 'row',
     backgroundColor: Colors.card,
-    paddingHorizontal: Sizes.spacing.s13,
-    paddingVertical: Sizes.spacing.s17,
+    padding: '10%',
     borderRadius: Shapes.rounded.md,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   circleProgressPlaceholder: {
     width: 53,
     height: 53,
-    borderRadius: 9999,
+    borderRadius: Shapes.rounded.circle,
     backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',

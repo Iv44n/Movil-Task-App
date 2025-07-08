@@ -1,0 +1,133 @@
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'expo-router'
+import {
+  View,
+  Pressable,
+  KeyboardAvoidingView,
+  Alert
+} from 'react-native'
+import { Colors, Sizes } from '@/constants/theme'
+import EyeIcon from '@/components/icons/EyeIcon'
+import EyeOffIcon from '@/components/icons/EyeOffIcon'
+import Typo from '@/components/shared/Typo'
+import FormField from '@/components/shared/FormField'
+import { Controller, useForm } from 'react-hook-form'
+import useSignIn from '@/hooks/auth/useSignIn'
+import ActionButton from '@/components/shared/ActionButton'
+import AuthPrompt from './AuthPrompt'
+
+interface FormData {
+  username: string
+  password: string
+}
+
+export default function LoginFields() {
+  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
+  const { signIn, signInLoading, signInError } = useSignIn()
+
+  const { control, handleSubmit, formState: { errors }, clearErrors } = useForm<FormData>({
+    defaultValues: { username: '', password: '' },
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit'
+  })
+
+  const onSubmit = useCallback(async ({ username, password }: FormData) => {
+    await signIn(username.trim(), password.trim())
+  }, [signIn])
+
+  useEffect(() => {
+    if (signInError) {
+      // TODO: Improve error alert UI/UX
+      Alert.alert(
+        'Login Failed',
+        signInError.message,
+        [
+          { text: 'ok', style: 'cancel' }
+        ],
+        { userInterfaceStyle: 'dark' }
+      )
+    }
+  }, [signInError])
+
+  return (
+    <>
+      <KeyboardAvoidingView>
+        <Controller
+          name='username'
+          control={control}
+          rules={{ required: 'Username is required' }}
+          render={({ field: { onChange, value } }) => (
+            <FormField
+              autoCapitalize='none'
+              error={errors.username?.message}
+              placeholder='Email Address'
+              value={value}
+              onChangeText={(value) => {
+                onChange(value)
+                clearErrors('username')
+              }}
+            />
+          )}
+        />
+
+        <View>
+          <Controller
+            name='password'
+            control={control}
+            rules={{ required: 'Password is required' }}
+            render={({ field: { onChange, value } }) => (
+              <FormField
+                autoCapitalize='none'
+                icon={
+                  showPassword
+                    ? <EyeOffIcon size={21} color={Colors.secondary} />
+                    : <EyeIcon size={21} color={Colors.secondary} />
+                }
+                onIconPress={() => setShowPassword(!showPassword)}
+                error={errors.password?.message}
+                value={value}
+                onChangeText={(value) => {
+                  onChange(value)
+                  clearErrors('password')
+                }}
+                placeholder='Password'
+                secureTextEntry={!showPassword}
+              />
+            )}
+          />
+          <Pressable
+            style={{
+              marginTop: -Sizes.spacing.s9,
+              marginRight: Sizes.spacing.s5,
+              alignItems: 'flex-end'
+            }}
+            onPress={() => {
+              router.replace('/forgot-password')
+            }}
+          >
+            <Typo
+              size={13}
+              weight='500'
+              color='yellow'
+            >
+              Forgot Password?
+            </Typo>
+          </Pressable>
+        </View>
+
+        <ActionButton
+          label={signInLoading ? 'Loading...' : 'Login'}
+          onPress={handleSubmit(onSubmit)}
+          style={{ marginTop: Sizes.spacing.s21 }}
+        />
+      </KeyboardAvoidingView>
+
+      <AuthPrompt
+        promptText='Don&apos;t have an account?'
+        actionText='Sign Up'
+        onAction={() => router.replace('/register')}
+      />
+    </>
+  )
+}
