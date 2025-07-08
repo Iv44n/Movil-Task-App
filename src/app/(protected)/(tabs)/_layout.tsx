@@ -43,12 +43,12 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: '100%',
     height: '100%',
-    borderRadius: Shapes.rounded.full,
+    borderRadius: Shapes.rounded.circle,
     justifyContent: 'center',
     alignItems: 'center'
   },
   iconActive: {
-    borderRadius: Shapes.rounded.full,
+    borderRadius: Shapes.rounded.circle,
     backgroundColor: Colors.yellow
   }
 })
