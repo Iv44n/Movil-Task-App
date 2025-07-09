@@ -26,8 +26,8 @@ const Colors = {
   primary: '#fcfcfc',
   secondary: '#B3B3B3',
   black: '#000',
-  background: '#1A1A1A',
-  card: '#242424',
+  background: '#1b1a1a',
+  card: '#202020',
   border: '#333333',
 
   green: '#b3fedc',
