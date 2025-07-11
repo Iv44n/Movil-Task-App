@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
     marginBottom: Sizes.spacing.s15
   },
   label: {
-    marginLeft: Sizes.spacing.s7,
     marginBottom: Sizes.spacing.s5
   },
   wrapper: {

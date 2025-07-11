@@ -140,7 +140,7 @@ const Picker: PickerComponent = ({
             styles.dropdownWrapper,
             {
               top: layout.y + layout.height + Sizes.spacing.s3,
-              left: layout.x,
+              left: layout.x - 1.2,
               maxWidth: Sizes.width.w225,
               minWidth: Sizes.width.w131,
               zIndex: 1000,
@@ -176,7 +176,7 @@ export default Picker
 const styles = StyleSheet.create({
   trigger: {
     height: Sizes.height.h47,
-    borderRadius: Shapes.rounded.sm,
+    borderRadius: Shapes.rounded.base,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
