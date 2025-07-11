@@ -9,8 +9,9 @@ import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
 import CircleIcon from '@/components/icons/CircleIcon'
 import HorizontalDotMenuIcon from '@/components/icons/HorizontalDotMenuIcon'
 import { useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Modal, Pressable, View } from 'react-native'
 import Header from '@/components/home/Header'
+import { AddProjectModal } from '@/components/home/AddProjectModal'
 
 interface TodoItem {
   id: string
@@ -152,11 +153,12 @@ const ToDoItem = observer(function ToDoItem({ title, subtitle, checked, onToggle
 
 export default function Index() {
   const { user } = useAuth()
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false)
 
   return (
     <ScreenWrapper isScrollable>
       <Header userName={user?.user_metadata.firstName} />
-      <ProjectsSlider />
+      <ProjectsSlider setShowAddProjectModal={setShowAddProjectModal}/>
       <ProgressInfo />
       <View
         style={{
@@ -180,6 +182,11 @@ export default function Index() {
           ))
         }
       </View>
+
+      <AddProjectModal
+        visible={showAddProjectModal}
+        onClose={() => setShowAddProjectModal(false)}
+      />
     </ScreenWrapper>
   )
 }
