@@ -4,8 +4,10 @@ import { use$ } from '@legendapp/state/react'
 import { observable } from '@legendapp/state'
 import { globalSync } from '@/lib/syncConfig'
 import { supabase } from '@/lib/supabase'
+import useProjectTasks from './useProjectTasks'
 
 type ProjectInsertType = Omit<Database['public']['Tables']['projects']['Insert'], 'id' | 'created_at' | 'updated_at' | 'task_count' | 'deleted'>
+type Project = Database['public']['Tables']['projects']['Row']
 
 const projects$ = observable(
   globalSync({
@@ -21,10 +23,11 @@ const projects$ = observable(
 )
 
 export default function useProjects() {
+  const { deleteTaskByProjectId } = useProjectTasks()
   const data = use$(projects$)
   const projects = Object.values(data || {}).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-  function getProjectsById(id: string) {
+  function getProjectsById(id: string): Project | undefined {
     return projects$[id].get()
   }
 
@@ -47,6 +50,7 @@ export default function useProjects() {
 
   function deleteProjectById(id: string) {
     projects$[id].delete()
+    deleteTaskByProjectId(id)
   }
 
   return {
