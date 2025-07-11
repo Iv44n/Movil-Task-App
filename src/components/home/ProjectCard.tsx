@@ -2,36 +2,35 @@ import ArrowRightUpIcon from '@/components/icons/ArrowRightUpIcon'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import useCategories from '@/hooks/data/useCategories'
-import { CapitalizeWords } from '@/utils/utils'
+import { formatProjectName } from '@/utils/utils'
 import { observer } from '@legendapp/state/react'
 import { Link } from 'expo-router'
 import { Pressable, StyleSheet, View } from 'react-native'
+import ProjectProgressBar from './ProjectProgressBar'
 
 interface ProjectCardProps {
-  task_count: number
+  taskCount: number
   name: string
   color: string
-  category_id: string
+  categoryId: string
+  completedTasks: number
   id: string
 }
 
-export default observer(function ProjectCard({ task_count, name, color, id, category_id }: ProjectCardProps) {
-  const words = name.trim().split(' ').filter(Boolean).map(CapitalizeWords) || []
-  const categoryName = useCategories().getCategoryById(category_id)?.name
+export default observer(function ProjectCard({
+  taskCount,
+  completedTasks,
+  name,
+  color,
+  id,
+  categoryId
+}: ProjectCardProps) {
+  const { firstPart, remaining } = formatProjectName(name)
+  const categoryName = useCategories().getCategoryById(categoryId)?.name
+  const progressPercentage = taskCount === 0 ? 0 : Math.round((completedTasks / taskCount) * 100)
 
-  let [firstWord = '', ...rest] = words
-
-  if (rest.length > 0 && rest[0].length < 4) {
-    firstWord = `${firstWord} ${rest[0]}`
-    rest = rest.slice(1)
-  }
-
-  const progressPercentage = task_count === 0
-    ? 0
-    : (task_count / task_count) * 100
-
-  return(
-    <View style={[styles.mainCard, { backgroundColor: color }]}>
+  return (
+    <View style={[styles.mainCard, { backgroundColor: color || Colors.primary }]}>
       <View>
         <Typo
           size={11}
@@ -40,24 +39,7 @@ export default observer(function ProjectCard({ task_count, name, color, id, cate
         >
           Progress
         </Typo>
-        <View style={styles.progressBarContainer}>
-          <View style={styles.progressBarBackground}>
-            <View
-              style={[
-                styles.progressBarFill,
-                { width: `${progressPercentage}%` }
-              ]}
-            />
-          </View>
-          <Typo
-            size={11}
-            weight='600'
-            color='black'
-            style={{ marginBottom: Sizes.spacing.s3 }}
-          >
-            {progressPercentage}%
-          </Typo>
-        </View>
+        <ProjectProgressBar progress={progressPercentage} />
       </View>
 
       <View style={styles.footerCard}>
@@ -69,7 +51,7 @@ export default observer(function ProjectCard({ task_count, name, color, id, cate
               ellipsizeMode='tail'
               numberOfLines={1}
             >
-              {firstWord}
+              {firstPart}
             </Typo>
             <Typo
               size={23}
@@ -78,7 +60,7 @@ export default observer(function ProjectCard({ task_count, name, color, id, cate
               ellipsizeMode='tail'
               numberOfLines={1}
             >
-              {rest.join(' ')}
+              {remaining}
             </Typo>
           </View>
           <Typo
@@ -110,26 +92,10 @@ const styles = StyleSheet.create({
     width: Sizes.width.w225,
     paddingHorizontal: Sizes.spacing.s17,
     paddingVertical: Sizes.spacing.s21,
-    height: Sizes.height.h191,
+    height: '100%',
     borderRadius: Shapes.rounded.md,
     justifyContent: 'space-around',
     marginRight: Sizes.spacing.s11
-  },
-  progressBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Sizes.spacing.s9
-  },
-  progressBarBackground: {
-    width: '60%',
-    height: Sizes.height.h5,
-    backgroundColor: Colors.secondary,
-    borderRadius: Shapes.rounded.md
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: Colors.background,
-    borderRadius: Shapes.rounded.md
   },
   footerCard: {
     flexDirection: 'row',
@@ -137,7 +103,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   projectInfo: {
-    gap: Sizes.spacing.s5,
+    gap: Sizes.spacing.s7,
     maxWidth: Sizes.width.w225 - 100
   },
   arrowButton: {

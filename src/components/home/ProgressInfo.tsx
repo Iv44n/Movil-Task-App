@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { StyleSheet, View, FlatList, ListRenderItem, Pressable } from 'react-native'
 import ProgressIcon from '@/components/icons/ProgressIcon'
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
@@ -6,41 +6,30 @@ import CircleIcon from '@/components/icons/CircleIcon'
 import Svg, { Circle } from 'react-native-svg'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { observer } from '@legendapp/state/react'
+import useProjectTasks from '@/hooks/data/useProjectTasks'
 
-const PRIORITY_TASKS: string[] = [
-  'Diseñar el dashboard de analiticas',
-  'Daily Meeting',
-  'Design Homepage',
-  'Design About Page',
-  'Design Logo',
-  'Daily Meeting',
-  'Design Homepage',
-  'Design About Page'
-]
-
-const PriorityItem = ({ label }: { label: string }) => {
-  const [checked, setChecked] = useState(false)
-
+const PriorityItem = ({ label, isCompleted, onCompleted }: { label: string, isCompleted: boolean, onCompleted: () => void }) => {
   return(
     <View style={styles.priorityItem}>
       <Pressable
-        onPress={() => setChecked(!checked)}
+        onPress={onCompleted}
         style={{
           flexDirection: 'row'
         }}
       >
         <View>
           {
-            checked
+            isCompleted
               ? <CheckCircleIcon size={19} color={Colors.secondary} />
               : <CircleIcon size={19} color={Colors.primary}/>
           }
         </View>
         <Typo
           size={13}
-          color={checked ? 'secondary' : 'primary'}
+          color={isCompleted ? 'secondary' : 'primary'}
           style={{
-            textDecorationLine: checked ? 'line-through' : 'none',
+            textDecorationLine: isCompleted ? 'line-through' : 'none',
             maxWidth: '85%',
             marginLeft: Sizes.spacing.s7
           }}
@@ -120,12 +109,64 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
   )
 }
 
-export default function ProgressInfo () {
-  const completed = useMemo(() => ({ percent: 10, count: 56, total: 64 }), [])
-  const inProgress = useMemo(() => ({ count: 6 }), [])
+export default observer(function ProgressInfo () {
+  const { tasks, updateTask, totalTasks } = useProjectTasks()
 
-  const renderPriority: ListRenderItem<string> = ({ item }) => (
-    <PriorityItem label={item} />
+  const todayStart = useMemo(() => {
+    const now = new Date()
+    now.setHours(0, 0, 0, 0)
+    return now
+  }, [])
+
+  const todayEnd = useMemo(() => {
+    const now = new Date()
+    now.setHours(23, 59, 59, 999)
+    return now
+  }, [])
+
+  const completedTodayLength = useMemo(() => {
+    return tasks.filter(task => {
+      const { status, updated_at } = task
+      if (status !== 'completed') return false
+
+      const completionDate = new Date(updated_at)
+      return completionDate >= todayStart && completionDate <= todayEnd
+    }).length
+  }, [tasks, todayStart, todayEnd])
+
+  const completedTasksLength = useMemo(() => {
+    return tasks.filter(task => task.status === 'completed').length
+  }, [tasks])
+
+  const importantTasks = useMemo(() => {
+    const result: { title: string, id: string, status: string }[] = []
+
+    for (const task of tasks) {
+      const { title, id, priority, due_date, status } = task
+      const isHighPriority = priority?.toLowerCase() === 'high'
+
+      let isDueToday = false
+      if (due_date) {
+        const due = new Date(due_date)
+        due.setHours(0, 0, 0, 0)
+        isDueToday = due.getTime() === todayStart.getTime()
+      }
+
+      if (isHighPriority || isDueToday) {
+        result.push({ title, id, status })
+        if (result.length === 4) break
+      }
+    }
+
+    return result
+  }, [tasks, todayStart])
+
+  const renderPriority: ListRenderItem<{ title: string, id: string, status: string }> = ({ item }) => (
+    <PriorityItem
+      label={item.title}
+      isCompleted={item.status === 'completed'}
+      onCompleted={() => updateTask(item.id, { status: item.status === 'completed' ? 'pending' : 'completed' })}
+    />
   )
 
   return (
@@ -142,10 +183,15 @@ export default function ProgressInfo () {
             Priority Tasks
           </Typo>
           <FlatList
-            data={PRIORITY_TASKS.slice(0, 4)}
-            keyExtractor={(item) => item}
+            data={importantTasks}
+            keyExtractor={(item) => item.id}
             renderItem={renderPriority}
             scrollEnabled={false}
+            contentContainerStyle={{
+              gap: Sizes.spacing.s11,
+              flex: 1,
+              justifyContent: 'space-between'
+            }}
           />
         </View>
 
@@ -153,21 +199,21 @@ export default function ProgressInfo () {
         <View style={styles.indicatorContainer}>
           <ProgressSummary
             label='Completed'
-            percent={completed.percent}
-            count={completed.count}
-            total={completed.total}
+            percent={totalTasks > 0 ? Math.round((completedTasksLength / totalTasks) * 100) : 0}
+            count={completedTasksLength}
+            total={totalTasks}
           />
 
           <ProgressSummary
-            label='In Progress'
+            label='Done Today'
             useIcon
-            count={inProgress.count}
+            count={completedTodayLength}
           />
         </View>
       </View>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {
@@ -181,7 +227,7 @@ const styles = StyleSheet.create({
   card: {
     width: '49%',
     backgroundColor: Colors.card,
-    padding: Sizes.spacing.s13,
+    padding: Sizes.spacing.s15,
     borderRadius: Shapes.rounded.md,
     borderWidth: 1,
     borderColor: Colors.border
@@ -189,7 +235,6 @@ const styles = StyleSheet.create({
   priorityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Sizes.spacing.s11,
     marginLeft: -1
   },
   indicatorContainer: {
@@ -200,7 +245,7 @@ const styles = StyleSheet.create({
   progressSummary: {
     flexDirection: 'row',
     backgroundColor: Colors.card,
-    padding: '10%',
+    padding: '9%',
     borderRadius: Shapes.rounded.md,
     borderWidth: 1,
     borderColor: Colors.border,
