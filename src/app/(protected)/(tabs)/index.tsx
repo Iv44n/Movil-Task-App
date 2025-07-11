@@ -9,7 +9,7 @@ import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
 import CircleIcon from '@/components/icons/CircleIcon'
 import HorizontalDotMenuIcon from '@/components/icons/HorizontalDotMenuIcon'
 import { useState } from 'react'
-import { Modal, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import Header from '@/components/home/Header'
 import { AddProjectModal } from '@/components/home/AddProjectModal'
 
