@@ -11,6 +11,7 @@ import OptionsModal from '@/components/project/OptionsModal'
 import { Sizes } from '@/constants/theme'
 import TaskItem from '@/components/project/TaskItem'
 import FloatingButton from '@/components/project/FloatingButton'
+import { AddTaskModal } from '@/components/project/AddTaskModalProps'
 
 type Status = 'pending' | 'completed' | 'all'
 
@@ -29,6 +30,7 @@ export default function Details() {
   const { id } = useLocalSearchParams() as { id: string | undefined }
   const router = useRouter()
   const [showOptions, setShowOptions] = useState(false)
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false)
   const [tab, setTab] = useState<Status>('all')
   const { getProjectsById, deleteProjectById } = useProjects()
 
@@ -133,7 +135,7 @@ export default function Details() {
         </View>
 
         <FloatingButton
-          onPress={() => { /* abrir modal de nueva tarea */ }}
+          onPress={() => setShowAddTaskModal(true)}
           color={color}
         />
 
@@ -145,6 +147,15 @@ export default function Details() {
           // navegar a editar
           }}
           onDelete={handleDelete}
+        />
+
+        <AddTaskModal
+          colorTheme={color!}
+          visible={showAddTaskModal}
+          onClose={() => setShowAddTaskModal(false)}
+          onAddTask={() => {
+            setShowAddTaskModal(false)
+          }}
         />
       </View>
     </ScreenWrapper>
