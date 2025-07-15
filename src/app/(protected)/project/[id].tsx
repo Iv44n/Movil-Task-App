@@ -12,6 +12,7 @@ import { Sizes } from '@/constants/theme'
 import TaskItem from '@/components/project/TaskItem'
 import FloatingButton from '@/components/project/FloatingButton'
 import { AddTaskModal } from '@/components/project/AddTaskModalProps'
+import { observer } from '@legendapp/state/react'
 
 type Status = 'pending' | 'completed' | 'all'
 
@@ -26,7 +27,7 @@ const tabs: TabItem[] = [
   { key: 'completed', label: 'Completed' }
 ]
 
-export default function Details() {
+export default observer(function Details() {
   const { id } = useLocalSearchParams() as { id: string | undefined }
   const router = useRouter()
   const [showOptions, setShowOptions] = useState(false)
@@ -130,7 +131,7 @@ export default function Details() {
                 No tasks.
               </Typo>
             }
-            renderItem={({ item }) => <TaskItem task={item} />}
+            renderItem={({ item }) => <TaskItem task={item} colorTheme={color} />}
           />
         </View>
 
@@ -160,7 +161,7 @@ export default function Details() {
       </View>
     </ScreenWrapper>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {
