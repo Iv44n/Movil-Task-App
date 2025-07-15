@@ -9,6 +9,7 @@ export interface TypoProps extends TextProps {
   weight?: FontWeight
   children: React.ReactNode
   color?: keyof typeof Colors
+  forceColor?: string
   style?: TextStyle
 }
 
@@ -47,10 +48,10 @@ function getFontFamilyFromWeight(fontWeight?: FontWeight): string {
   }
 }
 
-export default function Typo({ size, color, weight, children, style, ...rest }: TypoProps) {
+export default function Typo({ size, color, weight, children, style, forceColor, ...rest }: TypoProps) {
   const textStyle: TextStyle = {
     fontSize: moderateScale(size || DEFAULT_SIZE),
-    color: Colors[color || DEFAULT_COLOR_TOKEN],
+    color: forceColor ? forceColor : Colors[color || DEFAULT_COLOR_TOKEN],
     fontFamily: getFontFamilyFromWeight(weight || DEFAULT_WEIGHT),
     //fontWeight: weight || DEFAULT_WEIGHT,
     ...style
