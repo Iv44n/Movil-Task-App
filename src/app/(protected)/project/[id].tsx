@@ -13,7 +13,9 @@ import TaskItem from '@/components/project/TaskItem'
 import FloatingButton from '@/components/project/FloatingButton'
 import { AddTaskModal } from '@/components/project/AddTaskModalProps'
 import { observer } from '@legendapp/state/react'
+import { Database } from '@/lib/database.types'
 
+type InsertTaskForForm = Omit<Database['public']['Tables']['project_tasks']['Insert'], 'id' | 'created_at' | 'updated_at' | 'user_id' | 'project_id' | 'deleted' | 'status'>
 type Status = 'pending' | 'completed' | 'all'
 
 type TabItem = {
@@ -34,11 +36,31 @@ export default observer(function Details() {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false)
   const [tab, setTab] = useState<Status>('all')
   const { getProjectsById, deleteProjectById } = useProjects()
+  const { tasks, updateTask, createTask } = useProjectTasks()
 
   const { name: projectName, description, color } = getProjectsById(id || '') || {}
-  const tasks = useProjectTasks().tasks.filter(t => t.project_id === id)
+  const projectTasks = tasks.filter(t => t.project_id === id)
 
   const { firstPart, remaining } = formatProjectName(projectName || '')
+
+  const onAddTask = useCallback((task: InsertTaskForForm) => {
+    if (!id) return
+
+    const newTask = {
+      ...task,
+      project_id: id
+    }
+
+    createTask(newTask)
+    setShowAddTaskModal(false)
+  }, [id, createTask])
+
+  const handleStatusChange = useCallback((taskId: string) => {
+    const task = projectTasks.find(t => t.id === taskId)
+    if (!task) return
+    task.status = task.status === 'completed' ? 'pending' : 'completed'
+    updateTask(task.id, { status: task.status })
+  }, [projectTasks, updateTask])
 
   const handleDelete = useCallback(() => {
     Alert.alert(
@@ -60,13 +82,13 @@ export default observer(function Details() {
   }, [deleteProjectById, id, router])
 
   const filteredTasks = useMemo(() => {
-    if (tab === 'all') return tasks
+    if (tab === 'all') return projectTasks
 
-    return tasks.filter(t => {
+    return projectTasks.filter(t => {
       if (tab === 'pending') return t.status === 'pending'
       return t.status === 'completed'
     })
-  }, [tasks, tab])
+  }, [projectTasks, tab])
 
   return (
     <ScreenWrapper>
@@ -131,7 +153,7 @@ export default observer(function Details() {
                 No tasks.
               </Typo>
             }
-            renderItem={({ item }) => <TaskItem task={item} colorTheme={color} />}
+            renderItem={({ item }) => <TaskItem task={item} colorTheme={color} onChangeStatus={handleStatusChange}/>}
           />
         </View>
 
@@ -154,9 +176,7 @@ export default observer(function Details() {
           colorTheme={color!}
           visible={showAddTaskModal}
           onClose={() => setShowAddTaskModal(false)}
-          onAddTask={() => {
-            setShowAddTaskModal(false)
-          }}
+          onAddTask={onAddTask}
         />
       </View>
     </ScreenWrapper>
