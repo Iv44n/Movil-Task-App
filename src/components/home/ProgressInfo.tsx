@@ -188,7 +188,7 @@ export default observer(function ProgressInfo () {
             contentContainerStyle={{
               gap: Sizes.spacing.s11,
               flex: 1,
-              justifyContent: 'space-between'
+              justifyContent: 'flex-start'
             }}
           />
         </View>
