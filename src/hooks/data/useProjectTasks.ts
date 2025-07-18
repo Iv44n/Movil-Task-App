@@ -1,14 +1,15 @@
 import { randomUUID } from 'expo-crypto'
-import { Database } from '@/lib/database.types'
 import { use$ } from '@legendapp/state/react'
-import { observable } from '@legendapp/state'
+import { observable, computed } from '@legendapp/state'
 import { globalSync } from '@/lib/syncConfig'
 import { supabase } from '@/lib/supabase'
+import type {
+  InsertProjectTaskForForm,
+  ProjectTask,
+  UpdateProjectTaskForForm
+} from '@/types/ProjectTask'
 
-type TaskInsertType = Omit<Database['public']['Tables']['project_tasks']['Insert'], 'id' | 'created_at' | 'updated_at' | 'task_count' | 'deleted'>
-type TaskUpdateType = Omit<Database['public']['Tables']['project_tasks']['Update'], 'updated_at'>
-
-const tasks$ = observable(
+const projectTasks$ = observable(
   globalSync({
     supabase,
     collection: 'project_tasks',
@@ -17,67 +18,67 @@ const tasks$ = observable(
     realtime: true,
     persist: { name: 'project_tasks', retrySync: true },
     retry: { infinite: true },
-    onError: (error) => console.log(error)
+    onError: error => console.error('Sync error:', error)
   })
 )
 
 export default function useProjectTasks() {
-  const data = use$(tasks$)
-  const tasks = Object.values(data || {}).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const rawData = use$(projectTasks$)
 
-  function getTaskById(id: string) {
-    return tasks$[id].get()
-  }
+  const tasks = use$(
+    computed(() =>
+      Object.values(rawData || {}).sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    )
+  )
 
-  function createTask(project: TaskInsertType) {
-    const id = randomUUID()
+  const getTaskById = (taskId: string): ProjectTask | null => projectTasks$[taskId]?.get() || null
 
-    const record = tasks$[id].assign({
-      id,
-      ...project
+  const createTask = (projectId: string, payload: InsertProjectTaskForForm) => {
+    if (!payload.title) throw new Error('Title is required')
+    if (!projectId) throw new Error('Project ID is required')
+
+    const newTaskId = randomUUID()
+    const newTask = projectTasks$[newTaskId].assign({
+      id: newTaskId,
+      project_id: projectId,
+      ...payload
     })
 
-    tasks$.set((prev) => ({
-      [id]: record.get(),
-      ...prev
+    projectTasks$.set(prev => ({ [newTaskId]: newTask.get(), ...prev }))
+    return newTask.get()
+  }
+
+  const updateTask = (taskId: string, changes: Partial<UpdateProjectTaskForForm>) => {
+    if (!taskId) throw new Error('Task ID is required')
+
+    const node = projectTasks$[taskId]
+    if (!node.get()) throw new Error(`Task not found: ${taskId}`)
+
+    node.set(prev => ({
+      ...prev,
+      ...changes
     }))
-
-    return record.get()
   }
 
-  function updateTask(id: string, changes: TaskUpdateType) {
-    const existing = tasks$[id].get()
-    if (!existing) throw new Error(`Task ${id} not found`)
-
-    const updated = tasks$[id].assign({
-      ...changes,
-      updated_at: new Date().toISOString()
-    })
-
-    return updated.get()
+  const deleteTaskById = (taskId: string) => {
+    projectTasks$[taskId]?.delete()
   }
 
-  function deleteTaskById(id: string) {
-    tasks$[id].delete()
-  }
-
-  function deleteTaskByProjectId(projectId: string){
-    const idsToDelete = tasks
-      .filter(t => t.project_id === projectId)
-      .map(t => t.id)
-
-    idsToDelete.forEach(id => {
-      tasks$[id].delete()
-    })
+  const deleteTasksByProjectId = (projectId: string) => {
+    tasks
+      .filter(task => task.project_id === projectId)
+      .forEach(task => projectTasks$[task.id]?.delete())
   }
 
   return {
-    tasks: tasks || [],
-    totalTasks: tasks ? tasks.length : 0,
-    updateTask,
+    tasks,
+    totalTasks: tasks.length,
     getTaskById,
     createTask,
+    updateTask,
     deleteTaskById,
-    deleteTaskByProjectId
+    deleteTasksByProjectId
   }
 }
