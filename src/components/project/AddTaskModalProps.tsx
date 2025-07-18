@@ -12,16 +12,14 @@ import ActionButton from '../shared/ActionButton'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useCallback } from 'react'
 import FormField from '../shared/FormField'
-import { Database } from '@/lib/database.types'
 import Icon from '../icons/Icon'
-
-type InsertTaskForForm = Omit<Database['public']['Tables']['project_tasks']['Insert'], 'id' | 'created_at' | 'updated_at' | 'user_id' | 'project_id' | 'deleted' | 'status'>
+import { InsertProjectTaskForForm } from '@/types/ProjectTask'
 
 interface AddTaskModalProps {
   readonly colorTheme: string;
   readonly visible: boolean;
   readonly onClose: () => void;
-  readonly onAddTask: (task: InsertTaskForForm) => void;
+  readonly onAddTask: (task: InsertProjectTaskForForm) => void;
 }
 
 type FormData = {

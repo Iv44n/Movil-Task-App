@@ -5,7 +5,7 @@ import { Sizes } from '@/constants/theme'
 import { View } from 'react-native'
 
 const Header = observer(function Header({ userName }: { userName: string }) {
-  const { projectsLength } = useProjects()
+  const { totalProjects } = useProjects()
 
   return (
     <View style={{
@@ -30,7 +30,7 @@ const Header = observer(function Header({ userName }: { userName: string }) {
           weight='600'
           style={{ textDecorationLine: 'underline' }}
         >
-          {projectsLength} Projects
+          {totalProjects} Projects
         </Typo>
       </View>
       {/*       <View style={styles.iconContainer}>

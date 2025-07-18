@@ -11,11 +11,9 @@ import FormField from '@/components/shared/FormField'
 import ActionButton from '@/components/shared/ActionButton'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import useCategories from '@/hooks/data/useCategories'
-import { Database } from '@/lib/database.types'
 import { observer } from '@legendapp/state/react'
 import Icon from '@/components/icons/Icon'
-
-type Category = Database['public']['Tables']['categories']['Row']
+import { Category } from '@/types/Category'
 
 interface CategorySelectorProps {
   onSelect: (category: Category | null) => void

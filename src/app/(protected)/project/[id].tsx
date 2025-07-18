@@ -13,9 +13,9 @@ import TaskItem from '@/components/project/TaskItem'
 import FloatingButton from '@/components/project/FloatingButton'
 import { AddTaskModal } from '@/components/project/AddTaskModalProps'
 import { observer } from '@legendapp/state/react'
-import { Database } from '@/lib/database.types'
+import { InsertProjectTaskForForm } from '@/types/ProjectTask'
+import { StatusTask } from '@/constants/constants'
 
-type InsertTaskForForm = Omit<Database['public']['Tables']['project_tasks']['Insert'], 'id' | 'created_at' | 'updated_at' | 'user_id' | 'project_id' | 'deleted' | 'status'>
 type Status = 'pending' | 'completed' | 'all'
 
 type TabItem = {
@@ -30,36 +30,31 @@ const tabs: TabItem[] = [
 ]
 
 export default observer(function Details() {
-  const { id } = useLocalSearchParams() as { id: string | undefined }
+  const { id: projectId } = useLocalSearchParams() as { id: string | undefined }
   const router = useRouter()
   const [showOptions, setShowOptions] = useState(false)
   const [showAddTaskModal, setShowAddTaskModal] = useState(false)
   const [tab, setTab] = useState<Status>('all')
-  const { getProjectsById, deleteProjectById } = useProjects()
+  const { getProjectById, deleteProjectById } = useProjects()
   const { tasks, updateTask, createTask } = useProjectTasks()
 
-  const { name: projectName, description, color } = getProjectsById(id || '') || {}
-  const projectTasks = tasks.filter(t => t.project_id === id)
+  const { name: projectName, description, color } = getProjectById(projectId || '') || {}
+  const projectTasks = tasks.filter(t => t.project_id === projectId)
 
   const { firstPart, remaining } = formatProjectName(projectName || '')
 
-  const onAddTask = useCallback((task: InsertTaskForForm) => {
-    if (!id) return
-
-    const newTask = {
-      ...task,
-      project_id: id
-    }
-
-    createTask(newTask)
+  const onAddTask = useCallback((newTask: InsertProjectTaskForForm) => {
+    if (!projectId) return
+    createTask(projectId, newTask)
     setShowAddTaskModal(false)
-  }, [id, createTask])
+  }, [projectId, createTask])
 
-  const handleStatusChange = useCallback((taskId: string) => {
+  const handleStatusTaskChange = useCallback((taskId: string) => {
     const task = projectTasks.find(t => t.id === taskId)
     if (!task) return
-    task.status = task.status === 'completed' ? 'pending' : 'completed'
-    updateTask(task.id, { status: task.status })
+
+    const newStatus = task.status === StatusTask.COMPLETED ? StatusTask.PENDING : StatusTask.COMPLETED
+    updateTask(task.id, { status: newStatus })
   }, [projectTasks, updateTask])
 
   const handleDelete = useCallback(() => {
@@ -72,14 +67,14 @@ export default observer(function Details() {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            if (!id) return
-            deleteProjectById(id)
+            if (!projectId) return
+            deleteProjectById(projectId)
             router.back()
           }
         }
       ]
     )
-  }, [deleteProjectById, id, router])
+  }, [deleteProjectById, projectId, router])
 
   const filteredTasks = useMemo(() => {
     if (tab === 'all') return projectTasks
@@ -153,7 +148,7 @@ export default observer(function Details() {
                 No tasks.
               </Typo>
             }
-            renderItem={({ item }) => <TaskItem task={item} colorTheme={color} onChangeStatus={handleStatusChange}/>}
+            renderItem={({ item }) => <TaskItem task={item} colorTheme={color} onChangeStatus={handleStatusTaskChange}/>}
           />
         </View>
 

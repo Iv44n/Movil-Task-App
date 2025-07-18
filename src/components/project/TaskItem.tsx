@@ -8,14 +8,14 @@ import {
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { CapitalizeWords } from '@/utils/utils'
-import { Database } from '@/lib/database.types'
 import Icon from '../icons/Icon'
 import Avatar from '../shared/Avatar'
 import { format } from '@formkit/tempo'
 import { isPast, isToday } from '@/utils/date'
+import { ProjectTask } from '@/types/ProjectTask'
 
 interface Props {
-  task: Database['public']['Tables']['project_tasks']['Row']
+  task: ProjectTask
   onPress?: () => void
   onChangeStatus?: (id: string) => void
   colorTheme?: string

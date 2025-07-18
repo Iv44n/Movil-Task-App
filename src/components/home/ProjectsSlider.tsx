@@ -11,12 +11,9 @@ import {
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import ProjectCard from '@/components/home/ProjectCard'
 import Typo from '@/components/shared/Typo'
-import { Database } from '@/lib/database.types'
 import useProjects from '@/hooks/data/useProjects'
 import { observer } from '@legendapp/state/react'
 import { BlurView } from 'expo-blur'
-
-export type ProjectType = Database['public']['Tables']['projects']['Row']
 
 function AddProjectButton({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
   return (

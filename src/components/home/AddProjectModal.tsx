@@ -15,8 +15,8 @@ import FormField from '../shared/FormField'
 import useProjects from '@/hooks/data/useProjects'
 import { useRouter } from 'expo-router'
 import CategorySelector from '@/components/home/CategorySelector'
-import { Database } from '@/lib/database.types'
 import Icon from '@/components/icons/Icon'
+import { Category } from '@/types/Category'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -28,8 +28,6 @@ interface FormData {
   description: string;
   selectedColor: string;
 }
-
-type Category = Database['public']['Tables']['categories']['Row']
 
 const PROJECT_COLORS = [
   Colors.green,
