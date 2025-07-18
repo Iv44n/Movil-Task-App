@@ -5,8 +5,6 @@ import {
   StyleSheet,
   View
 } from 'react-native'
-import AddIcon from '@/components/icons/AddIcon'
-import TrashIcon from '@/components/icons/TrashIcon'
 import Picker from '@/components/shared/Picker'
 import Typo from '@/components/shared/Typo'
 import FormField from '@/components/shared/FormField'
@@ -15,6 +13,7 @@ import { Colors, Shapes, Sizes } from '@/constants/theme'
 import useCategories from '@/hooks/data/useCategories'
 import { Database } from '@/lib/database.types'
 import { observer } from '@legendapp/state/react'
+import Icon from '@/components/icons/Icon'
 
 type Category = Database['public']['Tables']['categories']['Row']
 
@@ -155,7 +154,7 @@ export default observer(function CategorySelector({
           label='New category'
           value={NEW_VALUE}
           typoProps={{ size: 15, color: 'secondary' }}
-          icon={<AddIcon color={Colors.secondary} size={23} />}
+          icon={<Icon.Add color={Colors.secondary} size={23} />}
           handleIconPress={() => setShowAddModal(true)}
           style={[styles.newItem, categories.length > 0 && addNewCategoryListStyle]}
         />
@@ -166,7 +165,7 @@ export default observer(function CategorySelector({
             label={c.name}
             value={c.name}
             isSelected={selected?.id === c.id}
-            icon={<TrashIcon color={Colors.error} size={19} />}
+            icon={<Icon.Trash color={Colors.error} size={19} />}
             iconPosition='right'
             handleIconPress={() => handleDelete(c.id)}
           />

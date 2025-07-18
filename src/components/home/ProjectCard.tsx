@@ -1,4 +1,4 @@
-import ArrowRightUpIcon from '@/components/icons/ArrowRightUpIcon'
+import Icon from '@/components/icons/Icon'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import useCategories from '@/hooks/data/useCategories'
@@ -79,7 +79,7 @@ export default observer(function ProjectCard({
           asChild
         >
           <Pressable style={styles.arrowButton}>
-            <ArrowRightUpIcon color={Colors.primary} />
+            <Icon.ArrowRightUp color={Colors.primary} />
           </Pressable>
         </Link>
       </View>

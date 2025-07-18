@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { Colors, Sizes, Shapes } from '@/constants/theme'
 import Typo, { TypoProps } from './Typo'
-import AltArrowDownIcon from '../icons/AltArrowDownIcon'
+import Icon from '../icons/Icon'
 
 // PickerItem interface
 interface PickerItemProps {
@@ -127,7 +127,7 @@ const Picker: PickerComponent = ({
           {selectedValue || placeholder}
         </Typo>
         {triggerIcon ?? (
-          <AltArrowDownIcon
+          <Icon.AltArrowDown
             size={20}
             color={selectedValue ? Colors.primary : Colors.primary}
           />

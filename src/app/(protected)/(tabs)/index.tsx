@@ -5,13 +5,11 @@ import ProjectsSlider from '@/components/home/ProjectsSlider'
 import ProgressInfo from '@/components/home/ProgressInfo'
 import { useAuth } from '@/hooks/auth/useAuth'
 import { observer } from '@legendapp/state/react'
-import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
-import CircleIcon from '@/components/icons/CircleIcon'
-import HorizontalDotMenuIcon from '@/components/icons/HorizontalDotMenuIcon'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import Header from '@/components/home/Header'
 import { AddProjectModal } from '@/components/home/AddProjectModal'
+import Icon from '@/components/icons/Icon'
 
 interface TodoItem {
   id: string
@@ -115,9 +113,9 @@ const ToDoItem = observer(function ToDoItem({ title, subtitle, checked, onToggle
     >
       <Pressable onPress={() => setIsChecked(!isChecked)}>
         {isChecked ? (
-          <CheckCircleIcon size={29} color={Colors.secondary} />
+          <Icon.CheckCircle size={29} color={Colors.secondary} />
         ) : (
-          <CircleIcon size={29} />
+          <Icon.Circle size={29} />
         )}
       </Pressable>
 
@@ -145,7 +143,7 @@ const ToDoItem = observer(function ToDoItem({ title, subtitle, checked, onToggle
       </View>
 
       <Pressable onPress={onPressMenu}>
-        <HorizontalDotMenuIcon size={29} color={Colors.secondary} />
+        <Icon.HorizontalDotMenu size={29} color={Colors.secondary} />
       </Pressable>
     </View>
   )

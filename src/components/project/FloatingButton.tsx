@@ -1,6 +1,6 @@
 import { Shapes, Sizes } from '@/constants/theme'
 import { Pressable, StyleSheet } from 'react-native'
-import AddIcon from '../icons/AddIcon'
+import Icon from '../icons/Icon'
 
 interface Props {
   onPress(): void
@@ -16,7 +16,7 @@ export default function FloatingButton({ onPress, color }: Props) {
       ]}
       onPress={onPress}
     >
-      <AddIcon color='black' size={31}/>
+      <Icon.Add color='black' size={31}/>
     </Pressable>
   )
 }

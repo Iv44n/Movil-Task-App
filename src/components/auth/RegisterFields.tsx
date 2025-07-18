@@ -6,13 +6,12 @@ import {
   Alert
 } from 'react-native'
 import { Colors, Sizes } from '@/constants/theme'
-import EyeIcon from '@/components/icons/EyeIcon'
-import EyeOffIcon from '@/components/icons/EyeOffIcon'
 import FormField from '@/components/shared/FormField'
 import useSignUp from '@/hooks/auth/useSignUp'
 import { Controller, useForm } from 'react-hook-form'
 import ActionButton from '@/components/shared/ActionButton'
 import AuthPrompt from './AuthPrompt'
+import Icon from '@/components/icons/Icon'
 
 interface FormData {
   firstName: string
@@ -158,8 +157,8 @@ export default function UserRegister() {
               autoCapitalize='none'
               icon={
                 showPassword
-                  ? <EyeOffIcon size={21} color={Colors.secondary} />
-                  : <EyeIcon size={21} color={Colors.secondary} />
+                  ? <Icon.EyeOff size={21} color={Colors.secondary} />
+                  : <Icon.Eye size={21} color={Colors.secondary} />
               }
               onIconPress={togglePasswordVisibility}
               error={errors.password?.message}

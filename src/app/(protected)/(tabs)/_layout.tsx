@@ -1,9 +1,8 @@
 import { Tabs } from 'expo-router'
 import { StyleSheet, View } from 'react-native'
 import { Colors, Shapes } from '@/constants/theme'
-import HomeIcon from '@/components/icons/HomeIcon'
-import UserIcon from '@/components/icons/UserIcon'
 import TabBar from '@/components/TabBar'
+import Icon from '@/components/icons/Icon'
 
 export default function TabsLayout() {
   return (
@@ -20,7 +19,7 @@ export default function TabsLayout() {
           title: 'Home',
           tabBarIcon: ({ color, focused, size }) => (
             <View style={[styles.iconContainer, focused && styles.iconActive]}>
-              <HomeIcon color={color} size={size}/>
+              <Icon.Home color={color} size={size}/>
             </View>
           )
         }}
@@ -30,7 +29,7 @@ export default function TabsLayout() {
           title: 'Profile',
           tabBarIcon: ({ color, focused, size }) => (
             <View style={[styles.iconContainer, focused && styles.iconActive]}>
-              <UserIcon color={color} size={size}/>
+              <Icon.User color={color} size={size}/>
             </View>
           )
         }}

@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useCallback } from 'react'
 import FormField from '../shared/FormField'
 import { Database } from '@/lib/database.types'
-import CloseIcon from '../icons/CloseIcon'
+import Icon from '../icons/Icon'
 
 type InsertTaskForForm = Omit<Database['public']['Tables']['project_tasks']['Insert'], 'id' | 'created_at' | 'updated_at' | 'user_id' | 'project_id' | 'deleted' | 'status'>
 
@@ -69,7 +69,7 @@ export function AddTaskModal({ visible, onClose, onAddTask, colorTheme }: AddTas
         <View style={styles.header}>
           <Typo size={19} weight='600'>Create New Task</Typo>
           <TouchableOpacity onPress={onClose}>
-            <CloseIcon />
+            <Icon.Close />
           </TouchableOpacity>
         </View>
 

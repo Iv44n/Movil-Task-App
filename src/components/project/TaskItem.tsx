@@ -9,9 +9,7 @@ import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { CapitalizeWords } from '@/utils/utils'
 import { Database } from '@/lib/database.types'
-import CheckCircleIcon from '../icons/CheckCircleIcon'
-import CircleIcon from '../icons/CircleIcon'
-import ChatLineIcon from '../icons/ChatLineIcon'
+import Icon from '../icons/Icon'
 import Avatar from '../shared/Avatar'
 import { format } from '@formkit/tempo'
 import { isPast, isToday } from '@/utils/date'
@@ -77,9 +75,9 @@ export default function TaskItem({ task, onPress, colorTheme = Colors.primary, o
 
         <Pressable onPress={() => onChangeStatus?.(task.id)}>
           {status === 'completed' ? (
-            <CheckCircleIcon size={31} color={colorTheme} />
+            <Icon.CheckCircle size={31} color={colorTheme} />
           ) : (
-            <CircleIcon size={31} color={colorTheme} />
+            <Icon.Circle size={31} color={colorTheme} />
           )}
         </Pressable>
       </View>
@@ -124,7 +122,7 @@ export default function TaskItem({ task, onPress, colorTheme = Colors.primary, o
         </View>
 
         <View style={styles.commentsContainer}>
-          <ChatLineIcon size={21} />
+          <Icon.ChatLine size={21} />
           <Typo size={13} weight='500' color='secondary' style={styles.commentsText}>
             <Typo size={15} weight='600'>
               2

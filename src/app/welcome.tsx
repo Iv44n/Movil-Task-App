@@ -1,10 +1,10 @@
-import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Pressable, StyleSheet, View } from 'react-native'
+import Icon from '@/components/icons/Icon'
 
 export default function Welcome() {
   const router = useRouter()
@@ -37,7 +37,7 @@ export default function Welcome() {
       <Pressable style={styles.button} onPress={finishWelcome}>
         <Typo size={16} color='black' weight='500'>Get Started</Typo>
         <View style={styles.iconWrapper}>
-          <ArrowRightIcon color={Colors.primary} />
+          <Icon.ArrowRight color={Colors.primary} />
         </View>
       </Pressable>
     </ScreenWrapper>

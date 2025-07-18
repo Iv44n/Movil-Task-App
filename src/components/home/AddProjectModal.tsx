@@ -16,8 +16,7 @@ import useProjects from '@/hooks/data/useProjects'
 import { useRouter } from 'expo-router'
 import CategorySelector from '@/components/home/CategorySelector'
 import { Database } from '@/lib/database.types'
-import CloseIcon from '../icons/CloseIcon'
-import CheckIcon from '../icons/CheckIcon'
+import Icon from '@/components/icons/Icon'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -92,7 +91,7 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
         <View style={styles.header}>
           <Typo size={19} weight='600'>Create New Project</Typo>
           <TouchableOpacity onPress={onClose}>
-            <CloseIcon />
+            <Icon.Close />
           </TouchableOpacity>
         </View>
 
@@ -167,7 +166,7 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
                         ]}
                         onPress={() => onChange(color)}
                       >
-                        {isSelected && <CheckIcon size={37} color={Colors.black} />}
+                        {isSelected && <Icon.Check size={37} color={Colors.black} />}
                       </TouchableOpacity>
                     )
                   })}

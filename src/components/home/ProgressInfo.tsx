@@ -1,8 +1,6 @@
 import { useMemo } from 'react'
 import { StyleSheet, View, FlatList, ListRenderItem, Pressable } from 'react-native'
-import ProgressIcon from '@/components/icons/ProgressIcon'
-import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
-import CircleIcon from '@/components/icons/CircleIcon'
+import Icon from '@/components/icons/Icon'
 import Svg, { Circle } from 'react-native-svg'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
@@ -21,8 +19,8 @@ const PriorityItem = ({ label, isCompleted, onCompleted }: { label: string, isCo
         <View>
           {
             isCompleted
-              ? <CheckCircleIcon size={19} color={Colors.secondary} />
-              : <CircleIcon size={19} color={Colors.primary}/>
+              ? <Icon.CheckCircle size={19} color={Colors.secondary} />
+              : <Icon.Circle size={19} color={Colors.primary}/>
           }
         </View>
         <Typo
@@ -62,7 +60,7 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
     <View style={styles.progressSummary}>
       <View style={styles.circleProgressPlaceholder}>
         {useIcon ? (
-          <ProgressIcon color={Colors.primary} />
+          <Icon.Progress color={Colors.primary} />
         ) : (
           <>
             <Svg height={radius * 2} width={radius * 2}>

@@ -6,7 +6,7 @@ import {
 } from 'react-native'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
-import GoogleIcon from '@/components/icons/GoogleIcon'
+import Icon from '@/components/icons/Icon'
 import * as WebBrowser from 'expo-web-browser'
 
 type SocialStrategy = 'google'
@@ -19,7 +19,7 @@ interface SocialProvider {
 const providers: SocialProvider[] = [
   {
     key: 'google',
-    Icon: GoogleIcon
+    Icon: Icon.Google
   }
 ]
 
