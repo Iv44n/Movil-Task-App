@@ -4,13 +4,15 @@ import { Colors } from '@/constants/theme'
 
 export default function CloseIcon({
   size = 25,
-  color = Colors.primary
+  color = Colors.primary,
+  ...props
 }: IconProps) {
   return (
     <Svg
       width={size}
       height={size}
       viewBox='0 0 1024 1024'
+      {...props}
     >
       <Path
         fill={color}

@@ -4,7 +4,8 @@ import { Colors } from '@/constants/theme'
 
 export default function ArrowRightIcon ({
   size = 25,
-  color = Colors.primary
+  color = Colors.primary,
+  ...props
 }: IconProps) {
   return (
     <Svg
@@ -13,6 +14,7 @@ export default function ArrowRightIcon ({
       viewBox='1 0 23 23'
       fill='none'
       stroke={color}
+      {...props}
     >
       <Path
         fillRule='evenodd'

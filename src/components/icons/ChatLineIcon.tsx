@@ -4,7 +4,8 @@ import { Colors } from '@/constants/theme'
 
 export default function ChatLineIcon({
   size = 25,
-  color = Colors.primary
+  color = Colors.primary,
+  ...props
 }: IconProps) {
   return (
     <Svg
@@ -12,6 +13,7 @@ export default function ChatLineIcon({
       height={size}
       fill='none'
       viewBox='0 0 24 24'
+      {...props}
     >
       <Path
         fill={color}

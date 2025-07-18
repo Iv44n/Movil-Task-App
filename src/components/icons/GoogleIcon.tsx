@@ -2,13 +2,15 @@ import Svg, { G, Path } from 'react-native-svg'
 import { IconProps } from '.'
 
 export default function GoogleIcon({
-  size = 25
+  size = 25,
+  ...props
 }: IconProps) {
   return (
     <Svg
       width={size}
       height={size}
       viewBox='-1 0 48 48'
+      {...props}
     >
       <G fill='none' fillRule='evenodd'>
         <Path

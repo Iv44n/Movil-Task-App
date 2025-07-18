@@ -4,7 +4,8 @@ import { Colors } from '@/constants/theme'
 
 export default function EyeIcon({
   color = Colors.primary,
-  size = 25
+  size = 25,
+  ...props
 }: IconProps) {
   return (
     <Svg
@@ -12,6 +13,7 @@ export default function EyeIcon({
       height={size}
       fill='none'
       viewBox='0 -1 23 23'
+      {...props}
     >
       <G fill={color} fillRule='evenodd' clipRule='evenodd'>
         <Path d='M12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5zM9.75 12a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z' />

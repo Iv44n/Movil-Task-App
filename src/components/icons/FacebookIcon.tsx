@@ -1,12 +1,16 @@
 import Svg, { G, Path } from 'react-native-svg'
 import { IconProps } from '.'
 
-export default function FacebookIcon({ size = 25 }: IconProps) {
+export default function FacebookIcon({
+  size = 25,
+  ...props
+}: IconProps) {
   return (
     <Svg
       width={size + 4}
       height={size + 4}
       viewBox='-0.5 0 100 100'
+      {...props}
     >
       <G id='SVGRepo_iconCarrier'>
         <G id='Layer_2'>

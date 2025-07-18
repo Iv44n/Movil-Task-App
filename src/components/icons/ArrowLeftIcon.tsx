@@ -4,7 +4,8 @@ import { Colors } from '@/constants/theme'
 
 export default function ArrowLeftIcon({
   color = Colors.primary,
-  size = 25
+  size = 25,
+  ...props
 }: IconProps) {
   return (
     <Svg
@@ -12,6 +13,7 @@ export default function ArrowLeftIcon({
       height={size}
       fill='none'
       viewBox='1 0 23 23'
+      {...props}
     >
       <Path
         fill={color}

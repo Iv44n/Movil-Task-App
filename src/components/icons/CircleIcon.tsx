@@ -1,11 +1,11 @@
-import * as React from 'react'
 import Svg, { Path } from 'react-native-svg'
 import { IconProps } from '.'
 import { Colors } from '@/constants/theme'
 
 export default function CircleIcon({
   color = Colors.primary,
-  size = 25
+  size = 25,
+  ...props
 }: IconProps) {
   return (
     <Svg
@@ -13,6 +13,7 @@ export default function CircleIcon({
       height={size}
       fill='none'
       viewBox='0 0 23 23'
+      {...props}
     >
       <Path
         fill={color}

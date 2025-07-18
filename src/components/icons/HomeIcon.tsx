@@ -4,7 +4,8 @@ import { Colors } from '@/constants/theme'
 
 export default function HomeIcon({
   color = Colors.primary,
-  size = 25
+  size = 25,
+  ...props
 }: IconProps) {
   return (
     <Svg
@@ -14,6 +15,7 @@ export default function HomeIcon({
       stroke={color}
       viewBox='1 0 23 23'
       strokeWidth={0.5}
+      {...props}
     >
       <G fill={color}>
         <Path d='M11.25 18a.75.75 0 001.5 0v-3a.75.75 0 00-1.5 0v3z' />
