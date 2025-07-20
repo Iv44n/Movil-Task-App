@@ -10,13 +10,13 @@ import { Colors, Shapes, Sizes } from '@/constants/theme'
 import Typo from '../shared/Typo'
 import ActionButton from '../shared/ActionButton'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import FormField from '../shared/FormField'
 import useProjects from '@/hooks/data/useProjects'
 import { useRouter } from 'expo-router'
 import CategorySelector from '@/components/home/CategorySelector'
 import Icon from '@/components/icons/Icon'
-import { Category } from '@/types/Category'
+import { Memo } from '@legendapp/state/react'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -24,9 +24,10 @@ interface AddProjectModalProps {
 }
 
 interface FormData {
-  name: string;
-  description: string;
-  selectedColor: string;
+  name: string
+  description: string
+  selectedColor: string
+  selectedCategoryId: string | null
 }
 
 const PROJECT_COLORS = [
@@ -42,38 +43,34 @@ const PROJECT_COLORS = [
 
 export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
   const router = useRouter()
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    clearErrors
-  } = useForm<FormData>({
+  const { control, handleSubmit, formState: { errors }, clearErrors } = useForm<FormData>({
     defaultValues: {
       name: '',
       description: '',
-      selectedColor: PROJECT_COLORS[0]
+      selectedColor: PROJECT_COLORS[0],
+      selectedCategoryId: null
     },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit'
   })
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const { createProject } = useProjects()
 
   const onSubmit = useCallback(
     (data: FormData) => {
-      if (!selectedCategory) return
+      const { selectedCategoryId, selectedColor, name, description } = data
+      if (!selectedCategoryId || !name.trim()) return
 
       const project = createProject({
-        name: data.name.trim(),
-        description: data.description.trim() ?? null,
-        category_id: selectedCategory.id,
-        color: data.selectedColor
+        name: name.trim(),
+        description: description.trim() ?? null,
+        category_id: selectedCategoryId,
+        color: selectedColor
       })
 
       router.navigate(`project/${project?.id}`)
       onClose()
     },
-    [onClose, createProject, router, selectedCategory]
+    [onClose, createProject, router]
   )
 
   return (
@@ -140,10 +137,19 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
             )}
           />
 
-          <CategorySelector
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
+          <Memo>
+            <Controller
+              name='selectedCategoryId'
+              control={control}
+              rules={{ required: 'Category is required' }}
+              render={({ field: { onChange, value } }) => (
+                <CategorySelector
+                  selectedCategoryId={value}
+                  onSelect={onChange}
+                />
+              )}
+            />
+          </Memo>
 
           <Controller
             name='selectedColor'

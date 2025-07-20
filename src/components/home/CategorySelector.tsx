@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   Modal,
   Pressable,
@@ -10,14 +10,16 @@ import Typo from '@/components/shared/Typo'
 import FormField from '@/components/shared/FormField'
 import ActionButton from '@/components/shared/ActionButton'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
-import useCategories from '@/hooks/data/useCategories'
-import { observer } from '@legendapp/state/react'
 import Icon from '@/components/icons/Icon'
-import { Category } from '@/types/Category'
+import { categories$ } from '@/store/categories.store'
+import { use$ } from '@legendapp/state/react'
+import { randomUUID } from 'expo-crypto'
+import { batch } from '@legendapp/state'
+import useProjects from '@/hooks/data/useProjects'
 
 interface CategorySelectorProps {
-  onSelect: (category: Category | null) => void
-  selected: Category | null
+  onSelect: (category: string | null) => void
+  selectedCategoryId: string | null
 }
 
 const NEW_VALUE = '__NEW__'
@@ -80,61 +82,58 @@ function AddCategoryModal({
   )
 }
 
-export default observer(function CategorySelector({
-  onSelect,
-  selected
-}: CategorySelectorProps) {
-  const { categories, createCategory, deleteCategoryById } = useCategories()
+export default function CategorySelector({ onSelect, selectedCategoryId }: CategorySelectorProps) {
+  const { projects } = useProjects()
   const [showAddModal, setShowAddModal] = useState(false)
 
-  const handleAdd = useCallback(
-    async (name: string) => {
-      try {
-        const newCat = createCategory(name)
-        onSelect(newCat)
-      } catch (error) {
-        console.error('Add category error:', error)
-      } finally {
-        setShowAddModal(false)
-      }
-    },
-    [createCategory, onSelect]
+  const selectedCatName: string | undefined = use$(() => categories$[selectedCategoryId ?? '']?.name)
+  const countCategories = use$(() => Object.keys(categories$.get(true) || {}).length || 0)
+  const categories = use$(() =>
+    Object.values(categories$.get(true) || {})
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .map(({ id, name }) => ({ id, name }))
   )
 
-  const handleDelete = useCallback(
-    async (id: string) => {
-      try {
-        deleteCategoryById(id)
-        if (selected?.id === id) {
-          onSelect(null)
-        }
-      } catch (error) {
-        console.error('Delete category error:', error)
-      }
-    },
-    [deleteCategoryById, selected, onSelect]
-  )
+  const handleAdd = useCallback((name: string) => {
+    const nameTrimmed = name.trim()
+    if (!nameTrimmed) return setShowAddModal(false)
 
-  const handleValueChange = useCallback(
-    (value: string) => {
-      if (value === NEW_VALUE) {
-        setShowAddModal(true)
-        return
-      }
-      const found = categories.find((c) => c.name === value) || null
-      onSelect(found)
-    },
-    [categories, onSelect]
-  )
+    try {
+      const id = randomUUID()
+      const newC = categories$[id].assign({ id, name: nameTrimmed })
 
-  const addNewCategoryListStyle = useMemo(() => {
-    return {
-      borderBottomWidth: 1,
-      marginBottom: Sizes.spacing.s5,
-      borderBottomLeftRadius: 0,
-      borderBottomRightRadius: 0
+      batch(() => {
+        categories$.set((prev) => ({
+          [id]: newC.get(),
+          ...prev
+        }))
+        onSelect(id)
+      })
+    } catch (error) {
+      console.error('Create category error:', error)
+    } finally {
+      setShowAddModal(false)
     }
-  }, [])
+  }, [onSelect])
+
+  const handleDelete = useCallback((id: string) => {
+    try {
+      const inUse = projects.some(p => p.category_id === id)
+      if (inUse) {
+        throw new Error('Category in use, cannot delete')
+      }
+
+      categories$[id].delete()
+      if (selectedCategoryId === id) onSelect(null)
+    } catch (error) {
+      console.error('Delete category error:', error)
+    }
+  }, [onSelect, selectedCategoryId, projects])
+
+  const handleValueChange = useCallback((value: string) => {
+    if (value === NEW_VALUE) return setShowAddModal(true)
+    onSelect(value)
+  }, [onSelect])
 
   return (
     <View style={styles.container}>
@@ -144,7 +143,7 @@ export default observer(function CategorySelector({
 
       <Picker
         style={styles.picker}
-        selectedValue={selected?.name}
+        selectedValue={selectedCatName}
         onValueChange={handleValueChange}
         placeholder='Select a category'
       >
@@ -154,20 +153,22 @@ export default observer(function CategorySelector({
           typoProps={{ size: 15, color: 'secondary' }}
           icon={<Icon.Add color={Colors.secondary} size={23} />}
           handleIconPress={() => setShowAddModal(true)}
-          style={[styles.newItem, categories.length > 0 && addNewCategoryListStyle]}
+          style={[styles.newItem, countCategories > 0 && styles.addedItemStyle]}
         />
 
-        {categories.length > 0 && categories.map((c) => (
-          <Picker.Item
-            key={c.id}
-            label={c.name}
-            value={c.name}
-            isSelected={selected?.id === c.id}
-            icon={<Icon.Trash color={Colors.error} size={19} />}
-            iconPosition='right'
-            handleIconPress={() => handleDelete(c.id)}
-          />
-        ))}
+        {
+          categories.map((c) => (
+            <Picker.Item
+              key={c.id}
+              label={c.name}
+              value={c.id}
+              isSelected={selectedCategoryId === c.id}
+              icon={<Icon.Trash color={Colors.error} size={19} />}
+              iconPosition='right'
+              handleIconPress={() => handleDelete(c.id)}
+            />
+          ))
+        }
       </Picker>
 
       <AddCategoryModal
@@ -177,7 +178,7 @@ export default observer(function CategorySelector({
       />
     </View>
   )
-})
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -196,6 +197,12 @@ const styles = StyleSheet.create({
   newItem: {
     borderBottomColor: Colors.border,
     paddingVertical: Sizes.spacing.s9
+  },
+  addedItemStyle: {
+    borderBottomWidth: 1,
+    marginBottom: Sizes.spacing.s5,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0
   },
   overlay: {
     flex: 1,
