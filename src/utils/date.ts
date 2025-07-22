@@ -12,4 +12,16 @@ const isToday = (date: string | Date) => {
   return date.getDate() === new Date().getDate()
 }
 
-export { isPast, isToday }
+const todayStart = () => {
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+  return now
+}
+
+const todayEnd = () => {
+  const now = new Date()
+  now.setHours(23, 59, 59, 999)
+  return now
+}
+
+export { isPast, isToday, todayStart, todayEnd }
