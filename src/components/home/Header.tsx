@@ -1,11 +1,11 @@
-import useProjects from '@/hooks/data/useProjects'
-import { observer } from '@legendapp/state/react'
 import Typo from '../shared/Typo'
 import { Sizes } from '@/constants/theme'
 import { View } from 'react-native'
+import { projects$ } from '@/store/projects.store'
+import { use$ } from '@legendapp/state/react'
 
-const Header = observer(function Header({ userName }: { userName: string }) {
-  const { totalProjects } = useProjects()
+export default function Header({ userName }: { userName: string }) {
+  const totalProjects = use$(() => Object.keys(projects$.get(true) || {}).length)
 
   return (
     <View style={{
@@ -42,6 +42,4 @@ const Header = observer(function Header({ userName }: { userName: string }) {
       </View> */}
     </View>
   )
-})
-
-export default Header
+}

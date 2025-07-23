@@ -2,7 +2,7 @@ import Icon from '@/components/icons/Icon'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { formatProjectName } from '@/utils/utils'
-import { observer, use$ } from '@legendapp/state/react'
+import { use$ } from '@legendapp/state/react'
 import { Link } from 'expo-router'
 import { Pressable, StyleSheet, View } from 'react-native'
 import ProjectProgressBar from './ProjectProgressBar'
@@ -17,7 +17,7 @@ interface ProjectCardProps {
   id: string
 }
 
-export default observer(function ProjectCard({
+export default function ProjectCard({
   taskCount,
   completedTasks,
   name,
@@ -85,7 +85,7 @@ export default observer(function ProjectCard({
       </View>
     </View>
   )
-})
+}
 
 const styles = StyleSheet.create({
   mainCard: {

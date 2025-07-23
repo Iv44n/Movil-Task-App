@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import {
+  Alert,
   Modal,
   Pressable,
   StyleSheet,
@@ -15,7 +16,7 @@ import { categories$ } from '@/store/categories.store'
 import { use$ } from '@legendapp/state/react'
 import { randomUUID } from 'expo-crypto'
 import { batch } from '@legendapp/state'
-import useProjects from '@/hooks/data/useProjects'
+import { projects$ } from '@/store/projects.store'
 
 interface CategorySelectorProps {
   onSelect: (category: string | null) => void
@@ -83,7 +84,6 @@ function AddCategoryModal({
 }
 
 export default function CategorySelector({ onSelect, selectedCategoryId }: CategorySelectorProps) {
-  const { projects } = useProjects()
   const [showAddModal, setShowAddModal] = useState(false)
 
   const selectedCatName: string | undefined = use$(() => categories$[selectedCategoryId ?? '']?.name)
@@ -118,9 +118,12 @@ export default function CategorySelector({ onSelect, selectedCategoryId }: Categ
 
   const handleDelete = useCallback((id: string) => {
     try {
-      const inUse = projects.some(p => p.category_id === id)
+      const inUse = Object.values(projects$.get(true) || {}).some(p => p.category_id === id)
       if (inUse) {
-        throw new Error('Category in use, cannot delete')
+        return Alert.alert(
+          'Category in use',
+          'This category is in use by some projects'
+        )
       }
 
       categories$[id].delete()
@@ -128,7 +131,7 @@ export default function CategorySelector({ onSelect, selectedCategoryId }: Categ
     } catch (error) {
       console.error('Delete category error:', error)
     }
-  }, [onSelect, selectedCategoryId, projects])
+  }, [onSelect, selectedCategoryId])
 
   const handleValueChange = useCallback((value: string) => {
     if (value === NEW_VALUE) return setShowAddModal(true)

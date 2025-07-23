@@ -4,7 +4,8 @@ import {
   TouchableOpacity,
   Modal,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import Typo from '../shared/Typo'
@@ -12,11 +13,13 @@ import ActionButton from '../shared/ActionButton'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useCallback } from 'react'
 import FormField from '../shared/FormField'
-import useProjects from '@/hooks/data/useProjects'
 import { useRouter } from 'expo-router'
 import CategorySelector from '@/components/home/CategorySelector'
 import Icon from '@/components/icons/Icon'
 import { Memo } from '@legendapp/state/react'
+import { projects$ } from '@/store/projects.store'
+import { randomUUID } from 'expo-crypto'
+import { batch } from '@legendapp/state'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -53,25 +56,35 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
     mode: 'onSubmit',
     reValidateMode: 'onSubmit'
   })
-  const { createProject } = useProjects()
 
-  const onSubmit = useCallback(
-    (data: FormData) => {
-      const { selectedCategoryId, selectedColor, name, description } = data
-      if (!selectedCategoryId || !name.trim()) return
+  const onSubmit = useCallback((data: FormData) => {
+    const { selectedCategoryId, selectedColor, name, description } = data
+    if (!name.trim()) return
+    if (!selectedCategoryId) return Alert.alert('Error', 'Category is required')
 
-      const project = createProject({
-        name: name.trim(),
+    const newProjectId = randomUUID()
+
+    try {
+      const newProject = projects$[newProjectId].assign({
+        id: newProjectId,
+        name,
         description: description.trim() ?? null,
         category_id: selectedCategoryId,
-        color: selectedColor
+        color: selectedColor,
+        task_count: 0,
+        completed_tasks: 0
       })
 
-      router.navigate(`project/${project?.id}`)
+      batch(() => {
+        projects$.set(prev => ({ [newProjectId]: newProject.get(), ...prev }))
+      })
+
+      router.navigate(`project/${newProject.id.get()}`)
       onClose()
-    },
-    [onClose, createProject, router]
-  )
+    } catch (error) {
+      console.error('Error creating project:', error)
+    }
+  }, [onClose, router])
 
   return (
     <Modal
@@ -141,7 +154,6 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
             <Controller
               name='selectedCategoryId'
               control={control}
-              rules={{ required: 'Category is required' }}
               render={({ field: { onChange, value } }) => (
                 <CategorySelector
                   selectedCategoryId={value}

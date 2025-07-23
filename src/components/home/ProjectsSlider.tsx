@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import {
   Animated,
   StyleSheet,
@@ -11,9 +11,9 @@ import {
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import ProjectCard from '@/components/home/ProjectCard'
 import Typo from '@/components/shared/Typo'
-import useProjects from '@/hooks/data/useProjects'
-import { observer } from '@legendapp/state/react'
+import { For, use$, Memo } from '@legendapp/state/react'
 import { BlurView } from 'expo-blur'
+import { projects$ } from '@/store/projects.store'
 
 function AddProjectButton({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
   return (
@@ -47,16 +47,10 @@ function EmptyState({ setShowAddProjectModal }: { readonly setShowAddProjectModa
   )
 }
 
-export default observer(function ProjectsSlider({ setShowAddProjectModal }: { setShowAddProjectModal: (value: boolean) => void }) {
-  const { projects } = useProjects()
+export default function ProjectsSlider({ setShowAddProjectModal }: { setShowAddProjectModal: (value: boolean) => void }) {
   const [showAdd, setShowAdd] = useState(false)
   const scrollRef = useRef<ScrollView>(null)
-
-  useEffect(() => {
-    if (projects.length === 0) {
-      scrollRef.current?.scrollTo({ x: 0, animated: true })
-    }
-  }, [projects])
+  const projectsLength = use$(() => Object.keys(projects$.get(true) || {}).length)
 
   const onScrollEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -66,7 +60,7 @@ export default observer(function ProjectsSlider({ setShowAddProjectModal }: { se
     []
   )
 
-  if (!projects || projects.length === 0) {
+  if (projectsLength === 0) {
     return <EmptyState setShowAddProjectModal={setShowAddProjectModal} />
   }
 
@@ -80,20 +74,29 @@ export default observer(function ProjectsSlider({ setShowAddProjectModal }: { se
       contentContainerStyle={styles.sliderContainer}
     >
       {showAdd && <AddProjectButton setShowAddProjectModal={setShowAddProjectModal} />}
-      {projects.map((proj) => (
-        <ProjectCard
-          key={proj.id}
-          taskCount={proj.task_count}
-          completedTasks={proj.completed_tasks}
-          name={proj.name}
-          color={proj.color}
-          id={proj.id}
-          categoryId={proj.category_id}
-        />
-      ))}
+
+      <For
+        each={projects$}
+        optimized
+        sortValues={(a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()}
+        item={({ item$, id }) => (
+          <Memo key={id}>
+            {() => (
+              <ProjectCard
+                taskCount={item$.task_count.get()}
+                completedTasks={item$.completed_tasks.get()}
+                name={item$.name.get()}
+                color={item$.color.get()}
+                id={item$.id.get()}
+                categoryId={item$.category_id.get()}
+              />
+            )}
+          </Memo>
+        )}
+      />
     </Animated.ScrollView>
   )
-})
+}
 
 const styles = StyleSheet.create({
   sliderContainer: {
