@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'expo-router'
 import {
   View,
-  Pressable,
+  TouchableOpacity,
   KeyboardAvoidingView,
   Alert
 } from 'react-native'
@@ -95,7 +95,8 @@ export default function LoginFields() {
               />
             )}
           />
-          <Pressable
+          <TouchableOpacity
+            activeOpacity={0.8}
             style={{
               marginTop: -Sizes.spacing.s9,
               marginRight: Sizes.spacing.s5,
@@ -112,7 +113,7 @@ export default function LoginFields() {
             >
               Forgot Password?
             </Typo>
-          </Pressable>
+          </TouchableOpacity>
         </View>
 
         <ActionButton

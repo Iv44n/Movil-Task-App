@@ -4,7 +4,7 @@ import {
   StyleSheet,
   NativeSyntheticEvent,
   NativeScrollEvent,
-  Pressable,
+  TouchableOpacity,
   ScrollView,
   View
 } from 'react-native'
@@ -18,18 +18,18 @@ import { projects$ } from '@/store/projects.store'
 function AddProjectButton({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
   return (
     <BlurView tint='dark' intensity={100} style={styles.blurContainer}>
-      <Pressable onPress={() => setShowAddProjectModal(true)} style={styles.addButton}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddProjectModal(true)} style={styles.addButton}>
         <Typo size={29} weight='500'>
           +
         </Typo>
-      </Pressable>
+      </TouchableOpacity>
     </BlurView>
   )
 }
 
 function EmptyState({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
   return (
-    <Pressable onPress={() => setShowAddProjectModal(true)} style={styles.emptyContainer}>
+    <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddProjectModal(true)} style={styles.emptyContainer}>
       <View style={styles.emptyContent}>
         <Typo size={17} weight='500' color='secondary' style={styles.emptyText}>
           You have no projects
@@ -43,7 +43,7 @@ function EmptyState({ setShowAddProjectModal }: { readonly setShowAddProjectModa
           Tap to create one
         </Typo>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 

@@ -1,9 +1,9 @@
-import { Pressable, PressableProps, StyleProp, StyleSheet, ViewStyle } from 'react-native'
+import { StyleProp, StyleSheet, TouchableOpacity, TouchableOpacityProps, ViewStyle } from 'react-native'
 import Typo, { TypoProps } from './Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { memo } from 'react'
 
-type ActionButtonProps = PressableProps & {
+type ActionButtonProps = TouchableOpacityProps & {
   label: string
   backgroundColor?: string
   style?: StyleProp<ViewStyle>
@@ -26,7 +26,7 @@ const ActionButton = memo(function ActionButton({
   style,
   onPress,
   typoProps,
-  ...pressableProps
+  ...touchableOpacityProps
 }: ActionButtonProps) {
   const mergedTypoProps = {
     ...DEFAULTS.typography,
@@ -34,13 +34,14 @@ const ActionButton = memo(function ActionButton({
   }
 
   return (
-    <Pressable
+    <TouchableOpacity
       style={[styles.button, { backgroundColor }, style]}
       onPress={onPress}
-      {...pressableProps}
+      activeOpacity={0.7}
+      {...touchableOpacityProps}
     >
       <Typo {...mergedTypoProps}>{label}</Typo>
-    </Pressable>
+    </TouchableOpacity>
   )
 })
 

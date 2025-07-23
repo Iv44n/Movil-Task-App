@@ -1,7 +1,7 @@
 import React, { useState, ReactNode, memo, useCallback, useMemo } from 'react'
 import {
   View,
-  Pressable,
+  TouchableOpacity,
   ScrollView,
   StyleSheet,
   LayoutRectangle,
@@ -58,16 +58,17 @@ const ItemOption = memo<PickerItemProps & {
       }, [onSelect, value])
 
       return (
-        <Pressable
+        <TouchableOpacity
+          activeOpacity={0.7}
           style={[styles.option, isSelected && styles.optionSelected, style]}
           onPress={handlePress}
         >
-          {icon && iconPosition === 'left' && <Pressable onPress={handleIconPress}>{icon}</Pressable>}
+          {icon && iconPosition === 'left' && <TouchableOpacity onPress={handleIconPress}>{icon}</TouchableOpacity>}
           <Typo {...finalTypo} style={textStyle}>
             {label}
           </Typo>
-          {icon && iconPosition === 'right' && <Pressable onPress={handleIconPress}>{icon}</Pressable>}
-        </Pressable>
+          {icon && iconPosition === 'right' && <TouchableOpacity onPress={handleIconPress}>{icon}</TouchableOpacity>}
+        </TouchableOpacity>
       )
     })
 
@@ -113,7 +114,8 @@ const Picker: PickerComponent = ({
 
   return (
     <View style={style}>
-      <Pressable
+      <TouchableOpacity
+        activeOpacity={0.8}
         style={[styles.trigger, triggerStyle]}
         onPress={toggleOpen}
         onLayout={({ nativeEvent }) => setLayout(nativeEvent.layout)}
@@ -132,7 +134,7 @@ const Picker: PickerComponent = ({
             color={selectedValue ? Colors.primary : Colors.primary}
           />
         )}
-      </Pressable>
+      </TouchableOpacity>
 
       {open && layout && (
         <View

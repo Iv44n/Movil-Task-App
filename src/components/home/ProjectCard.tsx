@@ -4,7 +4,7 @@ import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { formatProjectName } from '@/utils/utils'
 import { use$ } from '@legendapp/state/react'
 import { Link } from 'expo-router'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, StyleSheet, View } from 'react-native'
 import ProjectProgressBar from './ProjectProgressBar'
 import { categories$ } from '@/store/categories.store'
 
@@ -78,9 +78,9 @@ export default function ProjectCard({
           href={`project/${id}`}
           asChild
         >
-          <Pressable style={styles.arrowButton}>
+          <TouchableOpacity activeOpacity={0.7} style={styles.arrowButton}>
             <Icon.ArrowRightUp color={Colors.primary} />
-          </Pressable>
+          </TouchableOpacity>
         </Link>
       </View>
     </View>

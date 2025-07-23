@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import {
   View,
-  Pressable,
+  TouchableOpacity,
   StyleSheet
 } from 'react-native'
 import Typo from '@/components/shared/Typo'
@@ -54,13 +54,14 @@ export default function SocialAuth() {
 
       <View style={styles.providersRow}>
         {providers.map(({ key, Icon }) => (
-          <Pressable
+          <TouchableOpacity
+            activeOpacity={0.8}
             key={key}
             style={styles.providerButton}
             onPress={() => onPress(key)}
           >
             <Icon size={21} />
-          </Pressable>
+          </TouchableOpacity>
         ))}
       </View>
     </View>

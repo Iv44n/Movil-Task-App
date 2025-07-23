@@ -1,4 +1,4 @@
-import { Modal, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
+import { Modal, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
@@ -30,12 +30,20 @@ export default function OptionsModal({
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Pressable onPress={onEdit} style={styles.optionButton}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={onEdit}
+                style={styles.optionButton}
+              >
                 <Typo size={15} color='primary' weight='500'>Editar proyecto</Typo>
-              </Pressable>
-              <Pressable onPress={onDelete} style={styles.optionButton}>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={onDelete}
+                style={styles.optionButton}
+              >
                 <Typo size={15} color='error' weight='500'>Eliminar proyecto</Typo>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableWithoutFeedback>

@@ -1,5 +1,5 @@
 import { Shapes, Sizes } from '@/constants/theme'
-import { Pressable, StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import Icon from '../icons/Icon'
 
 interface Props {
@@ -9,7 +9,8 @@ interface Props {
 
 export default function FloatingButton({ onPress, color }: Props) {
   return (
-    <Pressable
+    <TouchableOpacity
+      activeOpacity={0.7}
       style={[
         styles.fab,
         { bottom: Sizes.spacing.s15, backgroundColor: color || 'white' }
@@ -17,7 +18,7 @@ export default function FloatingButton({ onPress, color }: Props) {
       onPress={onPress}
     >
       <Icon.Add color='black' size={31}/>
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 

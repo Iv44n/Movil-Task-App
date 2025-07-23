@@ -3,7 +3,7 @@ import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, StyleSheet, View } from 'react-native'
 import Icon from '@/components/icons/Icon'
 
 export default function Welcome() {
@@ -34,12 +34,12 @@ export default function Welcome() {
         Manage projects and standalone tasks—from daily routines and habits to complex workflows. Define start and due dates, break down work into subtasks, and track progress at a glance.
       </Typo>
 
-      <Pressable style={styles.button} onPress={finishWelcome}>
+      <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={finishWelcome}>
         <Typo size={16} color='black' weight='500'>Get Started</Typo>
         <View style={styles.iconWrapper}>
           <Icon.ArrowRight color={Colors.primary} />
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </ScreenWrapper>
   )
 }

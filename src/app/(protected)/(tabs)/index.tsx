@@ -6,7 +6,7 @@ import ProgressInfo from '@/components/home/ProgressInfo'
 import { useAuth } from '@/hooks/auth/useAuth'
 import { observer } from '@legendapp/state/react'
 import { useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import Header from '@/components/home/Header'
 import { AddProjectModal } from '@/components/home/AddProjectModal'
 import Icon from '@/components/icons/Icon'
@@ -111,13 +111,13 @@ const ToDoItem = observer(function ToDoItem({ title, subtitle, checked, onToggle
       paddingVertical: Sizes.spacing.s15
     }}
     >
-      <Pressable onPress={() => setIsChecked(!isChecked)}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => setIsChecked(!isChecked)}>
         {isChecked ? (
           <Icon.CheckCircle size={29} color={Colors.secondary} />
         ) : (
           <Icon.Circle size={29} />
         )}
-      </Pressable>
+      </TouchableOpacity>
 
       <View style={{
         flex: 1,
@@ -142,9 +142,9 @@ const ToDoItem = observer(function ToDoItem({ title, subtitle, checked, onToggle
         </Typo>
       </View>
 
-      <Pressable onPress={onPressMenu}>
+      <TouchableOpacity activeOpacity={0.7} onPress={onPressMenu}>
         <Icon.HorizontalDotMenu size={29} color={Colors.secondary} />
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 })

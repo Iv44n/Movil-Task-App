@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import {
   Alert,
   Modal,
-  Pressable,
+  TouchableWithoutFeedback,
   StyleSheet,
   View
 } from 'react-native'
@@ -47,38 +47,41 @@ function AddCategoryModal({
       visible={visible}
       animationType='fade'
       transparent
+      hardwareAccelerated
       statusBarTranslucent
       onRequestClose={onCancel}
     >
-      <Pressable style={styles.overlay} onPress={onCancel}>
-        <View style={styles.modalContent}>
-          <Typo size={19} weight='600'>
-            Create New Category
-          </Typo>
+      <TouchableWithoutFeedback onPress={onCancel}>
+        <View style={styles.overlay}>
+          <View style={styles.modalContent}>
+            <Typo size={19} weight='600'>
+              Create New Category
+            </Typo>
 
-          <FormField
-            placeholder='Category name'
-            value={name}
-            onChangeText={setName}
-            autoFocus
-          />
+            <FormField
+              placeholder='Category name'
+              value={name}
+              onChangeText={setName}
+              autoFocus
+            />
 
-          <View style={styles.modalButtons}>
-            <ActionButton
-              label='Cancel'
-              onPress={onCancel}
-              style={[styles.modalButton, styles.cancelButton]}
-              typoProps={{ color: 'primary', size: 15 }}
-            />
-            <ActionButton
-              label='Create'
-              onPress={handleCreate}
-              style={styles.modalButton}
-              typoProps={{ size: 15 }}
-            />
+            <View style={styles.modalButtons}>
+              <ActionButton
+                label='Cancel'
+                onPress={onCancel}
+                style={[styles.modalButton, styles.cancelButton]}
+                typoProps={{ color: 'primary', size: 15 }}
+              />
+              <ActionButton
+                label='Create'
+                onPress={handleCreate}
+                style={styles.modalButton}
+                typoProps={{ size: 15 }}
+              />
+            </View>
           </View>
         </View>
-      </Pressable>
+      </TouchableWithoutFeedback>
     </Modal>
   )
 }

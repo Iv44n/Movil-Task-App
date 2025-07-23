@@ -2,7 +2,7 @@ import ScreenWrapper from '@/components/ScreenWrapper'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { formatProjectName } from '@/utils/utils'
-import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native'
+import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
 import Header from '@/components/project/Header'
 import Typo from '@/components/shared/Typo'
 import OptionsModal from '@/components/project/OptionsModal'
@@ -166,8 +166,9 @@ export default function Details() {
 
           <View style={styles.tabBar}>
             {tabs.map(t => (
-              <Pressable
+              <TouchableOpacity
                 key={t.key}
+                activeOpacity={0.7}
                 onPress={() => setTab(t.key)}
                 style={[
                   styles.tabItem,
@@ -182,7 +183,7 @@ export default function Details() {
                 >
                   {t.label}
                 </Typo>
-              </Pressable>
+              </TouchableOpacity>
             ))}
           </View>
 

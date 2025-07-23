@@ -2,8 +2,7 @@ import { useMemo } from 'react'
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
-  Pressable
+  TouchableOpacity
 } from 'react-native'
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
@@ -13,6 +12,7 @@ import Avatar from '../shared/Avatar'
 import { format } from '@formkit/tempo'
 import { isPast, isToday } from '@/utils/date'
 import { ProjectTask } from '@/types/ProjectTask'
+import { StatusTask } from '@/constants/constants'
 
 interface Props {
   task: ProjectTask
@@ -73,13 +73,13 @@ export default function TaskItem({ task, onPress, colorTheme = Colors.primary, o
           </Typo>
         </View>
 
-        <Pressable onPress={() => onChangeStatus?.(task.id)}>
-          {status === 'completed' ? (
+        <TouchableOpacity onPress={() => onChangeStatus?.(task.id)}>
+          {status === StatusTask.COMPLETED ? (
             <Icon.CheckCircle size={31} color={colorTheme} />
           ) : (
             <Icon.Circle size={31} color={colorTheme} />
           )}
-        </Pressable>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.chipContainer}>

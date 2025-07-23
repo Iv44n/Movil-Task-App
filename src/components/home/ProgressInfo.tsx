@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { StyleSheet, View, FlatList, ListRenderItem, Pressable } from 'react-native'
+import { StyleSheet, View, FlatList, ListRenderItem, TouchableOpacity } from 'react-native'
 import Icon from '@/components/icons/Icon'
 import Svg, { Circle } from 'react-native-svg'
 import Typo from '@/components/shared/Typo'
@@ -15,7 +15,8 @@ import { batch } from '@legendapp/state'
 const PriorityItem = ({ label, isCompleted, onCompleted }: { label: string, isCompleted: boolean, onCompleted: () => void }) => {
   return(
     <View style={styles.priorityItem}>
-      <Pressable
+      <TouchableOpacity
+        activeOpacity={0.8}
         onPress={onCompleted}
         style={{
           flexDirection: 'row'
@@ -41,7 +42,7 @@ const PriorityItem = ({ label, isCompleted, onCompleted }: { label: string, isCo
         >
           {label}
         </Typo>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 }

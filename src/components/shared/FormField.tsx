@@ -6,7 +6,7 @@ import {
   TextInputProps,
   StyleProp,
   ViewStyle,
-  Pressable,
+  TouchableOpacity,
   TextInput as RNTextInput
 } from 'react-native'
 import { Colors, Shapes, Sizes, Typography } from '@/constants/theme'
@@ -53,14 +53,15 @@ const FormField = forwardRef<RNTextInput, FormFieldProps>(({
           {...inputProps}
         />
         {icon && (
-          <Pressable
+          <TouchableOpacity
+            activeOpacity={0.8}
             onPress={onIconPress}
             style={styles.iconWrapper}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole='button'
           >
             {icon}
-          </Pressable>
+          </TouchableOpacity>
         )}
       </View>
 
