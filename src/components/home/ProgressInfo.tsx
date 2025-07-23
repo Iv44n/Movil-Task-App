@@ -1,11 +1,16 @@
-import { useMemo } from 'react'
+import { useCallback } from 'react'
 import { StyleSheet, View, FlatList, ListRenderItem, Pressable } from 'react-native'
 import Icon from '@/components/icons/Icon'
 import Svg, { Circle } from 'react-native-svg'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
-import { observer } from '@legendapp/state/react'
-import useProjectTasks from '@/hooks/data/useProjectTasks'
+import { isToday } from '@/utils/date'
+import { projects$ } from '@/store/projects.store'
+import { Priority, StatusTask } from '@/constants/constants'
+import { projectTasks$ } from '@/store/projectTasks.store'
+import { use$ } from '@legendapp/state/react'
+import useProgress from '@/hooks/data/useProgress'
+import { batch } from '@legendapp/state'
 
 const PriorityItem = ({ label, isCompleted, onCompleted }: { label: string, isCompleted: boolean, onCompleted: () => void }) => {
   return(
@@ -96,9 +101,9 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
         <Typo size={15} weight='800'>
           {
             useIcon ? (
-              <>{count} <Typo size={11} weight='500'>Task</Typo></>
+              <>{count} <Typo size={11} weight='500'>{count === 1 ? 'Task' : 'Tasks'}</Typo></>
             ) : (
-              <>{count}/{total} <Typo size={11} weight='500'>Tasks</Typo></>
+              <>{count}/{total} <Typo size={11} weight='500'>{total === 1 ? 'Task' : 'Tasks'}</Typo></>
             )
           }
         </Typo>
@@ -107,63 +112,78 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
   )
 }
 
-export default observer(function ProgressInfo () {
-  const { tasks, updateTask, totalTasks } = useProjectTasks()
+type ListRenderItemProps = {
+  title: string
+  id: string
+  status: string
+  projectId: string
+}
 
-  const todayStart = useMemo(() => {
-    const now = new Date()
-    now.setHours(0, 0, 0, 0)
-    return now
-  }, [])
+export default function ProgressInfo () {
+  const projectTasks = use$(() => Object.values(projectTasks$.get() || {}))
+  const { completed, completedToday } = useProgress()
 
-  const todayEnd = useMemo(() => {
-    const now = new Date()
-    now.setHours(23, 59, 59, 999)
-    return now
-  }, [])
+  const importantTasks = use$(() => {
+    const selected: {
+      title: string
+      id: string
+      status: string
+      projectId: string
+    }[] = []
+    let countToday = 0
 
-  const completedTodayLength = useMemo(() => {
-    return tasks.filter(task => {
-      const { status, updated_at } = task
-      if (status !== 'completed') return false
+    for (const t of projectTasks) {
+      if (selected.length === 4) break
 
-      const completionDate = new Date(updated_at)
-      return completionDate >= todayStart && completionDate <= todayEnd
-    }).length
-  }, [tasks, todayStart, todayEnd])
-
-  const completedTasksLength = useMemo(() => {
-    return tasks.filter(task => task.status === 'completed').length
-  }, [tasks])
-
-  const importantTasks = useMemo(() => {
-    const result: { title: string, id: string, status: string }[] = []
-
-    for (const task of tasks) {
-      const { title, id, priority, due_date, status } = task
-      const isHighPriority = priority?.toLowerCase() === 'high'
-
-      let isDueToday = false
-      if (due_date) {
-        const due = new Date(due_date)
-        due.setHours(0, 0, 0, 0)
-        isDueToday = due.getTime() === todayStart.getTime()
+      if (countToday < 4 && t.due_date && t.priority?.toLowerCase() === Priority.HIGH && t.status === StatusTask.PENDING) {
+        const due = new Date(t.due_date)
+        if (isToday(due)) {
+          selected.push({
+            title: t.title,
+            id: t.id,
+            status: t.status,
+            projectId: t.project_id
+          })
+          countToday++
+          continue
+        }
       }
 
-      if (isHighPriority || isDueToday) {
-        result.push({ title, id, status })
-        if (result.length === 4) break
+      if (
+        selected.length < 4 &&
+        t.priority?.toLowerCase() === Priority.HIGH
+      ) {
+        selected.push({
+          title: t.title,
+          id: t.id,
+          status: t.status,
+          projectId: t.project_id
+        })
       }
     }
 
-    return result
-  }, [tasks, todayStart])
+    return selected
+  })
 
-  const renderPriority: ListRenderItem<{ title: string, id: string, status: string }> = ({ item }) => (
+  const handleCompleted = useCallback(({ id, prevStatus, projectId }: { id: string, prevStatus: string, projectId: string }) =>
+    batch(() => {
+      projectTasks$[id].status.set(
+        prevStatus === StatusTask.COMPLETED
+          ? StatusTask.PENDING
+          : StatusTask.COMPLETED
+      )
+
+      projects$[projectId].completed_tasks
+        .set(prevCompletedTasks =>
+          prevCompletedTasks + (prevStatus === StatusTask.COMPLETED ? -1 : 1)
+        )
+    }), [])
+
+  const renderPriority: ListRenderItem<ListRenderItemProps> = ({ item: { title, id, status, projectId } }) => (
     <PriorityItem
-      label={item.title}
-      isCompleted={item.status === 'completed'}
-      onCompleted={() => updateTask(item.id, { status: item.status === 'completed' ? 'pending' : 'completed' })}
+      label={title}
+      isCompleted={status === StatusTask.COMPLETED}
+      onCompleted={() => handleCompleted({ id, prevStatus: status, projectId })}
     />
   )
 
@@ -197,21 +217,21 @@ export default observer(function ProgressInfo () {
         <View style={styles.indicatorContainer}>
           <ProgressSummary
             label='Completed'
-            percent={totalTasks > 0 ? Math.round((completedTasksLength / totalTasks) * 100) : 0}
-            count={completedTasksLength}
-            total={totalTasks}
+            percent={completed.percent}
+            count={completed.count}
+            total={completed.total}
           />
 
           <ProgressSummary
             label='Done Today'
             useIcon
-            count={completedTodayLength}
+            count={completedToday}
           />
         </View>
       </View>
     </View>
   )
-})
+}
 
 const styles = StyleSheet.create({
   container: {

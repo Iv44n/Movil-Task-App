@@ -1,8 +1,6 @@
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useCallback, useMemo, useState } from 'react'
-import useProjects from '@/hooks/data/useProjects'
-import useProjectTasks from '@/hooks/data/useProjectTasks'
+import { useCallback, useState } from 'react'
 import { formatProjectName } from '@/utils/utils'
 import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native'
 import Header from '@/components/project/Header'
@@ -12,11 +10,15 @@ import { Sizes } from '@/constants/theme'
 import TaskItem from '@/components/project/TaskItem'
 import FloatingButton from '@/components/project/FloatingButton'
 import { AddTaskModal } from '@/components/project/AddTaskModalProps'
-import { observer } from '@legendapp/state/react'
+import { use$ } from '@legendapp/state/react'
 import { InsertProjectTaskForForm } from '@/types/ProjectTask'
 import { StatusTask } from '@/constants/constants'
+import { projects$ } from '@/store/projects.store'
+import { projectTasks$ } from '@/store/projectTasks.store'
+import { randomUUID } from 'expo-crypto'
+import { batch } from '@legendapp/state'
 
-type Status = 'pending' | 'completed' | 'all'
+type Status = StatusTask | 'all'
 
 type TabItem = {
   readonly key: Status
@@ -25,37 +27,83 @@ type TabItem = {
 
 const tabs: TabItem[] = [
   { key: 'all', label: 'All' },
-  { key: 'pending', label: 'Pending' },
-  { key: 'completed', label: 'Completed' }
+  { key: StatusTask.PENDING, label: 'Pending' },
+  { key: StatusTask.COMPLETED, label: 'Completed' }
 ]
 
-export default observer(function Details() {
-  const { id: projectId } = useLocalSearchParams() as { id: string | undefined }
+export default function Details() {
+  const { id: projectId } = useLocalSearchParams() as { id?: string }
   const router = useRouter()
   const [showOptions, setShowOptions] = useState(false)
   const [showAddTaskModal, setShowAddTaskModal] = useState(false)
   const [tab, setTab] = useState<Status>('all')
-  const { getProjectById, deleteProjectById } = useProjects()
-  const { tasks, updateTask, createTask } = useProjectTasks()
 
-  const { name: projectName, description, color } = getProjectById(projectId || '') || {}
-  const projectTasks = tasks.filter(t => t.project_id === projectId)
+  const allTasks = use$(() =>
+    Object.values(projectTasks$.peek() || {})
+      .filter(t => t.project_id === projectId)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  )
 
+  const filteredTasks = use$(() => {
+    const out: typeof allTasks = []
+
+    for (const t of allTasks) {
+      if (tab === 'all') {
+        out.push(t)
+        continue
+      }
+
+      if (tab === StatusTask.PENDING || tab === StatusTask.COMPLETED) {
+        if (t.status !== tab) continue
+      }
+
+      out.push(t)
+    }
+    return out
+  })
+
+  const { name: projectName, description, color } = use$(() =>
+    projects$[projectId ?? '']?.get() || {}
+  )
   const { firstPart, remaining } = formatProjectName(projectName || '')
 
   const onAddTask = useCallback((newTask: InsertProjectTaskForForm) => {
-    if (!projectId) return
-    createTask(projectId, newTask)
-    setShowAddTaskModal(false)
-  }, [projectId, createTask])
+    try {
+      if (!newTask.title) throw new Error('Title is required')
+      if (!projectId) throw new Error('Project ID is required')
 
-  const handleStatusTaskChange = useCallback((taskId: string) => {
-    const task = projectTasks.find(t => t.id === taskId)
-    if (!task) return
+      batch(() => {
+        const newTaskId = randomUUID()
+        const result = projectTasks$[newTaskId].assign({
+          id: newTaskId,
+          project_id: projectId,
+          ...newTask
+        })
 
-    const newStatus = task.status === StatusTask.COMPLETED ? StatusTask.PENDING : StatusTask.COMPLETED
-    updateTask(task.id, { status: newStatus })
-  }, [projectTasks, updateTask])
+        projectTasks$.set(prev => ({ [newTaskId]: result.get(), ...prev }))
+        projects$[projectId].task_count.set(c => c + 1)
+      })
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setShowAddTaskModal(false)
+    }
+  }, [projectId])
+
+  const handleStatusTaskChange = useCallback((taskId: string) =>
+    batch(() => {
+      const task = projectTasks$[taskId]
+      task.status.set(s =>
+        s === StatusTask.COMPLETED
+          ? StatusTask.PENDING
+          : StatusTask.COMPLETED
+      )
+
+      projects$[task.project_id.get()].completed_tasks
+        .set(prevCompletedTasks =>
+          prevCompletedTasks + (task.status.get() === StatusTask.COMPLETED ? -1 : 1)
+        )
+    }), [])
 
   const handleDelete = useCallback(() => {
     Alert.alert(
@@ -68,22 +116,21 @@ export default observer(function Details() {
           style: 'destructive',
           onPress: () => {
             if (!projectId) return
-            deleteProjectById(projectId)
+            batch(() => {
+              const projectTasks = Object.values(projectTasks$.peek() || {}).filter(task =>
+                task.project_id === projectId
+              ).map(task => task.id)
+              for (const taskId of projectTasks) {
+                projectTasks$[taskId].delete()
+              }
+              projects$[projectId].delete()
+            })
             router.back()
           }
         }
       ]
     )
-  }, [deleteProjectById, projectId, router])
-
-  const filteredTasks = useMemo(() => {
-    if (tab === 'all') return projectTasks
-
-    return projectTasks.filter(t => {
-      if (tab === 'pending') return t.status === 'pending'
-      return t.status === 'completed'
-    })
-  }, [projectTasks, tab])
+  }, [projectId, router])
 
   return (
     <ScreenWrapper>
@@ -96,7 +143,7 @@ export default observer(function Details() {
 
         <View style={styles.container}>
           <View style={styles.titleSection}>
-            <Typo size={23} weight='400' color='secondary'>
+            <Typo size={23} weight='400' color={remaining ? 'secondary' : 'primary'}>
               {firstPart}
             </Typo>
             {remaining && (
@@ -143,12 +190,17 @@ export default observer(function Details() {
             data={filteredTasks}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.list}
+            removeClippedSubviews
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            updateCellsBatchingPeriod={50}
+            renderItem={({ item }) => <TaskItem task={item} colorTheme={color} onChangeStatus={handleStatusTaskChange}/>}
             ListEmptyComponent={
               <Typo size={15} color='secondary' style={styles.empty}>
                 No tasks.
               </Typo>
             }
-            renderItem={({ item }) => <TaskItem task={item} colorTheme={color} onChangeStatus={handleStatusTaskChange}/>}
           />
         </View>
 
@@ -176,7 +228,7 @@ export default observer(function Details() {
       </View>
     </ScreenWrapper>
   )
-})
+}
 
 const styles = StyleSheet.create({
   container: {
