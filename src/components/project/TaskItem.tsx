@@ -9,8 +9,7 @@ import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { CapitalizeWords } from '@/utils/utils'
 import Icon from '../icons/Icon'
 import Avatar from '../shared/Avatar'
-import { format } from '@formkit/tempo'
-import { isPast, isToday } from '@/utils/date'
+import { format, isPast, isToday } from '@/utils/date'
 import { ProjectTask } from '@/types/ProjectTask'
 import { StatusTask } from '@/constants/constants'
 
@@ -35,11 +34,17 @@ export default function TaskItem({ task, onPress, colorTheme = Colors.primary, o
   } = task
 
   const formattedStart = useMemo(
-    () => start_date && format(start_date, DATE_FORMAT, LOCALE_DEFAULT),
+    () => start_date && format(start_date, {
+      format: DATE_FORMAT,
+      locale: LOCALE_DEFAULT
+    }),
     [start_date]
   )
   const formattedDue = useMemo(
-    () => due_date && format(due_date, DATE_FORMAT, LOCALE_DEFAULT),
+    () => due_date && format(due_date, {
+      format: DATE_FORMAT,
+      locale: LOCALE_DEFAULT
+    }),
     [due_date]
   )
 
