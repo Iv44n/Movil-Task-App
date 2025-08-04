@@ -12,7 +12,7 @@ export default function ChatLineIcon({
       width={size}
       height={size}
       fill='none'
-      viewBox='0 0 24 24'
+      viewBox='0 0 23 23'
       {...props}
     >
       <Path

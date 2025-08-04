@@ -12,7 +12,7 @@ export default function UserIcon({
       width={size}
       height={size}
       fill='none'
-      viewBox='0 0 23 23'
+      viewBox='.5 0 23 23'
       stroke={color}
       strokeWidth={0.3}
       {...props}

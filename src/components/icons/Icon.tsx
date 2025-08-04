@@ -17,10 +17,14 @@ import FacebookIcon from './FacebookIcon'
 import HorizontalDotMenuIcon from './HorizontalDotMenuIcon'
 import ProgressIcon from './ProgressIcon'
 import TrashIcon from './TrashIcon'
+import LogoutIcon from './LogoutIcon'
+import DangerCircleIcon from './DangerCircleIcon'
+import AltArrowRightIcon from './AltArrowRightIcon'
 
 const Icon = {
   Add: (props: React.ComponentProps<typeof AddIcon>) => <AddIcon {...props} />,
   AltArrowDown: (props: React.ComponentProps<typeof AltArrowDownIcon>) => <AltArrowDownIcon {...props} />,
+  AltArrowRight: (props: React.ComponentProps<typeof AltArrowRightIcon>) => <AltArrowRightIcon {...props} />,
   ArrowLeft: (props: React.ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon {...props} />,
   ArrowRight: (props: React.ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon {...props} />,
   ArrowRightUp: (props: React.ComponentProps<typeof ArrowRightUpIcon>) => <ArrowRightUpIcon {...props} />,
@@ -37,7 +41,9 @@ const Icon = {
   HorizontalDotMenu: (props: React.ComponentProps<typeof HorizontalDotMenuIcon>) => <HorizontalDotMenuIcon {...props} />,
   Progress: (props: React.ComponentProps<typeof ProgressIcon>) => <ProgressIcon {...props} />,
   Trash: (props: React.ComponentProps<typeof TrashIcon>) => <TrashIcon {...props} />,
-  User: (props: React.ComponentProps<typeof UserIcon>) => <UserIcon {...props} />
+  User: (props: React.ComponentProps<typeof UserIcon>) => <UserIcon {...props} />,
+  Logout: (props: React.ComponentProps<typeof LogoutIcon>) => <LogoutIcon {...props} />,
+  DangerCircle: (props: React.ComponentProps<typeof DangerCircleIcon>) => <DangerCircleIcon {...props} />
 }
 
 export default Icon
