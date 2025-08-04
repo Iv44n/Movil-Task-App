@@ -1,3 +1,5 @@
+import format from './formatDate'
+
 const isPast = (date: string | Date) => {
   if (typeof date === 'string') {
     return new Date(date) < new Date()
@@ -24,4 +26,4 @@ const todayEnd = () => {
   return now
 }
 
-export { isPast, isToday, todayStart, todayEnd }
+export { format, isPast, isToday, todayStart, todayEnd }
