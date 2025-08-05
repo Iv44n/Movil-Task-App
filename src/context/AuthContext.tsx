@@ -34,13 +34,10 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true
 
-    Promise.all([
-      supabase.auth.getSession(),
-      supabase.auth.getUser()
-    ]).then(([{ data: sessionData }, { data: userData }]) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (isMounted) {
-        setSession(sessionData.session)
-        setUser(userData.user)
+        setSession(session)
+        setUser(session?.user ?? null)
         setIsLoaded(true)
       }
     })

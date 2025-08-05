@@ -1,25 +1,16 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { User } from '@supabase/supabase-js'
-
 import Icon from '@/components/icons/Icon'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import ActionButton from '@/components/shared/ActionButton'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/hooks/auth/useAuth'
 
 export default function Profile() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useAuth()
   const metadata = user?.user_metadata || {}
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      setUser(data.user)
-    }
-    fetchUser()
-  }, [])
 
   const handleSignOut = useCallback(async () => {
     try {
