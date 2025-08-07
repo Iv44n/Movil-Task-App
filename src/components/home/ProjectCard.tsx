@@ -2,17 +2,15 @@ import Icon from '@/components/icons/Icon'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { formatProjectName } from '@/utils/utils'
-import { use$ } from '@legendapp/state/react'
 import { Link } from 'expo-router'
 import { TouchableOpacity, StyleSheet, View } from 'react-native'
 import ProjectProgressBar from './ProjectProgressBar'
-import { categories$ } from '@/store/categories.store'
 
 interface ProjectCardProps {
   taskCount: number
   name: string
   color: string
-  categoryId: string
+  categoryName: string
   completedTasks: number
   id: string
 }
@@ -23,10 +21,9 @@ export default function ProjectCard({
   name,
   color,
   id,
-  categoryId
+  categoryName
 }: ProjectCardProps) {
   const { firstPart, remaining } = formatProjectName(name)
-  const categoryName = use$(() => categories$[categoryId]?.name)
   const progressPercentage = taskCount === 0 ? 0 : Math.round((completedTasks / taskCount) * 100)
 
   return (
