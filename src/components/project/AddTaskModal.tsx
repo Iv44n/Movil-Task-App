@@ -19,7 +19,7 @@ interface AddTaskModalProps {
   readonly colorTheme: string;
   readonly visible: boolean;
   readonly onClose: () => void;
-  readonly onAddTask: (task: InsertProjectTaskForForm) => void;
+  readonly onAddTask: (task: Omit<InsertProjectTaskForForm, 'project_id'>) => void;
 }
 
 type FormData = {
@@ -32,8 +32,8 @@ type FormData = {
 
 const PRIORITY_OPTIONS = ['low', 'medium', 'high'] as const
 
-export function AddTaskModal({ visible, onClose, onAddTask, colorTheme }: AddTaskModalProps) {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+export default function AddTaskModal({ visible, onClose, onAddTask, colorTheme }: AddTaskModalProps) {
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       title: '',
       description: '',
@@ -44,15 +44,17 @@ export function AddTaskModal({ visible, onClose, onAddTask, colorTheme }: AddTas
   })
 
   const onSubmit = useCallback((data: FormData) => {
-    onAddTask({
+    const taskData = {
       title: data.title.trim(),
       description: data.description.trim() || undefined,
       priority: data.priority,
       start_date: data.start_date ? new Date(data.start_date).toISOString() : undefined,
       due_date: data.due_date ? new Date(data.due_date).toISOString() : undefined
-    })
+    }
+    onAddTask(taskData)
+    reset()
     onClose()
-  }, [onAddTask, onClose])
+  }, [onAddTask, onClose, reset])
 
   return (
     <Modal
