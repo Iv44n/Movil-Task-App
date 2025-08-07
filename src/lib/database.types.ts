@@ -42,26 +42,32 @@ export type Database = {
       categories: {
         Row: {
           created_at: string
+          createdAtLocal: string
           deleted: boolean
           id: string
           name: string
           updated_at: string
+          updatedAtLocal: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          createdAtLocal?: string
           deleted?: boolean
           id?: string
           name: string
           updated_at?: string
+          updatedAtLocal?: string
           user_id?: string
         }
         Update: {
           created_at?: string
+          createdAtLocal?: string
           deleted?: boolean
           id?: string
           name?: string
           updated_at?: string
+          updatedAtLocal?: string
           user_id?: string
         }
         Relationships: []
@@ -69,6 +75,7 @@ export type Database = {
       project_tasks: {
         Row: {
           created_at: string
+          createdAtLocal: string
           deleted: boolean
           description: string
           due_date: string | null
@@ -79,10 +86,12 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          updatedAtLocal: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          createdAtLocal?: string
           deleted?: boolean
           description?: string
           due_date?: string | null
@@ -93,10 +102,12 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          updatedAtLocal?: string
           user_id?: string
         }
         Update: {
           created_at?: string
+          createdAtLocal?: string
           deleted?: boolean
           description?: string
           due_date?: string | null
@@ -107,6 +118,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          updatedAtLocal?: string
           user_id?: string
         }
         Relationships: [
@@ -123,38 +135,46 @@ export type Database = {
         Row: {
           category_id: string
           color: string
+          completed_tasks: number
           created_at: string
+          createdAtLocal: string
           deleted: boolean
           description: string
           id: string
           name: string
           task_count: number
           updated_at: string
-          user_id: string,
-          completed_tasks: number
+          updatedAtLocal: string
+          user_id: string
         }
         Insert: {
           category_id: string
           color?: string
+          completed_tasks?: number
           created_at?: string
+          createdAtLocal?: string
           deleted?: boolean
           description?: string
           id?: string
           name: string
           task_count?: number
           updated_at?: string
+          updatedAtLocal?: string
           user_id?: string
         }
         Update: {
           category_id?: string
           color?: string
+          completed_tasks?: number
           created_at?: string
+          createdAtLocal?: string
           deleted?: boolean
           description?: string
           id?: string
           name?: string
           task_count?: number
           updated_at?: string
+          updatedAtLocal?: string
           user_id?: string
         }
         Relationships: [
@@ -166,81 +186,6 @@ export type Database = {
             referencedColumns: ['id']
           }
         ]
-      }
-      recurrences: {
-        Row: {
-          created_at: string
-          id: string
-          interval: number
-          monthly_day: number | null
-          task_id: string
-          unit: string
-          updated_at: string
-          user_id: string
-          week_days: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          interval: number
-          monthly_day?: number | null
-          task_id: string
-          unit: string
-          updated_at?: string
-          user_id: string
-          week_days?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          interval?: number
-          monthly_day?: number | null
-          task_id?: string
-          unit?: string
-          updated_at?: string
-          user_id?: string
-          week_days?: string
-        }
-        Relationships: []
-      }
-      recurring_tasks: {
-        Row: {
-          created_at: string
-          description: string
-          id: number
-          interval: number
-          monthly_day: number | null
-          title: string
-          unit: string
-          updated_at: string
-          user_id: string
-          week_days: string
-        }
-        Insert: {
-          created_at?: string
-          description: string
-          id?: number
-          interval: number
-          monthly_day?: number | null
-          title: string
-          unit: string
-          updated_at?: string
-          user_id: string
-          week_days?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string
-          id?: number
-          interval?: number
-          monthly_day?: number | null
-          title?: string
-          unit?: string
-          updated_at?: string
-          user_id?: string
-          week_days?: string
-        }
-        Relationships: []
       }
     }
     Views: {
