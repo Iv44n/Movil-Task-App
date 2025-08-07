@@ -5,12 +5,13 @@ import Svg, { Circle } from 'react-native-svg'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { isToday } from '@/utils/date'
-import { projects$ } from '@/store/projects.store'
+import { projectsStore$ } from '@/store/projects.store'
 import { Priority, StatusTask } from '@/constants/constants'
-import { projectTasks$ } from '@/store/projectTasks.store'
+import { projectTasksStore$ } from '@/store/projectTasks.store'
 import { use$ } from '@legendapp/state/react'
 import useProgress from '@/hooks/data/useProgress'
 import { batch } from '@legendapp/state'
+import { useAuth } from '@/hooks/auth/useAuth'
 
 const PriorityItem = ({ label, isCompleted, onCompleted }: { label: string, isCompleted: boolean, onCompleted: () => void }) => {
   return(
@@ -121,8 +122,10 @@ type ListRenderItemProps = {
 }
 
 export default function ProgressInfo () {
-  const projectTasks = use$(() => Object.values(projectTasks$.get() || {}))
   const { completed, completedToday } = useProgress()
+  const { user } = useAuth()
+  const { projectTasks, updateProjectTask } = use$(() => projectTasksStore$(user?.id ?? ''))
+  const { updateProject } = use$(() => projectsStore$(user?.id ?? ''))
 
   const importantTasks = use$(() => {
     const selected: {
@@ -133,7 +136,7 @@ export default function ProgressInfo () {
     }[] = []
     let countToday = 0
 
-    for (const t of projectTasks) {
+    for (const t of Object.values(projectTasks)) {
       if (selected.length === 4) break
 
       if (countToday < 4 && t.due_date && t.priority?.toLowerCase() === Priority.HIGH && t.status === StatusTask.PENDING) {
@@ -168,17 +171,20 @@ export default function ProgressInfo () {
 
   const handleCompleted = useCallback(({ id, prevStatus, projectId }: { id: string, prevStatus: string, projectId: string }) =>
     batch(() => {
-      projectTasks$[id].status.set(
-        prevStatus === StatusTask.COMPLETED
+      if (!updateProjectTask || !updateProject) return
+
+      updateProjectTask(id, {
+        status: prevStatus === StatusTask.COMPLETED
           ? StatusTask.PENDING
           : StatusTask.COMPLETED
-      )
+      })
 
-      projects$[projectId].completed_tasks
-        .set(prevCompletedTasks =>
-          prevCompletedTasks + (prevStatus === StatusTask.COMPLETED ? -1 : 1)
-        )
-    }), [])
+      const isPrevCompleted = prevStatus === StatusTask.COMPLETED
+
+      updateProject(projectId, (prev) => ({
+        completed_tasks: prev.completed_tasks + (isPrevCompleted ? -1 : 1)
+      }))
+    }), [updateProject, updateProjectTask])
 
   const renderPriority: ListRenderItem<ListRenderItemProps> = ({ item: { title, id, status, projectId } }) => (
     <PriorityItem

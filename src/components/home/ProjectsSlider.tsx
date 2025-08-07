@@ -11,9 +11,11 @@ import {
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import ProjectCard from '@/components/home/ProjectCard'
 import Typo from '@/components/shared/Typo'
-import { For, use$, Memo } from '@legendapp/state/react'
+import { use$ } from '@legendapp/state/react'
 import { BlurView } from 'expo-blur'
-import { projects$ } from '@/store/projects.store'
+import { projectsStore$ } from '@/store/projects.store'
+import { useAuth } from '@/hooks/auth/useAuth'
+import { categoriesStore$ } from '@/store/categories.store'
 
 function AddProjectButton({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
   return (
@@ -50,7 +52,10 @@ function EmptyState({ setShowAddProjectModal }: { readonly setShowAddProjectModa
 export default function ProjectsSlider({ setShowAddProjectModal }: { setShowAddProjectModal: (value: boolean) => void }) {
   const [showAdd, setShowAdd] = useState(false)
   const scrollRef = useRef<ScrollView>(null)
-  const projectsLength = use$(() => Object.keys(projects$.get(true) || {}).length)
+  const { user } = useAuth()
+
+  const projectsStore = use$(() => projectsStore$(user?.id || ''))
+  const categoriesStore = use$(() => categoriesStore$(user?.id || ''))
 
   const onScrollEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -60,7 +65,15 @@ export default function ProjectsSlider({ setShowAddProjectModal }: { setShowAddP
     []
   )
 
-  if (projectsLength === 0) {
+  if (!user?.id) {
+    return <EmptyState setShowAddProjectModal={setShowAddProjectModal} />
+  }
+
+  const { projects } = projectsStore
+  const { categories } = categoriesStore
+  const projectsArray = Object.values(projects)
+
+  if (projectsArray.length === 0) {
     return <EmptyState setShowAddProjectModal={setShowAddProjectModal} />
   }
 
@@ -75,25 +88,20 @@ export default function ProjectsSlider({ setShowAddProjectModal }: { setShowAddP
     >
       {showAdd && <AddProjectButton setShowAddProjectModal={setShowAddProjectModal} />}
 
-      <For
-        each={projects$}
-        optimized
-        sortValues={(a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()}
-        item={({ item$, id }) => (
-          <Memo key={id}>
-            {() => (
-              <ProjectCard
-                taskCount={item$.task_count.get()}
-                completedTasks={item$.completed_tasks.get()}
-                name={item$.name.get()}
-                color={item$.color.get()}
-                id={item$.id.get()}
-                categoryId={item$.category_id.get()}
-              />
-            )}
-          </Memo>
-        )}
-      />
+      {projectsArray.map((project) => {
+        const categoryName = categories[project.category_id].name
+        return (
+          <ProjectCard
+            key={project.id}
+            taskCount={project.task_count}
+            completedTasks={project.completed_tasks}
+            name={project.name}
+            color={project.color}
+            id={project.id}
+            categoryName={categoryName}
+          />
+        )
+      })}
     </Animated.ScrollView>
   )
 }

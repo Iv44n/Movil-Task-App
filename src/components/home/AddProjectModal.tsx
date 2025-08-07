@@ -16,10 +16,9 @@ import FormField from '../shared/FormField'
 import { useRouter } from 'expo-router'
 import CategorySelector from '@/components/home/CategorySelector'
 import Icon from '@/components/icons/Icon'
-import { Memo } from '@legendapp/state/react'
-import { projects$ } from '@/store/projects.store'
-import { randomUUID } from 'expo-crypto'
-import { batch } from '@legendapp/state'
+import { Memo, use$ } from '@legendapp/state/react'
+import { projectsStore$ } from '@/store/projects.store'
+import { useAuth } from '@/hooks/auth/useAuth'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -46,7 +45,11 @@ const PROJECT_COLORS = [
 
 export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
   const router = useRouter()
-  const { control, handleSubmit, formState: { errors }, clearErrors } = useForm<FormData>({
+  const { user } = useAuth()
+
+  const { createProject } = use$(() => projectsStore$(user?.id || ''))
+
+  const { control, handleSubmit, reset, formState: { errors }, clearErrors } = useForm<FormData>({
     defaultValues: {
       name: '',
       description: '',
@@ -57,34 +60,38 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
     reValidateMode: 'onSubmit'
   })
 
-  const onSubmit = useCallback((data: FormData) => {
-    const { selectedCategoryId, selectedColor, name, description } = data
-    if (!name.trim()) return
-    if (!selectedCategoryId) return Alert.alert('Error', 'Category is required')
+  const handleClose = useCallback(() => {
+    reset()
+    onClose()
+  }, [reset, onClose])
 
-    const newProjectId = randomUUID()
+  const onSubmit = useCallback((data: FormData) => {
+    if (!createProject || !user?.id) return
+    const { selectedCategoryId, selectedColor, name, description } = data
+
+    if (!selectedCategoryId) {
+      return Alert.alert('Error', 'Category is required')
+    }
 
     try {
-      const newProject = projects$[newProjectId].assign({
-        id: newProjectId,
-        name,
-        description: description.trim() ?? null,
+      const newProject = createProject({
+        name: name.trim(),
+        description: description.trim() || undefined,
         category_id: selectedCategoryId,
-        color: selectedColor,
-        task_count: 0,
-        completed_tasks: 0
+        color: selectedColor
       })
 
-      batch(() => {
-        projects$.set(prev => ({ [newProjectId]: newProject.get(), ...prev }))
-      })
-
-      router.navigate(`project/${newProject.id.get()}`)
+      reset()
       onClose()
+      router.replace(`project/${newProject.id}`)
     } catch (error) {
-      console.error('Error creating project:', error)
+      const message = error instanceof Error ? error.message : 'Failed to create project'
+      Alert.alert('Failed to create project', message)
+      console.error('Failed to create project on component AddProjectModal', error)
     }
-  }, [onClose, router])
+  }, [user?.id, createProject, reset, onClose, router])
+
+  if (!user?.id) return null
 
   return (
     <Modal
@@ -92,24 +99,29 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
       animationType='slide'
       hardwareAccelerated
       presentationStyle='pageSheet'
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       statusBarTranslucent
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Typo size={19} weight='600'>Create New Project</Typo>
-          <TouchableOpacity onPress={onClose}>
+          <TouchableOpacity onPress={handleClose}>
             <Icon.Close />
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps='handled'
+        >
           <Controller
             name='name'
             control={control}
             rules={{
-              required: 'Name is required',
-              minLength: { value: 3, message: 'Name must be at least 3 characters long' }
+              required: 'Project name is required',
+              minLength: { value: 3, message: 'Name must be at least 3 characters' },
+              maxLength: { value: 100, message: 'Name must be 100 characters or less' }
             }}
             render={({ field: { onChange, value } }) => (
               <FormField
@@ -121,6 +133,7 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
                   onChange(value)
                   clearErrors('name')
                 }}
+                maxLength={100}
               />
             )}
           />
@@ -129,7 +142,7 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
             name='description'
             control={control}
             rules={{
-              maxLength: { value: 200, message: 'Description must be at most 200 characters long' }
+              maxLength: { value: 500, message: 'Description must be 500 characters or less' }
             }}
             render={({ field: { onChange, value } }) => (
               <FormField
@@ -142,6 +155,7 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
                   clearErrors('description')
                 }}
                 multiline
+                maxLength={500}
                 style={{
                   height: Sizes.height.h99,
                   textAlignVertical: 'top'
@@ -197,7 +211,7 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
             style={styles.cancelButton}
             label='Cancel'
             typoProps={{ color: 'primary', size: 15 }}
-            onPress={onClose}
+            onPress={handleClose}
           />
           <ActionButton
             style={styles.submitButton}

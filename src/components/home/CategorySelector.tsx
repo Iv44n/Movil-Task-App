@@ -1,10 +1,10 @@
-import { useCallback, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import {
-  Alert,
   Modal,
   TouchableWithoutFeedback,
   StyleSheet,
-  View
+  View,
+  Alert
 } from 'react-native'
 import Picker from '@/components/shared/Picker'
 import Typo from '@/components/shared/Typo'
@@ -12,11 +12,9 @@ import FormField from '@/components/shared/FormField'
 import ActionButton from '@/components/shared/ActionButton'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import Icon from '@/components/icons/Icon'
-import { categories$ } from '@/store/categories.store'
+import { categoriesStore$ } from '@/store/categories.store'
 import { use$ } from '@legendapp/state/react'
-import { randomUUID } from 'expo-crypto'
-import { batch } from '@legendapp/state'
-import { projects$ } from '@/store/projects.store'
+import { useAuth } from '@/hooks/auth/useAuth'
 
 interface CategorySelectorProps {
   onSelect: (category: string | null) => void
@@ -25,7 +23,7 @@ interface CategorySelectorProps {
 
 const NEW_VALUE = '__NEW__'
 
-function AddCategoryModal({
+const AddCategoryModal = memo(function AddCategoryModal({
   visible,
   onCancel,
   onSubmit
@@ -84,62 +82,57 @@ function AddCategoryModal({
       </TouchableWithoutFeedback>
     </Modal>
   )
-}
+})
 
-export default function CategorySelector({ onSelect, selectedCategoryId }: CategorySelectorProps) {
+export default memo(function CategorySelector({ onSelect, selectedCategoryId }: CategorySelectorProps) {
   const [showAddModal, setShowAddModal] = useState(false)
+  const { user } = useAuth()
 
-  const selectedCatName: string | undefined = use$(() => categories$[selectedCategoryId ?? '']?.name)
-  const countCategories = use$(() => Object.keys(categories$.get(true) || {}).length || 0)
-  const categories = use$(() =>
-    Object.values(categories$.get(true) || {})
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .map(({ id, name }) => ({ id, name }))
-  )
+  const categoriesStore = use$(() => categoriesStore$(user?.id || ''))
 
   const handleAdd = useCallback((name: string) => {
-    const nameTrimmed = name.trim()
-    if (!nameTrimmed) return setShowAddModal(false)
+    const { createCategory } = categoriesStore
+    if (!createCategory || !user?.id) return
 
     try {
-      const id = randomUUID()
-      const newC = categories$[id].assign({ id, name: nameTrimmed })
-
-      batch(() => {
-        categories$.set((prev) => ({
-          [id]: newC.get(),
-          ...prev
-        }))
-        onSelect(id)
-      })
-    } catch (error) {
-      console.error('Create category error:', error)
-    } finally {
+      const newCategory = createCategory(name)
+      onSelect(newCategory.id)
       setShowAddModal(false)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create category'
+      Alert.alert('Failed to create category', message)
+      console.error('Failed to create category on component CategorySelector', error)
     }
-  }, [onSelect])
+  }, [onSelect, categoriesStore, user?.id])
 
   const handleDelete = useCallback((id: string) => {
-    try {
-      const inUse = Object.values(projects$.get(true) || {}).some(p => p.category_id === id)
-      if (inUse) {
-        return Alert.alert(
-          'Category in use',
-          'This category is in use by some projects'
-        )
-      }
+    const { deleteCategory } = categoriesStore
+    if (!deleteCategory || !user?.id) return
 
-      categories$[id].delete()
+    try {
+      deleteCategory(id)
       if (selectedCategoryId === id) onSelect(null)
     } catch (error) {
-      console.error('Delete category error:', error)
+      const message = error instanceof Error ? error.message : 'Failed to delete category'
+      Alert.alert('Failed to delete category', message)
+      console.error('Failed to delete category on component CategorySelector', error)
     }
-  }, [onSelect, selectedCategoryId])
+  }, [onSelect, selectedCategoryId, categoriesStore, user?.id])
 
   const handleValueChange = useCallback((value: string) => {
     if (value === NEW_VALUE) return setShowAddModal(true)
     onSelect(value)
   }, [onSelect])
+
+  const { categories } = categoriesStore
+  if (!categories || !user?.id) return null
+
+  const selectedCatName = selectedCategoryId && categories[selectedCategoryId]
+    ? categories[selectedCategoryId].name
+    : undefined
+
+  const categoriesArray = Object.values(categories)
+  const countCategories = categoriesArray.length
 
   return (
     <View style={styles.container}>
@@ -149,7 +142,7 @@ export default function CategorySelector({ onSelect, selectedCategoryId }: Categ
 
       <Picker
         style={styles.picker}
-        selectedValue={selectedCatName}
+        selectedValue={selectedCatName || ''}
         onValueChange={handleValueChange}
         placeholder='Select a category'
       >
@@ -162,19 +155,17 @@ export default function CategorySelector({ onSelect, selectedCategoryId }: Categ
           style={[styles.newItem, countCategories > 0 && styles.addedItemStyle]}
         />
 
-        {
-          categories.map((c) => (
-            <Picker.Item
-              key={c.id}
-              label={c.name}
-              value={c.id}
-              isSelected={selectedCategoryId === c.id}
-              icon={<Icon.Trash color={Colors.error} size={19} />}
-              iconPosition='right'
-              handleIconPress={() => handleDelete(c.id)}
-            />
-          ))
-        }
+        {categoriesArray.map((category) => (
+          <Picker.Item
+            key={category.id}
+            label={category.name}
+            value={category.id}
+            isSelected={selectedCategoryId === category.id}
+            icon={<Icon.Trash color={Colors.error} size={19} />}
+            iconPosition='right'
+            handleIconPress={() => handleDelete(category.id)}
+          />
+        ))}
       </Picker>
 
       <AddCategoryModal
@@ -184,7 +175,7 @@ export default function CategorySelector({ onSelect, selectedCategoryId }: Categ
       />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

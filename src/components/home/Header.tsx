@@ -1,11 +1,13 @@
 import Typo from '../shared/Typo'
 import { Sizes } from '@/constants/theme'
 import { View } from 'react-native'
-import { projects$ } from '@/store/projects.store'
+import { projectsStore$ } from '@/store/projects.store'
 import { use$ } from '@legendapp/state/react'
+import { useAuth } from '@/hooks/auth/useAuth'
 
 export default function Header({ userName }: { userName: string }) {
-  const totalProjects = use$(() => Object.keys(projects$.get(true) || {}).length)
+  const { user } = useAuth()
+  const totalProjects = use$(() => Object.values(projectsStore$(user?.id || '').projects).length)
 
   return (
     <View style={{
