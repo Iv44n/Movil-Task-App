@@ -89,7 +89,7 @@ export default function ProjectsSlider({ setShowAddProjectModal }: { setShowAddP
       {showAdd && <AddProjectButton setShowAddProjectModal={setShowAddProjectModal} />}
 
       {projectsArray.map((project) => {
-        const categoryName = categories[project.category_id].name
+        const categoryName = categories[project.category_id]?.name || 'No category'
         return (
           <ProjectCard
             key={project.id}

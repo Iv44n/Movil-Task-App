@@ -13,7 +13,8 @@ export default function Header({ userName }: { userName: string }) {
     <View style={{
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: Sizes.spacing.s21
+      marginBottom: Sizes.spacing.s21,
+      marginTop: Sizes.spacing.s9
     }}
     >
       <View>

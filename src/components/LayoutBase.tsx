@@ -8,8 +8,7 @@ export default function LayoutBase({ children }: React.PropsWithChildren) {
       style={{
         flex: 1,
         backgroundColor: Colors.background,
-        paddingHorizontal: Sizes.spacing.s9,
-        paddingTop: Sizes.spacing.s11
+        paddingHorizontal: Sizes.spacing.s9
       }}
     >
       <StatusBar style='light'/>
