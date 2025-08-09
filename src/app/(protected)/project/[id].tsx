@@ -1,52 +1,27 @@
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { memo, useCallback, useState, useMemo, useRef } from 'react'
+import { memo, useCallback, useState, useRef, useDeferredValue, useEffect } from 'react'
 import { formatProjectName } from '@/utils/utils'
-import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
-import Header from '@/components/project/Header'
+import { Alert, InteractionManager, StyleSheet, View } from 'react-native'
+import Header from '@/components/projectDetails/Header'
 import Typo from '@/components/shared/Typo'
-import OptionsModal from '@/components/project/OptionsModal'
+import OptionsModal from '@/components/projectDetails/OptionsModal'
 import { Sizes } from '@/constants/theme'
-import TaskItem from '@/components/project/TaskItem'
-import FloatingButton from '@/components/project/FloatingButton'
-import AddTaskModal from '@/components/project/AddTaskModal'
+import TaskItem from '@/components/projectDetails/TaskItem'
+import FloatingButton from '@/components/projectDetails/FloatingButton'
+import AddTaskModal from '@/components/projectDetails/AddTaskModal'
 import { use$ } from '@legendapp/state/react'
 import { InsertProjectTaskForForm, ProjectTask } from '@/types/ProjectTask'
 import { StatusTask } from '@/constants/constants'
 import { projectsStore$ } from '@/store/projects.store'
 import { projectTasksStore$ } from '@/store/projectTasks.store'
 import { useAuth } from '@/hooks/auth/useAuth'
+import { LegendList, LegendListRef } from '@legendapp/list'
+import ProjectInfo from '@/components/projectDetails/ProjectInfo'
+import ProjectTabs from '@/components/projectDetails/ProjectTabs'
+import TaskItemSkeleton from '@/components/projectDetails/TaskItemSkeleton'
 
 type Status = StatusTask | 'all'
-
-type TabItem = {
-  readonly key: Status
-  readonly label: string
-}
-
-const tabs: TabItem[] = [
-  { key: 'all', label: 'All' },
-  { key: StatusTask.PENDING, label: 'Pending' },
-  { key: StatusTask.COMPLETED, label: 'Completed' }
-]
-
-const MemoizedTaskItem = memo(({
-  task,
-  color,
-  onChangeStatus
-}: {
-  task: ProjectTask
-  color: string
-  onChangeStatus: (taskId: string) => void
-}) => (
-  <TaskItem
-    task={task}
-    colorTheme={color}
-    onChangeStatus={onChangeStatus}
-  />
-))
-
-MemoizedTaskItem.displayName = 'MemoizedTaskItem'
 
 const EmptyComponent = memo(({ tab }: { tab: Status }) => (
   <View style={styles.emptyContainer}>
@@ -65,14 +40,20 @@ export default memo(function Details() {
   const { id: projectId } = useLocalSearchParams() as { id?: string }
   const router = useRouter()
   const { user } = useAuth()
-  const flatListRef = useRef<FlatList>(null)
+  const flatListRef = useRef<LegendListRef>(null)
 
   const [showOptions, setShowOptions] = useState(false)
   const [showAddTaskModal, setShowAddTaskModal] = useState(false)
   const [tab, setTab] = useState<Status>('all')
+  const deferredTab = useDeferredValue(tab)
+  const [ready, setReady] = useState(false)
 
-  const projectTasksStore = use$(() => projectTasksStore$(user?.id ?? ''))
-  const projectsStore = use$(() => projectsStore$(user?.id ?? ''))
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      setReady(true)
+    })
+    return () => task.cancel?.()
+  }, [])
 
   const handleBack = useCallback(() => {
     const canGoBack = router.canGoBack()
@@ -80,18 +61,46 @@ export default memo(function Details() {
     router.replace('/(protected)/(tabs)')
   }, [router])
 
+  const { projectTasksStore, projectsStore } = use$(() => ({
+    projectTasksStore: projectTasksStore$(user?.id ?? ''),
+    projectsStore: projectsStore$(user?.id ?? '')
+  }))
+
   const { projects, updateProject, deleteProject } = projectsStore
   const { projectTasks, createProjectTask, updateProjectTask, deleteProjectTask } = projectTasksStore
 
-  const filteredTasks = useMemo(() => {
-    const allTasks = Object.values(projectTasks || {})
-    const projectSpecificTasks = allTasks.filter(t => t.project_id === projectId)
+  const tasksByProject = use$(() => {
+    const map = new Map<string, Map<Status, ProjectTask[]>>()
 
-    if (tab === 'all') return projectSpecificTasks
-    return projectSpecificTasks.filter(t => t.status === tab)
-  }, [projectTasks, projectId, tab])
+    if (!projectTasks) return map
 
-  const projectData = useMemo(() => {
+    for (const task of Object.values(projectTasks)) {
+      const pid = task.project_id
+      if (!map.has(pid)) {
+        map.set(
+          pid,
+          new Map<Status, ProjectTask[]>([
+            ['all', []],
+            [StatusTask.PENDING, []],
+            [StatusTask.COMPLETED, []]
+          ])
+        )
+      }
+
+      const statusMap = map.get(pid)!
+      statusMap.get('all')!.push(task)
+      statusMap.get(task.status as Status)!.push(task)
+    }
+
+    return map
+  })
+
+  const filteredTasks = use$(() => {
+    if (!projectId) return []
+    return tasksByProject.get(projectId)?.get(deferredTab) ?? []
+  })
+
+  const projectData = use$(() => {
     if (!projectId || !projects) return null
     const project = projects[projectId]
     if (!project) return null
@@ -100,7 +109,7 @@ export default memo(function Details() {
     const { firstPart, remaining } = formatProjectName(projectName || '')
 
     return { project, firstPart, remaining, description, color }
-  }, [projectId, projects])
+  })
 
   const onAddTask = useCallback((newTask: Omit<InsertProjectTaskForForm, 'project_id'>) => {
     if (!projectId || !createProjectTask || !updateProject) return
@@ -116,7 +125,6 @@ export default memo(function Details() {
       }))
 
       setShowAddTaskModal(false)
-
       flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to create task'
@@ -133,13 +141,10 @@ export default memo(function Details() {
 
     try {
       const newStatus = task.status === StatusTask.COMPLETED ? StatusTask.PENDING : StatusTask.COMPLETED
-
       updateProjectTask(taskId, { status: newStatus })
       updateProject(projectId, (prev) => {
         const completedChange = newStatus === StatusTask.COMPLETED ? 1 : -1
-        return {
-          completed_tasks: prev.completed_tasks + completedChange
-        }
+        return { completed_tasks: prev.completed_tasks + completedChange }
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to update task'
@@ -162,11 +167,9 @@ export default memo(function Details() {
           onPress: () => {
             try {
               const taskIds = Object.keys(projectTasks || {})
-
               taskIds.forEach(taskId => {
                 deleteProjectTask(taskId)
               })
-
               deleteProject(projectId)
               handleBack()
             } catch (error) {
@@ -185,21 +188,16 @@ export default memo(function Details() {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: false })
   }, [])
 
-  const renderTaskItem = useCallback(({ item }: { item: ProjectTask }) => (
-    <MemoizedTaskItem
-      task={item}
-      color={projectData?.color || ''}
-      onChangeStatus={handleStatusTaskChange}
-    />
-  ), [handleStatusTaskChange, projectData?.color])
-
-  const keyExtractor = useCallback((item: ProjectTask) => item.id, [])
-
-  const getItemLayout = useCallback((data: any, index: number) => ({
-    length: 80,
-    offset: 80 * index,
-    index
-  }), [])
+  const renderTaskItem = useCallback(
+    ({ item }: { item: ProjectTask }) => (
+      <TaskItem
+        task={item}
+        colorTheme={projectData?.color}
+        onChangeStatus={handleStatusTaskChange}
+      />
+    ),
+    [projectData?.color, handleStatusTaskChange]
+  )
 
   if (!user?.id || !projectId || !projects) {
     return (
@@ -244,67 +242,39 @@ export default memo(function Details() {
           onOptions={() => setShowOptions(true)}
         />
 
-        <View style={styles.content}>
-          <View style={styles.titleSection}>
-            <Typo size={23} weight='400' color={remaining ? 'secondary' : 'primary'}>
-              {firstPart}
-            </Typo>
-            {remaining && (
-              <Typo size={27} weight='600' color='primary'>
-                {remaining}
-              </Typo>
-            )}
-            {description && (
-              <Typo
-                style={styles.description}
-                size={15}
-                weight='500'
-                color='secondary'
-                numberOfLines={3}
-              >
-                {description}
-              </Typo>
-            )}
-          </View>
-
-          <View style={styles.tabBar}>
-            {tabs.map(t => (
-              <TouchableOpacity
-                key={t.key}
-                activeOpacity={0.7}
-                onPress={() => handleTabChange(t.key)}
-                style={[
-                  styles.tabItem,
-                  tab === t.key && styles.tabItemActive,
-                  { borderBottomColor: color }
-                ]}
-              >
-                <Typo
-                  size={15}
-                  weight={tab === t.key ? '600' : '400'}
-                  color={tab === t.key ? 'primary' : 'secondary'}
-                >
-                  {t.label}
-                </Typo>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <FlatList
-            ref={flatListRef}
-            data={filteredTasks}
-            keyExtractor={keyExtractor}
-            renderItem={renderTaskItem}
-            getItemLayout={getItemLayout}
-            contentContainerStyle={styles.list}
-            removeClippedSubviews={true}
-            initialNumToRender={15}
-            maxToRenderPerBatch={15}
-            windowSize={10}
-            updateCellsBatchingPeriod={50}
-            scrollEventThrottle={16}
-            ListEmptyComponent={<EmptyComponent tab={tab} />}
+        <View style={styles.container}>
+          <ProjectInfo
+            firstPart={firstPart}
+            remaining={remaining}
+            description={description}
           />
+
+          <ProjectTabs
+            tab={tab}
+            onChange={handleTabChange}
+            color={color}
+          />
+
+          {ready ? (
+            <LegendList
+              ref={flatListRef}
+              data={filteredTasks}
+              keyExtractor={item => item.id}
+              renderItem={renderTaskItem}
+              estimatedItemSize={50}
+              contentContainerStyle={styles.list}
+              ListEmptyComponent={<EmptyComponent tab={tab} />}
+              showsVerticalScrollIndicator={false}
+              waitForInitialLayout={true}
+              recycleItems
+            />
+          ) : (
+            <View style={styles.list}>
+              {Array.from({ length: 5 }, (_, index) => (
+                <TaskItemSkeleton key={index} />
+              ))}
+            </View>
+          )}
         </View>
 
         <FloatingButton
@@ -337,15 +307,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  content: {
-    flex: 1
-  },
-  titleSection: {
-    marginTop: Sizes.spacing.s15
-  },
-  description: {
-    marginTop: Sizes.spacing.s11
-  },
   tabBar: {
     flexDirection: 'row',
     marginTop: Sizes.spacing.s21,
@@ -353,7 +314,6 @@ const styles = StyleSheet.create({
   },
   tabItem: {
     flex: 1,
-    paddingVertical: Sizes.spacing.s7,
     alignItems: 'center'
   },
   tabItemActive: {
