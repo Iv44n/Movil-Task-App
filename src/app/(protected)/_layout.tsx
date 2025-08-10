@@ -23,6 +23,10 @@ export default function ProtectedLayout() {
         name='project/[id]'
         options={{ animation: 'fade' }}
       />
+      <Stack.Screen
+        name='profile/language'
+        options={{ animation: 'fade_from_bottom', presentation: 'modal' }}
+      />
     </Stack>
   )
 }
