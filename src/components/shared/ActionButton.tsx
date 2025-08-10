@@ -1,10 +1,10 @@
 import { StyleProp, StyleSheet, TouchableOpacity, TouchableOpacityProps, ViewStyle } from 'react-native'
 import Typo, { TypoProps } from './Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
-import { memo } from 'react'
+import { memo, ReactNode } from 'react'
 
 type ActionButtonProps = TouchableOpacityProps & {
-  label: string
+  children: ReactNode | string
   backgroundColor?: string
   style?: StyleProp<ViewStyle>
   typoProps?: Omit<TypoProps, 'children'>
@@ -14,7 +14,7 @@ type ActionButtonProps = TouchableOpacityProps & {
 const DEFAULTS = {
   background: Colors.yellow,
   typography: {
-    size: 17,
+    size: 15,
     color: 'black',
     weight: '700'
   } as const satisfies Omit<TypoProps, 'children'>
@@ -22,7 +22,7 @@ const DEFAULTS = {
 
 const ActionButton = memo(function ActionButton({
   backgroundColor = DEFAULTS.background,
-  label,
+  children,
   style,
   onPress,
   typoProps,
@@ -40,7 +40,7 @@ const ActionButton = memo(function ActionButton({
       activeOpacity={0.7}
       {...touchableOpacityProps}
     >
-      <Typo {...mergedTypoProps}>{label}</Typo>
+      {typeof children === 'string' ? <Typo {...mergedTypoProps}>{children}</Typo> : children}
     </TouchableOpacity>
   )
 })
@@ -49,10 +49,9 @@ export default ActionButton
 
 const styles = StyleSheet.create({
   button: {
-    width: '100%',
     paddingVertical: Sizes.spacing.s11,
     paddingHorizontal: Sizes.spacing.s15,
-    borderRadius: Shapes.rounded.base,
+    borderRadius: Shapes.rounded.lg,
     alignItems: 'center'
   }
 })

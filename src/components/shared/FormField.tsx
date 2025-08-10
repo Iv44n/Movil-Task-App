@@ -36,7 +36,7 @@ const FormField = forwardRef<RNTextInput, FormFieldProps>(({
     <View style={[styles.container, containerStyle]}>
       {label && (
         <Typo
-          size={15}
+          size={14}
           weight='500'
           style={styles.label}
           accessibilityLabel={label}
@@ -67,7 +67,7 @@ const FormField = forwardRef<RNTextInput, FormFieldProps>(({
 
       {error && (
         <Typo
-          size={13}
+          size={12}
           color='error'
           weight='500'
           style={styles.errorText}
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.card,
     borderRadius: Shapes.rounded.base,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden'
   },
   input: {

@@ -20,6 +20,8 @@ interface PickerItemProps {
   label: string
   value: string
   isSelected?: boolean
+  isFirst?: boolean
+  isLast?: boolean
   style?: StyleProp<ViewStyle>
   icon?: ReactNode
   textProps?: TextProps
@@ -43,7 +45,7 @@ interface PickerProps {
 
 const ItemOption = memo<PickerItemProps & {
   onSelect?: (value: string) => void
-}>(({ label, value, style, icon, textProps, textStyle, typoProps, isSelected, iconPosition = 'left', onSelect, handleIconPress }) => {
+}>(({ label, value, style, icon, textProps, textStyle, typoProps, isSelected, isFirst, isLast, iconPosition = 'left', onSelect, handleIconPress }) => {
       const defaultTypo: Omit<TypoProps, 'children'> = {
         size: 15,
         color: 'primary',
@@ -60,7 +62,13 @@ const ItemOption = memo<PickerItemProps & {
       return (
         <TouchableOpacity
           activeOpacity={0.7}
-          style={[styles.option, isSelected && styles.optionSelected, style]}
+          style={[
+            styles.option,
+            isSelected && styles.optionSelected,
+            isFirst && styles.optionFirst,
+            isLast && styles.optionLast,
+            style
+          ]}
           onPress={handlePress}
         >
           {icon && iconPosition === 'left' && <TouchableOpacity onPress={handleIconPress}>{icon}</TouchableOpacity>}
@@ -115,7 +123,7 @@ const Picker: PickerComponent = ({
   return (
     <View style={style}>
       <TouchableOpacity
-        activeOpacity={0.8}
+        activeOpacity={0.7}
         style={[styles.trigger, triggerStyle]}
         onPress={toggleOpen}
         onLayout={({ nativeEvent }) => setLayout(nativeEvent.layout)}
@@ -131,7 +139,8 @@ const Picker: PickerComponent = ({
         {triggerIcon ?? (
           <Icon.AltArrowDown
             size={20}
-            color={selectedValue ? Colors.primary : Colors.primary}
+            color={Colors.secondary}
+            style={[styles.chevron, open && styles.chevronUp]}
           />
         )}
       </TouchableOpacity>
@@ -177,29 +186,46 @@ export default Picker
 
 const styles = StyleSheet.create({
   trigger: {
-    height: Sizes.height.h47,
     borderRadius: Shapes.rounded.base,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Sizes.spacing.s15,
+    padding: Sizes.spacing.s13,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.border,
     backgroundColor: Colors.card
+  },
+  chevron: {
+    transform: [{ rotate: '0deg' }]
+  },
+  chevronUp: {
+    translateY: -Sizes.spacing.s3,
+    transform: [{ rotate: '180deg' }]
   },
   dropdownWrapper: {
     position: 'absolute',
     borderColor: Colors.border,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     backgroundColor: Colors.background,
     borderRadius: Shapes.rounded.sm
   },
   option: {
-    borderRadius: Shapes.rounded.sm,
     paddingVertical: Sizes.spacing.s7,
     paddingHorizontal: Sizes.spacing.s15,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: Sizes.spacing.s21
+  },
+  optionFirst: {
+    borderTopLeftRadius: Shapes.rounded.sm,
+    borderTopRightRadius: Shapes.rounded.sm
+  },
+  optionLast: {
+    borderBottomLeftRadius: Shapes.rounded.sm,
+    borderBottomRightRadius: Shapes.rounded.sm
   },
   optionSelected: {
     backgroundColor: Colors.card
