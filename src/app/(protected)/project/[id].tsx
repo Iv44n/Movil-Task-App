@@ -74,7 +74,7 @@ export default memo(function Details() {
 
     if (!projectTasks) return map
 
-    for (const task of Object.values(projectTasks)) {
+    for (const task of Object.values(projectTasks || {})) {
       const pid = task.project_id
       if (!map.has(pid)) {
         map.set(
@@ -87,9 +87,10 @@ export default memo(function Details() {
         )
       }
 
-      const statusMap = map.get(pid)!
-      statusMap.get('all')!.push(task)
-      statusMap.get(task.status as Status)!.push(task)
+      const statusMap = map.get(pid)
+      if (!statusMap) continue
+      statusMap.get('all')?.push(task)
+      statusMap.get(task.status as Status)?.push(task)
     }
 
     return map

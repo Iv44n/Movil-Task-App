@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   emptyContainer: {
     height: Sizes.height.h191,
     borderRadius: Shapes.rounded.md,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.border,
     backgroundColor: Colors.card,
     alignItems: 'center',

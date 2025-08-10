@@ -96,12 +96,12 @@ export const projectsStore$ = observable(
       deleteProject: (projectId: string) => {
         try {
           if (!projectId) throw new Error('Project ID is required')
-          const project = filtered[projectId]
+          const project = localProjects$[projectId]
 
           if (!project) throw new Error('Project not found')
-          if (project.user_id !== userId) throw new Error('Unauthorized: Cannot delete project')
+          if (project.user_id.get() !== userId) throw new Error('Unauthorized: Cannot delete project')
 
-          localProjects$[projectId].delete()
+          project.delete()
         } catch (error) {
           throw error
         }
