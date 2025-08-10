@@ -20,6 +20,9 @@ import TrashIcon from './TrashIcon'
 import LogoutIcon from './LogoutIcon'
 import DangerCircleIcon from './DangerCircleIcon'
 import AltArrowRightIcon from './AltArrowRightIcon'
+import GlobalIcon from './GlobalIcon'
+import BellIcon from './BellIcon'
+import ShieldIcon from './ShieldIcon'
 
 const Icon = {
   Add: (props: React.ComponentProps<typeof AddIcon>) => <AddIcon {...props} />,
@@ -43,7 +46,10 @@ const Icon = {
   Trash: (props: React.ComponentProps<typeof TrashIcon>) => <TrashIcon {...props} />,
   User: (props: React.ComponentProps<typeof UserIcon>) => <UserIcon {...props} />,
   Logout: (props: React.ComponentProps<typeof LogoutIcon>) => <LogoutIcon {...props} />,
-  DangerCircle: (props: React.ComponentProps<typeof DangerCircleIcon>) => <DangerCircleIcon {...props} />
+  DangerCircle: (props: React.ComponentProps<typeof DangerCircleIcon>) => <DangerCircleIcon {...props} />,
+  Global: (props: React.ComponentProps<typeof GlobalIcon>) => <GlobalIcon {...props} />,
+  Bell: (props: React.ComponentProps<typeof BellIcon>) => <BellIcon {...props} />,
+  Shield: (props: React.ComponentProps<typeof ShieldIcon>) => <ShieldIcon {...props} />
 }
 
 export default Icon
