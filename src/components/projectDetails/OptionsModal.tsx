@@ -2,6 +2,7 @@ import { Modal, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, View } f
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
+import i18n from '@/i18n'
 
 interface Props {
   visible: boolean
@@ -35,14 +36,14 @@ export default function OptionsModal({
                 onPress={onEdit}
                 style={styles.optionButton}
               >
-                <Typo size={15} color='primary' weight='500'>Editar proyecto</Typo>
+                <Typo size={15} color='primary' weight='500'>{i18n.t('projectDetails.options.edit')}</Typo>
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={onDelete}
                 style={styles.optionButton}
               >
-                <Typo size={15} color='error' weight='500'>Eliminar proyecto</Typo>
+                <Typo size={15} color='error' weight='500'>{i18n.t('projectDetails.options.delete')}</Typo>
               </TouchableOpacity>
             </View>
           </View>

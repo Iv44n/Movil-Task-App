@@ -20,19 +20,34 @@ import { LegendList, LegendListRef } from '@legendapp/list'
 import ProjectInfo from '@/components/projectDetails/ProjectInfo'
 import ProjectTabs from '@/components/projectDetails/ProjectTabs'
 import TaskItemSkeleton from '@/components/projectDetails/TaskItemSkeleton'
+import i18n from '@/i18n'
 
 type Status = StatusTask | 'all'
 
-const EmptyComponent = memo(({ tab }: { tab: Status }) => (
-  <View style={styles.emptyContainer}>
-    <Typo size={15} color='secondary' style={styles.empty}>
-      {tab === 'all' ? 'No tasks yet.' : `No ${tab.toLowerCase()} tasks.`}
-    </Typo>
-    <Typo size={13} color='secondary' style={styles.emptySubtext}>
-      Tap the + button to add a task
-    </Typo>
-  </View>
-))
+const EmptyComponent = memo(({ tab }: { tab: Status }) => {
+  const statusMap: Record<StatusTask, string> = {
+    [StatusTask.PENDING]: i18n.t('projectDetails.status.plural.pending').toLowerCase(),
+    [StatusTask.COMPLETED]: i18n.t('projectDetails.status.plural.completed').toLowerCase()
+  }
+
+  const isAll = tab === 'all'
+  const statusTranslation = !isAll && statusMap[tab as StatusTask] ? statusMap[tab as StatusTask] : ''
+
+  const mainText = isAll
+    ? i18n.t('projectDetails.emptyAll')
+    : i18n.t('projectDetails.emptyStatus', { status: statusTranslation })
+
+  return (
+    <View style={styles.emptyContainer}>
+      <Typo size={15} color='secondary' style={styles.empty}>
+        {mainText}
+      </Typo>
+      <Typo size={13} color='secondary' style={styles.emptySubtext}>
+        {i18n.t('projectDetails.emptySubtext')}
+      </Typo>
+    </View>
+  )
+})
 
 EmptyComponent.displayName = 'EmptyComponent'
 
@@ -158,12 +173,12 @@ export default memo(function Details() {
     if (!deleteProject || !deleteProjectTask || !projectId) return
 
     Alert.alert(
-      'Delete Project',
-      'Are you sure you want to delete this project? This will also delete all tasks.',
+      i18n.t('projectDetails.deleteProjectTitle'),
+      i18n.t('projectDetails.deleteProjectMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: i18n.t('projectDetails.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: i18n.t('projectDetails.delete'),
           style: 'destructive',
           onPress: () => {
             try {
@@ -204,7 +219,7 @@ export default memo(function Details() {
     return (
       <ScreenWrapper>
         <Header
-          title='Details'
+          title={i18n.t('projectDetails.headerTitle')}
           onBack={handleBack}
           onOptions={() => setShowOptions(true)}
         />
@@ -221,12 +236,12 @@ export default memo(function Details() {
     return (
       <ScreenWrapper>
         <Header
-          title='Details'
+          title={i18n.t('projectDetails.headerTitle')}
           onBack={handleBack}
           onOptions={() => setShowOptions(true)}
         />
         <View style={styles.errorContainer}>
-          <Typo size={17} weight='500' color='error'>Project not found</Typo>
+          <Typo size={17} weight='500' color='error'>{i18n.t('projectDetails.errorProjectNotFound')}</Typo>
         </View>
       </ScreenWrapper>
     )
@@ -238,7 +253,7 @@ export default memo(function Details() {
     <ScreenWrapper>
       <View style={styles.container}>
         <Header
-          title='Details'
+          title={i18n.t('projectDetails.headerTitle')}
           onBack={handleBack}
           onOptions={() => setShowOptions(true)}
         />

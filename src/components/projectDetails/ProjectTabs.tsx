@@ -2,18 +2,18 @@ import { TouchableOpacity, View, StyleSheet } from 'react-native'
 import Typo from '@/components/shared/Typo'
 import { Sizes } from '@/constants/theme'
 import { StatusTask } from '@/constants/constants'
+import i18n from '@/i18n'
 
 export type Status = StatusTask | 'all'
 
 type TabItem = {
   readonly key: Status
-  readonly label: string
 }
 
 const tabs: TabItem[] = [
-  { key: 'all', label: 'All' },
-  { key: StatusTask.PENDING, label: 'Pending' },
-  { key: StatusTask.COMPLETED, label: 'Completed' }
+  { key: 'all' },
+  { key: StatusTask.PENDING },
+  { key: StatusTask.COMPLETED }
 ]
 
 export default function ProjectTabs({ tab, onChange, color }: {
@@ -39,7 +39,7 @@ export default function ProjectTabs({ tab, onChange, color }: {
             weight={tab === t.key ? '600' : '400'}
             color={tab === t.key ? 'primary' : 'secondary'}
           >
-            {t.label}
+            {i18n.t('projectDetails.status.plural.' + t.key)}
           </Typo>
         </TouchableOpacity>
       ))}

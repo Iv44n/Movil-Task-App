@@ -15,6 +15,7 @@ import Icon from '@/components/icons/Icon'
 import { categoriesStore$ } from '@/store/categories.store'
 import { use$ } from '@legendapp/state/react'
 import { useAuth } from '@/hooks/auth/useAuth'
+import i18n from '@/i18n'
 
 interface CategorySelectorProps {
   onSelect: (category: string | null) => void
@@ -40,6 +41,11 @@ const AddCategoryModal = memo(function AddCategoryModal({
     setName('')
   }, [name, onSubmit])
 
+  const handleCancel = useCallback(() => {
+    setName('')
+    onCancel()
+  }, [onCancel])
+
   return (
     <Modal
       visible={visible}
@@ -47,37 +53,47 @@ const AddCategoryModal = memo(function AddCategoryModal({
       transparent
       hardwareAccelerated
       statusBarTranslucent
-      onRequestClose={onCancel}
+      onRequestClose={handleCancel}
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
+      <TouchableWithoutFeedback onPress={handleCancel}>
         <View style={styles.overlay}>
-          <View style={styles.modalContent}>
-            <Typo size={19} weight='600'>
-              Create New Category
-            </Typo>
+          <TouchableWithoutFeedback>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Typo size={18} weight='600'>
+                  {i18n.t('home.addProjectModal.form.newCategoryTitle')}
+                </Typo>
+              </View>
 
-            <FormField
-              placeholder='Category name'
-              value={name}
-              onChangeText={setName}
-              autoFocus
-            />
+              <View style={styles.modalBody}>
+                <FormField
+                  placeholder={i18n.t('home.addProjectModal.form.newCategoryPlaceholder')}
+                  value={name}
+                  onChangeText={setName}
+                  autoFocus
+                />
 
-            <View style={styles.modalButtons}>
-              <ActionButton
-                label='Cancel'
-                onPress={onCancel}
-                style={[styles.modalButton, styles.cancelButton]}
-                typoProps={{ color: 'primary', size: 15 }}
-              />
-              <ActionButton
-                label='Create'
-                onPress={handleCreate}
-                style={styles.modalButton}
-                typoProps={{ size: 15 }}
-              />
+                <View style={styles.modalButtons}>
+                  <ActionButton
+                    style={[styles.modalButton, { backgroundColor: Colors.card }]}
+                    onPress={handleCancel}
+                    typoProps={{ color: 'primary', weight: '500' }}
+                  >
+                    {i18n.t('home.addProjectModal.actions.cancel')}
+                  </ActionButton>
+
+                  <ActionButton
+                    style={styles.modalButton}
+                    onPress={handleCreate}
+                  >
+                    {i18n.t('home.addProjectModal.actions.create', {
+                      name: i18n.t('home.addProjectModal.form.category')
+                    })}
+                  </ActionButton>
+                </View>
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -127,47 +143,50 @@ export default memo(function CategorySelector({ onSelect, selectedCategoryId }: 
   const { categories } = categoriesStore
   if (!categories || !user?.id) return null
 
-  const selectedCatName = selectedCategoryId && categories[selectedCategoryId]
-    ? categories[selectedCategoryId].name
+  const selectedCategory = selectedCategoryId && categories[selectedCategoryId]
+    ? categories[selectedCategoryId]
     : undefined
 
   const categoriesArray = Object.values(categories)
-  const countCategories = categoriesArray.length
 
   return (
     <View style={styles.container}>
-      <Typo size={15} weight='500' style={styles.label}>
-        Category
+      <Typo size={14} weight='600' style={{ marginBottom: Sizes.spacing.s5 }}>
+        {i18n.t('home.addProjectModal.form.category')}
       </Typo>
 
       <Picker
-        style={styles.picker}
-        selectedValue={selectedCatName || ''}
         onValueChange={handleValueChange}
-        placeholder='Select a category'
+        selectedValue={selectedCategory?.name}
+        placeholder={i18n.t('home.addProjectModal.form.categoryPlaceholder')}
       >
         <Picker.Item
-          label='New category'
+          label={i18n.t('home.addProjectModal.form.newCategory')}
           value={NEW_VALUE}
-          typoProps={{ size: 15, color: 'secondary' }}
-          icon={<Icon.Add color={Colors.secondary} size={23} />}
+          icon={<Icon.Add size={20} color={Colors.primary} />}
+          iconPosition='left'
           handleIconPress={() => setShowAddModal(true)}
-          style={[styles.newItem, countCategories > 0 && styles.addedItemStyle]}
+          isFirst
+          isLast={categoriesArray.length === 0}
+          style={[
+            styles.categoryItem,
+            categoriesArray.length > 0 && { borderBottomWidth: StyleSheet.hairlineWidth, borderColor: Colors.border }
+          ]}
         />
-
         {categoriesArray.map((category) => (
           <Picker.Item
             key={category.id}
             label={category.name}
             value={category.id}
-            isSelected={selectedCategoryId === category.id}
-            icon={<Icon.Trash color={Colors.error} size={19} />}
+            style={styles.categoryItem}
+            isSelected={category.id === selectedCategoryId}
+            icon={<Icon.Trash size={19} color={Colors.error} />}
             iconPosition='right'
             handleIconPress={() => handleDelete(category.id)}
+            isLast={categoriesArray.length === categoriesArray.indexOf(category) + 1}
           />
         ))}
       </Picker>
-
       <AddCategoryModal
         visible={showAddModal}
         onCancel={() => setShowAddModal(false)}
@@ -179,51 +198,46 @@ export default memo(function CategorySelector({ onSelect, selectedCategoryId }: 
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: Sizes.spacing.s15,
-    gap: Sizes.spacing.s7
+    marginBottom: Sizes.spacing.s13
   },
-  label: {
-    borderRadius: Shapes.rounded.base
+  categoryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Sizes.spacing.s15,
+    paddingVertical: Sizes.spacing.s9,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.border
   },
-  picker: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Shapes.rounded.base,
-    marginBottom: Sizes.spacing.s5
-  },
-  newItem: {
-    borderBottomColor: Colors.border,
-    paddingVertical: Sizes.spacing.s9
-  },
-  addedItemStyle: {
-    borderBottomWidth: 1,
-    marginBottom: Sizes.spacing.s5,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0
-  },
+  // Modal styles
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingHorizontal: Sizes.spacing.s15
   },
   modalContent: {
-    width: '90%',
+    width: '100%',
+    maxWidth: 400,
     backgroundColor: Colors.background,
-    padding: Sizes.spacing.s15,
-    borderRadius: Shapes.rounded.base,
-    gap: Sizes.spacing.s15
+    borderRadius: Shapes.rounded.md,
+    overflow: 'hidden'
+  },
+  modalHeader: {
+    alignItems: 'center',
+    paddingVertical: Sizes.spacing.s15,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.border
+  },
+  modalBody: {
+    padding: Sizes.spacing.s15
   },
   modalButtons: {
+    marginTop: Sizes.spacing.s11,
     flexDirection: 'row',
-    gap: Sizes.spacing.s9,
-    justifyContent: 'center'
+    gap: Sizes.spacing.s9
   },
   modalButton: {
-    width: '49%',
-    alignItems: 'center'
-  },
-  cancelButton: {
-    backgroundColor: Colors.card
+    width: '49%'
   }
 })

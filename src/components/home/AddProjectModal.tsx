@@ -19,6 +19,7 @@ import Icon from '@/components/icons/Icon'
 import { Memo, use$ } from '@legendapp/state/react'
 import { projectsStore$ } from '@/store/projects.store'
 import { useAuth } from '@/hooks/auth/useAuth'
+import i18n from '@/i18n'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -104,121 +105,154 @@ export function AddProjectModal({ visible, onClose }: AddProjectModalProps) {
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Typo size={19} weight='600'>Create New Project</Typo>
-          <TouchableOpacity onPress={handleClose}>
-            <Icon.Close />
-          </TouchableOpacity>
+          <View style={styles.headerContent}>
+            <View style={styles.headerIndicator} />
+            <View style={styles.headerTitleContainer}>
+              <Typo size={18} weight='600' style={styles.headerTitle}>
+                {i18n.t('home.addProjectModal.title')}
+              </Typo>
+              <TouchableOpacity
+                onPress={handleClose}
+                style={{ marginTop: 1 }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Icon.Close size={21} color={Colors.secondary} />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         <ScrollView
-          style={styles.content}
+          style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps='handled'
+          contentContainerStyle={styles.scrollContent}
         >
-          <Controller
-            name='name'
-            control={control}
-            rules={{
-              required: 'Project name is required',
-              minLength: { value: 3, message: 'Name must be at least 3 characters' },
-              maxLength: { value: 100, message: 'Name must be 100 characters or less' }
-            }}
-            render={({ field: { onChange, value } }) => (
-              <FormField
-                label='Project Name'
-                placeholder='Enter project name'
-                value={value}
-                error={errors.name?.message}
-                onChangeText={(value) => {
-                  onChange(value)
-                  clearErrors('name')
-                }}
-                maxLength={100}
-              />
-            )}
-          />
-
-          <Controller
-            name='description'
-            control={control}
-            rules={{
-              maxLength: { value: 500, message: 'Description must be 500 characters or less' }
-            }}
-            render={({ field: { onChange, value } }) => (
-              <FormField
-                label='Description'
-                placeholder='Add project description (optional)'
-                value={value}
-                error={errors.description?.message}
-                onChangeText={(value) => {
-                  onChange(value)
-                  clearErrors('description')
-                }}
-                multiline
-                maxLength={500}
-                style={{
-                  height: Sizes.height.h99,
-                  textAlignVertical: 'top'
-                }}
-              />
-            )}
-          />
-
-          <Memo>
+          {/* Project Name */}
+          <View>
             <Controller
-              name='selectedCategoryId'
+              name='name'
               control={control}
+              rules={{
+                required: i18n.t('home.addProjectModal.form.errors.projectNameRequired'),
+                minLength: { value: 3, message: i18n.t('home.addProjectModal.form.errors.projectNameMinLength') },
+                maxLength: { value: 100, message: i18n.t('home.addProjectModal.form.errors.projectNameMaxLength') }
+              }}
               render={({ field: { onChange, value } }) => (
-                <CategorySelector
-                  selectedCategoryId={value}
-                  onSelect={onChange}
+                <FormField
+                  label={i18n.t('home.addProjectModal.form.projectName')}
+                  placeholder={i18n.t('home.addProjectModal.form.projectNamePlaceholder')}
+                  value={value}
+                  error={errors.name?.message}
+                  onChangeText={(value) => {
+                    onChange(value)
+                    clearErrors('name')
+                  }}
+                  maxLength={100}
                 />
               )}
             />
-          </Memo>
+          </View>
 
-          <Controller
-            name='selectedColor'
-            control={control}
-            rules={{ required: 'Color is required' }}
-            render={({ field: { onChange, value } }) => (
-              <View>
-                <Typo size={15} weight='600'>Project Color</Typo>
-                <View style={styles.colorGrid}>
-                  {PROJECT_COLORS.map((color) => {
-                    const isSelected = value === color
-                    return (
-                      <TouchableOpacity
-                        key={color}
-                        style={[
-                          styles.colorOption,
-                          { backgroundColor: color }
-                        ]}
-                        onPress={() => onChange(color)}
-                      >
-                        {isSelected && <Icon.Check size={37} color={Colors.black} />}
-                      </TouchableOpacity>
-                    )
-                  })}
+          {/* Description */}
+          <View>
+            <Controller
+              name='description'
+              control={control}
+              rules={{
+                maxLength: { value: 500, message: i18n.t('home.addProjectModal.form.errors.descriptionMaxLength') }
+              }}
+              render={({ field: { onChange, value } }) => (
+                <FormField
+                  label={i18n.t('home.addProjectModal.form.description')}
+                  placeholder={i18n.t('home.addProjectModal.form.descriptionPlaceholder')}
+                  value={value}
+                  error={errors.description?.message}
+                  onChangeText={(value) => {
+                    onChange(value)
+                    clearErrors('description')
+                  }}
+                  multiline
+                  maxLength={500}
+                  style={styles.textArea}
+                />
+              )}
+            />
+          </View>
+
+          {/* Category */}
+          <View>
+            <Memo>
+              <Controller
+                name='selectedCategoryId'
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <CategorySelector
+                    selectedCategoryId={value}
+                    onSelect={onChange}
+                  />
+                )}
+              />
+            </Memo>
+          </View>
+
+          {/* Color Selection */}
+          <View>
+            <Controller
+              name='selectedColor'
+              control={control}
+              rules={{ required: i18n.t('home.addProjectModal.form.errors.projectColorRequired') }}
+              render={({ field: { onChange, value } }) => (
+                <View>
+                  <Typo size={14} weight='600' style={styles.sectionTitle}>
+                    {i18n.t('home.addProjectModal.form.projectColor')}
+                  </Typo>
+                  <View style={styles.colorGrid}>
+                    {PROJECT_COLORS.map((color) => {
+                      const isSelected = value === color
+                      return (
+                        <TouchableOpacity
+                          key={color}
+                          style={[
+                            styles.colorOption,
+                            { backgroundColor: color }
+                          ]}
+                          onPress={() => onChange(color)}
+                          activeOpacity={0.7}
+                        >
+                          {isSelected && (
+                            <View style={styles.colorCheckContainer}>
+                              <Icon.Check size={21} color={Colors.black} />
+                            </View>
+                          )}
+                        </TouchableOpacity>
+                      )
+                    })}
+                  </View>
                 </View>
-              </View>
-            )}
-          />
+              )}
+            />
+          </View>
         </ScrollView>
 
         <View style={styles.footer}>
           <ActionButton
-            style={styles.cancelButton}
-            label='Cancel'
-            typoProps={{ color: 'primary', size: 15 }}
+            style={[styles.footerButton, { backgroundColor: Colors.card }]}
             onPress={handleClose}
-          />
+            typoProps={{ color: 'primary', weight: '500' }}
+          >
+            {i18n.t('home.addProjectModal.actions.cancel')}
+          </ActionButton>
+
           <ActionButton
-            style={styles.submitButton}
-            label='Create Project'
-            typoProps={{ size: 15 }}
+            style={styles.footerButton}
             onPress={handleSubmit(onSubmit)}
-          />
+            typoProps={{ color: 'black', weight: '700' }}
+          >
+            {i18n.t('home.addProjectModal.actions.create', {
+              name: i18n.t('home.addProjectModal.form.project')
+            })}
+          </ActionButton>
         </View>
       </SafeAreaView>
     </Modal>
@@ -231,46 +265,73 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background
   },
   header: {
+    paddingTop: Sizes.spacing.s9,
+    paddingBottom: Sizes.spacing.s13
+  },
+  headerContent: {
+    alignItems: 'center',
+    paddingHorizontal: Sizes.spacing.s21
+  },
+  headerIndicator: {
+    width: Sizes.spacing.s33,
+    height: Sizes.spacing.s3,
+    backgroundColor: Colors.border,
+    borderRadius: Shapes.rounded.md,
+    marginBottom: Sizes.spacing.s13
+  },
+  headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Sizes.spacing.s17,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border
+    width: '100%'
   },
-  content: {
+  headerTitle: {
     flex: 1,
-    padding: Sizes.spacing.s15
+    textAlign: 'center',
+    marginLeft: Sizes.spacing.s13
+  },
+  scrollContent: {
+    paddingHorizontal: Sizes.spacing.s21,
+    paddingTop: Sizes.spacing.s21,
+    paddingBottom: Sizes.spacing.s15
+  },
+  sectionTitle: {
+    marginBottom: Sizes.spacing.s15,
+    color: Colors.primary
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+    paddingTop: Sizes.spacing.s13
   },
   colorGrid: {
-    marginTop: Sizes.spacing.s9,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Sizes.spacing.s9
+    gap: Sizes.spacing.s11,
+    justifyContent: 'space-between'
   },
   colorOption: {
-    width: Sizes.width.w33,
-    height: Sizes.height.h33,
+    width: Sizes.spacing.s33,
+    height: Sizes.spacing.s33,
     borderRadius: Shapes.rounded.circle,
-    marginBottom: '40%',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  colorCheckContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    borderRadius: Shapes.rounded.circle,
+    width: Sizes.spacing.s21,
+    height: Sizes.spacing.s21,
     alignItems: 'center',
     justifyContent: 'center'
   },
   footer: {
     flexDirection: 'row',
-    padding: Sizes.spacing.s15,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    gap: Sizes.spacing.s9,
-    justifyContent: 'center'
+    paddingHorizontal: Sizes.spacing.s17,
+    paddingVertical: Sizes.spacing.s15,
+    gap: Sizes.spacing.s9
   },
-  cancelButton: {
-    width: '49%',
-    alignItems: 'center',
-    backgroundColor: Colors.card
-  },
-  submitButton: {
-    width: '49%',
-    alignItems: 'center'
+  footerButton: {
+    width: '49%'
   }
 })

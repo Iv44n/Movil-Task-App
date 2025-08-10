@@ -11,10 +11,10 @@ interface AuthPromptProps {
 export default function AuthPrompt({ promptText, actionText, onAction }: AuthPromptProps) {
   return (
     <View style={styles.container}>
-      <Typo size={15} weight='500' color='secondary'>
+      <Typo size={14} weight='500' color='secondary'>
         {promptText}
         <Typo
-          size={15}
+          size={14}
           color='yellow'
           weight='700'
           onPress={onAction}

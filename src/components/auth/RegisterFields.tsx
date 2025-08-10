@@ -12,6 +12,7 @@ import { Controller, useForm } from 'react-hook-form'
 import ActionButton from '@/components/shared/ActionButton'
 import AuthPrompt from './AuthPrompt'
 import Icon from '@/components/icons/Icon'
+import i18n from '@/i18n'
 
 interface FormData {
   firstName: string
@@ -99,7 +100,7 @@ export default function UserRegister() {
             render={({ field: { onChange, value } }) => (
               <FormField
                 error={errors.firstName?.message}
-                placeholder='First name'
+                placeholder={i18n.t('auth.register.form.firstName')}
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
@@ -117,7 +118,7 @@ export default function UserRegister() {
             render={({ field: { onChange, value } }) => (
               <FormField
                 error={errors.lastName?.message}
-                placeholder='Last name'
+                placeholder={i18n.t('auth.register.form.lastName')}
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
@@ -137,7 +138,7 @@ export default function UserRegister() {
             <FormField
               autoCapitalize='none'
               error={errors.emailAddress?.message}
-              placeholder='Email address'
+              placeholder={i18n.t('auth.register.form.emailAddress')}
               inputMode='email'
               value={value}
               onChangeText={(value) => {
@@ -167,22 +168,25 @@ export default function UserRegister() {
                 onChange(value)
                 clearErrors('password')
               }}
-              placeholder='Choose a secure password'
+              placeholder={i18n.t('auth.register.form.password')}
               secureTextEntry={!showPassword}
             />
           )}
         />
 
         <ActionButton
-          label={signUpLoading ? 'Registering...' : 'Register'}
           onPress={handleSubmit(onSubmit)}
           style={{ marginTop: Sizes.spacing.s15 }}
-        />
+        >
+          {signUpLoading
+            ? i18n.t('auth.register.actions.signUpLoading')
+            : i18n.t('auth.register.actions.signUp')}
+        </ActionButton>
       </KeyboardAvoidingView>
 
       <AuthPrompt
-        promptText='Already have an account?'
-        actionText='Login'
+        promptText={i18n.t('auth.register.promptText')}
+        actionText={i18n.t('auth.register.actionText')}
         onAction={() => router.replace('/login')}
       />
     </>

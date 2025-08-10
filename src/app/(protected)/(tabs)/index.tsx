@@ -10,6 +10,7 @@ import { TouchableOpacity, View } from 'react-native'
 import Header from '@/components/home/Header'
 import { AddProjectModal } from '@/components/home/AddProjectModal'
 import Icon from '@/components/icons/Icon'
+import i18n from '@/i18n'
 
 interface TodoItem {
   id: string
@@ -164,7 +165,7 @@ export default function Index() {
           marginBottom: todos.length <= 2 ? 0 : Sizes.spacing.s71
         }}
       >
-        <Typo size={18} weight='500'>To Do List</Typo>
+        <Typo size={18} weight='500'>{i18n.t('home.toDoList.title')}</Typo>
         {
           todos.slice(0, 5).map(todo => (
             <ToDoItem

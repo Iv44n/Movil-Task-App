@@ -14,6 +14,7 @@ import useSignIn from '@/hooks/auth/useSignIn'
 import ActionButton from '@/components/shared/ActionButton'
 import AuthPrompt from './AuthPrompt'
 import Icon from '../icons/Icon'
+import i18n from '@/i18n'
 
 interface FormData {
   username: string
@@ -60,7 +61,7 @@ export default function LoginFields() {
             <FormField
               autoCapitalize='none'
               error={errors.username?.message}
-              placeholder='Email Address'
+              placeholder={i18n.t('auth.login.form.emailAddress')}
               value={value}
               onChangeText={(value) => {
                 onChange(value)
@@ -90,7 +91,7 @@ export default function LoginFields() {
                   onChange(value)
                   clearErrors('password')
                 }}
-                placeholder='Password'
+                placeholder={i18n.t('auth.login.form.password')}
                 secureTextEntry={!showPassword}
               />
             )}
@@ -111,21 +112,24 @@ export default function LoginFields() {
               weight='500'
               color='yellow'
             >
-              Forgot Password?
+              {i18n.t('auth.login.form.forgotPassword')}
             </Typo>
           </TouchableOpacity>
         </View>
 
         <ActionButton
-          label={signInLoading ? 'Loading...' : 'Login'}
           onPress={handleSubmit(onSubmit)}
           style={{ marginTop: Sizes.spacing.s21 }}
-        />
+        >
+          {signInLoading
+            ? i18n.t('auth.login.actions.signInLoading')
+            : i18n.t('auth.login.actions.signIn')}
+        </ActionButton>
       </KeyboardAvoidingView>
 
       <AuthPrompt
-        promptText='Don&apos;t have an account?'
-        actionText='Sign Up'
+        promptText={i18n.t('auth.login.promptText')}
+        actionText={i18n.t('auth.login.actionText')}
         onAction={() => router.replace('/register')}
       />
     </>

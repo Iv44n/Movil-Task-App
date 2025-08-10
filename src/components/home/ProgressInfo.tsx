@@ -12,6 +12,7 @@ import { use$ } from '@legendapp/state/react'
 import useProgress from '@/hooks/data/useProgress'
 import { batch } from '@legendapp/state'
 import { useAuth } from '@/hooks/auth/useAuth'
+import i18n from '@/i18n'
 
 const PriorityItem = ({ label, isCompleted, onCompleted }: { label: string, isCompleted: boolean, onCompleted: () => void }) => {
   return(
@@ -103,9 +104,9 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
         <Typo size={15} weight='800'>
           {
             useIcon ? (
-              <>{count} <Typo size={11} weight='500'>{count === 1 ? 'Task' : 'Tasks'}</Typo></>
+              <>{count} <Typo size={11} weight='500'>{count === 1 ? i18n.t('home.progressInfo.task') : i18n.t('home.progressInfo.tasks')}</Typo></>
             ) : (
-              <>{count}/{total} <Typo size={11} weight='500'>{total === 1 ? 'Task' : 'Tasks'}</Typo></>
+              <>{count}/{total} <Typo size={11} weight='500'>{total === 1 ? i18n.t('home.progressInfo.task') : i18n.t('home.progressInfo.tasks')}</Typo></>
             )
           }
         </Typo>
@@ -196,7 +197,7 @@ export default function ProgressInfo () {
 
   return (
     <View style={styles.container}>
-      <Typo size={19} weight='500'>Your Progress</Typo>
+      <Typo size={19} weight='500'>{i18n.t('home.progressInfo.title')}</Typo>
       <View style={styles.content}>
         {/* Priority tasks */}
         <View style={styles.card}>
@@ -205,7 +206,7 @@ export default function ProgressInfo () {
             weight='600'
             style={{ marginBottom: Sizes.spacing.s9 }}
           >
-            Priority Tasks
+            {i18n.t('home.progressInfo.priorityTasks')}
           </Typo>
           <FlatList
             data={importantTasks}
@@ -223,14 +224,14 @@ export default function ProgressInfo () {
         {/* Progress indicators */}
         <View style={styles.indicatorContainer}>
           <ProgressSummary
-            label='Completed'
+            label={i18n.t('home.progressInfo.completed')}
             percent={completed.percent}
             count={completed.count}
             total={completed.total}
           />
 
           <ProgressSummary
-            label='Done Today'
+            label={i18n.t('home.progressInfo.doneToday')}
             useIcon
             count={completedToday}
           />
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     padding: Sizes.spacing.s15,
     borderRadius: Shapes.rounded.md,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.border
   },
   priorityItem: {
@@ -264,17 +265,21 @@ const styles = StyleSheet.create({
   },
   indicatorContainer: {
     width: '49%',
+    marginRight: 1,
     gap: Sizes.spacing.s9,
     justifyContent: 'space-between'
   },
   progressSummary: {
     flexDirection: 'row',
+    paddingHorizontal: '8%',
+    paddingVertical: '9%',
     backgroundColor: Colors.card,
-    padding: '9%',
     borderRadius: Shapes.rounded.md,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.border,
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: Sizes.spacing.s9
   },
   circleProgressPlaceholder: {
     width: 53,
@@ -282,8 +287,7 @@ const styles = StyleSheet.create({
     borderRadius: Shapes.rounded.circle,
     backgroundColor: Colors.background,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: Sizes.spacing.s9
+    alignItems: 'center'
   },
   circleTextWrapper: {
     position: 'absolute',

@@ -16,6 +16,7 @@ import { BlurView } from 'expo-blur'
 import { projectsStore$ } from '@/store/projects.store'
 import { useAuth } from '@/hooks/auth/useAuth'
 import { categoriesStore$ } from '@/store/categories.store'
+import i18n from '@/i18n'
 
 function AddProjectButton({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
   return (
@@ -34,7 +35,7 @@ function EmptyState({ setShowAddProjectModal }: { readonly setShowAddProjectModa
     <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddProjectModal(true)} style={styles.emptyContainer}>
       <View style={styles.emptyContent}>
         <Typo size={17} weight='500' color='secondary' style={styles.emptyText}>
-          You have no projects
+          {i18n.t('home.emptyState.title')}
         </Typo>
         <Typo
           size={15}
@@ -42,7 +43,7 @@ function EmptyState({ setShowAddProjectModal }: { readonly setShowAddProjectModa
           color='primary'
           style={styles.emptyLinkText}
         >
-          Tap to create one
+          {i18n.t('home.emptyState.subtitle')}
         </Typo>
       </View>
     </TouchableOpacity>
@@ -89,7 +90,7 @@ export default function ProjectsSlider({ setShowAddProjectModal }: { setShowAddP
       {showAdd && <AddProjectButton setShowAddProjectModal={setShowAddProjectModal} />}
 
       {projectsArray.map((project) => {
-        const categoryName = categories[project.category_id]?.name || 'No category'
+        const categoryName = categories[project.category_id]?.name || i18n.t('home.card.whitoutCategory')
         return (
           <ProjectCard
             key={project.id}
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: Shapes.rounded.md,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.border
   },
   emptyContainer: {

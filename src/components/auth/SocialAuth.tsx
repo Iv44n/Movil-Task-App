@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect } from 'react'
 import {
   View,
-  TouchableOpacity,
   StyleSheet
 } from 'react-native'
 import Typo from '@/components/shared/Typo'
-import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { Colors, Sizes } from '@/constants/theme'
 import Icon from '@/components/icons/Icon'
 import * as WebBrowser from 'expo-web-browser'
+import i18n from '@/i18n'
+import ActionButton from '../shared/ActionButton'
 
 type SocialStrategy = 'google'
 
@@ -48,20 +49,26 @@ export default function SocialAuth() {
     <View style={styles.container}>
       <View style={styles.dividerRow}>
         <View style={styles.dividerLine} />
-        <Typo style={styles.dividerText}>Or continue with</Typo>
+        <Typo
+          size={15}
+          weight='500'
+          color='secondary'
+          style={styles.dividerText}
+        >
+          {i18n.t('auth.dividerText')}
+        </Typo>
         <View style={styles.dividerLine} />
       </View>
 
       <View style={styles.providersRow}>
         {providers.map(({ key, Icon }) => (
-          <TouchableOpacity
-            activeOpacity={0.8}
+          <ActionButton
             key={key}
             style={styles.providerButton}
             onPress={() => onPress(key)}
           >
             <Icon size={21} />
-          </TouchableOpacity>
+          </ActionButton>
         ))}
       </View>
     </View>
@@ -87,8 +94,6 @@ const styles = StyleSheet.create({
   dividerText: {
     flexShrink: 0,
     fontSize: 15,
-    fontWeight: '500',
-    color: Colors.secondary,
     textAlign: 'center'
   },
   providersRow: {
@@ -99,12 +104,8 @@ const styles = StyleSheet.create({
   },
   providerButton: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: Colors.card,
-    borderRadius: Shapes.rounded.base,
-    paddingVertical: Sizes.spacing.s11,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.border
   }
 })

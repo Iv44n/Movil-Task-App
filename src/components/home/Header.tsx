@@ -4,6 +4,7 @@ import { View } from 'react-native'
 import { projectsStore$ } from '@/store/projects.store'
 import { use$ } from '@legendapp/state/react'
 import { useAuth } from '@/hooks/auth/useAuth'
+import i18n from '@/i18n'
 
 export default function Header({ userName }: { userName: string }) {
   const { user } = useAuth()
@@ -25,15 +26,19 @@ export default function Header({ userName }: { userName: string }) {
             marginBottom: Sizes.spacing.s7
           }}
         >
-          Hi, {userName}!
+          {i18n.t('home.headerTexts.greeting', { name: userName })}
         </Typo>
-        <Typo size={27}>You Have</Typo>
+        <Typo size={27}>{i18n.t('home.headerTexts.youHave')}</Typo>
         <Typo
           size={29}
           weight='600'
           style={{ textDecorationLine: 'underline' }}
         >
-          {totalProjects} Projects
+          {
+            totalProjects === 1
+              ? i18n.t('home.headerTexts.projects.one', { count: totalProjects })
+              : i18n.t('home.headerTexts.projects.other', { count: totalProjects })
+          }
         </Typo>
       </View>
       {/*       <View style={styles.iconContainer}>

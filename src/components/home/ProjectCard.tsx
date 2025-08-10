@@ -5,6 +5,7 @@ import { formatProjectName } from '@/utils/utils'
 import { Link } from 'expo-router'
 import { TouchableOpacity, StyleSheet, View } from 'react-native'
 import ProjectProgressBar from './ProjectProgressBar'
+import i18n from '@/i18n'
 
 interface ProjectCardProps {
   taskCount: number
@@ -34,7 +35,7 @@ export default function ProjectCard({
           weight='500'
           color='secondary'
         >
-          Progress
+          {i18n.t('home.card.progress')}
         </Typo>
         <ProjectProgressBar progress={progressPercentage} />
       </View>

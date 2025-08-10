@@ -8,12 +8,13 @@ import {
 } from 'react-native'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import Typo from '../shared/Typo'
-import ActionButton from '../shared/ActionButton'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useCallback } from 'react'
 import FormField from '../shared/FormField'
 import Icon from '../icons/Icon'
 import { InsertProjectTaskForForm } from '@/types/ProjectTask'
+import i18n from '@/i18n'
+import ActionButton from '../shared/ActionButton'
 
 interface AddTaskModalProps {
   readonly colorTheme: string;
@@ -30,7 +31,11 @@ type FormData = {
   start_date: string
 }
 
-const PRIORITY_OPTIONS = ['low', 'medium', 'high'] as const
+const PRIORITY_CONFIG = {
+  low: { color: '#10B981' },
+  medium: { color: Colors.yellow },
+  high: { color: '#EF4444' }
+} as const
 
 export default function AddTaskModal({ visible, onClose, onAddTask, colorTheme }: AddTaskModalProps) {
   const { control, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
@@ -42,6 +47,11 @@ export default function AddTaskModal({ visible, onClose, onAddTask, colorTheme }
       start_date: ''
     }
   })
+
+  const handleClose = useCallback(() => {
+    reset()
+    onClose()
+  }, [reset, onClose])
 
   const onSubmit = useCallback((data: FormData) => {
     const taskData = {
@@ -62,123 +72,162 @@ export default function AddTaskModal({ visible, onClose, onAddTask, colorTheme }
       animationType='slide'
       hardwareAccelerated
       presentationStyle='pageSheet'
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       statusBarTranslucent
     >
       <SafeAreaView style={styles.container}>
+        {/* Header */}
         <View style={styles.header}>
-          <Typo size={19} weight='600'>Create New Task</Typo>
-          <TouchableOpacity onPress={onClose}>
-            <Icon.Close />
-          </TouchableOpacity>
+          <View style={styles.headerContent}>
+            <View style={styles.headerIndicator} />
+            <View style={styles.headerTitleContainer}>
+              <Typo size={18} weight='600' style={styles.headerTitle}>
+                {i18n.t('projectDetails.addTaskModal.title')}
+              </Typo>
+              <TouchableOpacity
+                onPress={handleClose}
+                style={{ marginTop: 1 }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Icon.Close size={20} color={Colors.secondary} />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <Controller
-            name='title'
-            control={control}
-            rules={{ required: 'Task title is required' }}
-            render={({ field: { onChange, value } }) => (
-              <FormField
-                label='Task Title'
-                placeholder='Enter task title'
-                value={value}
-                error={errors.title?.message}
-                onChangeText={onChange}
-              />
-            )}
-          />
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps='handled'
+        >
+          {/* Task Title */}
+          <View>
+            <Controller
+              name='title'
+              control={control}
+              rules={{ required: i18n.t('projectDetails.addTaskModal.taskTitleRequired') }}
+              render={({ field: { onChange, value } }) => (
+                <FormField
+                  label={i18n.t('projectDetails.addTaskModal.taskTitleLabel')}
+                  placeholder={i18n.t('projectDetails.addTaskModal.taskTitlePlaceholder')}
+                  value={value}
+                  onChangeText={onChange}
+                  error={errors.title?.message}
+                />
+              )}
+            />
+          </View>
 
-          <Controller
-            name='description'
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormField
-                label='Description'
-                placeholder='Add description (optional)'
-                value={value}
-                error={errors.description?.message}
-                onChangeText={onChange}
-                multiline
-                style={{ height: Sizes.height.h99, textAlignVertical: 'top' }}
-              />
-            )}
-          />
-
-          <Controller
-            name='priority'
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <View style={styles.section}>
-                <Typo size={15} weight='600'>Priority</Typo>
-                <View style={styles.priorityContainer}>
-                  {PRIORITY_OPTIONS.map(p => {
-                    const selected = value === p
-                    const color = p === 'high' ? 'error' : p === 'medium' ? 'yellow' : 'green'
-
+          {/* Priority Selection */}
+          <View>
+            <Typo size={14} weight='600' style={styles.label}>
+              {i18n.t('projectDetails.addTaskModal.priorityLabel')}
+            </Typo>
+            <Controller
+              name='priority'
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.priorityGrid}>
+                  {Object.entries(PRIORITY_CONFIG).map(([key, config]) => {
+                    const isSelected = value === key
                     return (
                       <TouchableOpacity
-                        key={p}
+                        key={key}
                         style={[
-                          styles.priorityButton,
-                          selected && {
-                            backgroundColor: Colors[color] + '20',
-                            borderColor: Colors[color]
+                          styles.priorityCard,
+                          isSelected && {
+                            backgroundColor: config.color + '15',
+                            borderColor: config.color
                           }
                         ]}
-                        onPress={() => onChange(p)}
+                        onPress={() => onChange(key)}
+                        activeOpacity={0.7}
                       >
-                        <Typo color={selected ? color : 'secondary'} weight='600' size={13}>
-                          {p.charAt(0).toUpperCase() + p.slice(1)}
+                        <Typo
+                          size={14}
+                          weight={isSelected ? '600' : '500'}
+                          color={isSelected ? 'primary' : 'secondary'}
+                          forceColor={isSelected ? config.color : undefined}
+                          style={{ textAlign: 'center' }}
+                        >
+                          {i18n.t(`projectDetails.addTaskModal.priorityOptions.${key}`)}
                         </Typo>
                       </TouchableOpacity>
                     )
                   })}
                 </View>
-              </View>
-            )}
-          />
+              )}
+            />
+          </View>
 
-          <Controller
-            name='start_date'
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormField
-                label='Start Date'
-                placeholder='YYYY-MM-DD (optional)'
-                value={value}
-                onChangeText={onChange}
-              />
-            )}
-          />
+          {/* Description */}
+          <View style={styles.descriptionContainer}>
+            <Controller
+              name='description'
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <FormField
+                  label={i18n.t('projectDetails.addTaskModal.descriptionLabel')}
+                  placeholder={i18n.t('projectDetails.addTaskModal.descriptionPlaceholder')}
+                  value={value}
+                  onChangeText={onChange}
+                  multiline
+                  style={styles.textArea}
+                />
+              )}
+            />
+          </View>
 
-          <Controller
-            name='due_date'
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormField
-                label='Due Date'
-                placeholder='YYYY-MM-DD (optional)'
-                value={value}
-                onChangeText={onChange}
-              />
-            )}
-          />
+          {/* Date Fields */}
+          <View style={styles.dateRow}>
+            <Controller
+              name='start_date'
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.dateField}>
+                  <FormField
+                    label={i18n.t('projectDetails.addTaskModal.startDateLabel')}
+                    placeholder={i18n.t('projectDetails.addTaskModal.startDatePlaceholder')}
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                </View>
+              )}
+            />
+
+            <Controller
+              name='due_date'
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.dateField}>
+                  <FormField
+                    label={i18n.t('projectDetails.addTaskModal.dueDateLabel')}
+                    placeholder={i18n.t('projectDetails.addTaskModal.dueDatePlaceholder')}
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                </View>
+              )}
+            />
+          </View>
         </ScrollView>
 
+        {/* Footer */}
         <View style={styles.footer}>
           <ActionButton
-            style={styles.cancelButton}
-            label='Cancel'
-            typoProps={{ color: 'primary', size: 15 }}
-            onPress={onClose}
-          />
+            onPress={handleClose}
+            typoProps={{ color: 'secondary' }}
+            style={[styles.footerButton, { backgroundColor: Colors.card }]}
+          >
+            {i18n.t('projectDetails.addTaskModal.cancel')}
+          </ActionButton>
           <ActionButton
-            style={[styles.submitButton, { backgroundColor: colorTheme }]}
-            label='Create Task'
-            typoProps={{ size: 15 }}
             onPress={handleSubmit(onSubmit)}
-          />
+            style={[styles.footerButton, { backgroundColor: colorTheme }]}
+          >
+            {i18n.t('projectDetails.addTaskModal.create')}
+          </ActionButton>
         </View>
       </SafeAreaView>
     </Modal>
@@ -186,47 +235,83 @@ export default function AddTaskModal({ visible, onClose, onAddTask, colorTheme }
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background
+  },
   header: {
+    paddingTop: Sizes.spacing.s9,
+    paddingBottom: Sizes.spacing.s13
+  },
+  headerContent: {
+    alignItems: 'center',
+    paddingHorizontal: Sizes.spacing.s21
+  },
+  headerIndicator: {
+    width: Sizes.spacing.s33,
+    height: Sizes.spacing.s3,
+    backgroundColor: Colors.border,
+    borderRadius: Shapes.rounded.md,
+    marginBottom: Sizes.spacing.s13
+  },
+  headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Sizes.spacing.s17,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border
+    width: '100%'
   },
-  content: { flex: 1, padding: Sizes.spacing.s15 },
-  section: { marginBottom: Sizes.spacing.s15 },
-  priorityContainer: {
-    flexDirection: 'row',
-    gap: Sizes.spacing.s11,
-    marginTop: Sizes.spacing.s5
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    marginLeft: Sizes.spacing.s13
   },
-  priorityButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  content: {
+    flex: 1
+  },
+  scrollContent: {
     paddingHorizontal: Sizes.spacing.s15,
-    paddingVertical: Sizes.spacing.s9,
-    borderRadius: Shapes.rounded.base,
-    borderWidth: 1,
+    paddingTop: Sizes.spacing.s15,
+    paddingBottom: Sizes.spacing.s15
+  },
+  label: {
+    marginBottom: Sizes.spacing.s5
+  },
+  textArea: {
+    textAlignVertical: 'top',
+    minHeight: Sizes.spacing.s91
+  },
+  descriptionContainer: {
+    marginTop: Sizes.spacing.s15
+  },
+  priorityGrid: {
+    flexDirection: 'row',
+    gap: Sizes.spacing.s11
+  },
+  priorityCard: {
+    flex: 1,
+    padding: Sizes.spacing.s9,
+    borderRadius: Shapes.rounded.md,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.border,
-    backgroundColor: Colors.card
+    alignItems: 'center'
+  },
+  dateRow: {
+    flex: 1,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    gap: Sizes.spacing.s9
+  },
+  dateField: {
+    width: '49%'
   },
   footer: {
     flexDirection: 'row',
-    padding: Sizes.spacing.s15,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    gap: Sizes.spacing.s9,
-    justifyContent: 'center'
+    paddingHorizontal: Sizes.spacing.s15,
+    paddingVertical: Sizes.spacing.s15,
+    paddingBottom: Sizes.spacing.s21,
+    gap: Sizes.spacing.s15
   },
-  cancelButton: {
-    width: '49%',
-    alignItems: 'center',
-    backgroundColor: Colors.card
-  },
-  submitButton: {
-    width: '49%',
-    alignItems: 'center'
+  footerButton: {
+    width: '49%'
   }
 })
