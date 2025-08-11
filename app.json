@@ -31,6 +31,13 @@
       "expo-secure-store",
       "expo-web-browser",
       "expo-localization"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "089cf7eb-58aa-4ff8-862b-75fb2235c5e9"
+      }
+    },
+    "owner": "ivan.ia"
   }
 }

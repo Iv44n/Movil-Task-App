@@ -8,6 +8,7 @@ import stylisticJsx from '@stylistic/eslint-plugin-jsx'
 export default defineConfig([
   expoConfig,
   {
+    files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx'],
     ignores: ['dist/*', 'src/drizzle']
   },
   {
