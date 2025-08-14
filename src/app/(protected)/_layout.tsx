@@ -20,7 +20,7 @@ export default function ProtectedLayout() {
         options={{ animation: 'fade' }}
       />
       <Stack.Screen
-        name='project/[id]'
+        name='project'
         options={{ animation: 'fade' }}
       />
       <Stack.Screen
