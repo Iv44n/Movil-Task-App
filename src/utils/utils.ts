@@ -7,7 +7,7 @@ export function formatProjectName(name: string): { firstPart: string; remaining:
 
   let [firstWord = '', ...rest] = words
 
-  if (rest.length > 0 && rest[0].length < 4) {
+  if (rest.length > 0 && firstWord.length < 5 && rest[0].length < 7) {
     firstWord = `${firstWord} ${rest[0]}`
     rest = rest.slice(1)
   }
