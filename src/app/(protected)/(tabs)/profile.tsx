@@ -53,7 +53,6 @@ const MenuItem = ({
 
 export default function Profile() {
   const { user } = useAuth()
-  const metadata = user?.user_metadata || {}
   const router = useRouter()
 
   const handleSignOut = useCallback(async () => {
@@ -65,13 +64,12 @@ export default function Profile() {
   }, [])
 
   const displayName = useMemo(() => {
-    const first = metadata.firstName || ''
-    const last = metadata.lastName || ''
-    const full = `${first} ${last}`.trim()
-    return full || 'User'
-  }, [metadata.firstName, metadata.lastName])
+    const first = user?.firstName || ''
+    const last = user?.lastName || ''
+    return `${first} ${last}`.trim() || 'User'
+  }, [user?.firstName, user?.lastName])
 
-  const displayEmail = metadata.email || 'user@example.com'
+  const displayEmail = user?.email || 'user@example.com'
 
   const menuItems: MenuItemProps[] = [
     {
@@ -115,8 +113,8 @@ export default function Profile() {
 
   const userInfo = useMemo(() => (
     <View style={styles.userContainer}>
-      {metadata.avatar_url ? (
-        <Image source={{ uri: metadata.avatar_url }} style={styles.avatarImage} />
+      {user?.profileImageLocalPath ? (
+        <Image source={{ uri: user.profileImageLocalPath }} style={styles.avatarImage} />
       ) : (
         <View style={styles.avatarDefault}>
           <Icon.User color={Colors.primary} />
@@ -130,7 +128,7 @@ export default function Profile() {
         </Typo>
       </View>
     </View>
-  ), [metadata.avatar_url, displayName, displayEmail])
+  ), [user?.profileImageLocalPath, displayName, displayEmail])
 
   return (
     <ScreenWrapper style={styles.screen}>
