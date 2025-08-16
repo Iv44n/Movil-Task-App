@@ -51,6 +51,8 @@ export default appSchema({
         { name: 'description', type: 'string', isOptional: true },
         { name: 'color', type: 'string' },
         { name: 'category_id', type: 'string' },
+        { name: 'task_count', type: 'number' },
+        { name: 'completed_task_count', type: 'number' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' }
       ]
