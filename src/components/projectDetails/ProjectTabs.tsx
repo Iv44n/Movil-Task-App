@@ -1,64 +1,94 @@
-import { TouchableOpacity, View, StyleSheet } from 'react-native'
+import { TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
+import { memo } from 'react'
 import Typo from '@/components/shared/Typo'
-import { Sizes } from '@/constants/theme'
+import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { StatusTask } from '@/constants/constants'
 import i18n from '@/i18n'
 
 export type Status = StatusTask | 'all'
 
-type TabItem = {
-  readonly key: Status
+interface ProjectTabsProps {
+  tab: Status
+  onChange: (status: Status) => void
+  color: string
 }
 
-const tabs: TabItem[] = [
+const TABS: readonly { key: Status }[] = [
   { key: 'all' },
   { key: StatusTask.PENDING },
   { key: StatusTask.COMPLETED }
-]
+] as const
 
-export default function ProjectTabs({ tab, onChange, color }: {
-  tab: Status
-  onChange: (t: Status) => void
-  color: string
-}) {
-  return (
-    <View style={styles.tabBar}>
-      {tabs.map(t => (
-        <TouchableOpacity
-          key={t.key}
-          activeOpacity={0.7}
-          onPress={() => onChange(t.key)}
-          style={[
-            styles.tabItem,
-            tab === t.key && styles.tabItemActive,
-            { borderBottomColor: color }
-          ]}
+const ProjectTabs = memo<ProjectTabsProps>(({
+  tab,
+  onChange,
+  color
+}) => {
+  const renderTab = ({ key }: { key: Status }) => {
+    const isActive = tab === key
+
+    return (
+      <TouchableOpacity
+        key={key}
+        activeOpacity={0.7}
+        onPress={() => onChange(key)}
+        style={[
+          styles.tabItem,
+          isActive ?
+            { backgroundColor: color } :
+            styles.inactiveTab
+        ]}
+      >
+        <Typo
+          size={15}
+          weight='600'
+          color={isActive ? 'black' : 'secondary'}
+          style={{ textAlign: 'center' }}
         >
-          <Typo
-            size={15}
-            weight={tab === t.key ? '600' : '400'}
-            color={tab === t.key ? 'primary' : 'secondary'}
-          >
-            {i18n.t('projectDetails.status.plural.' + t.key)}
-          </Typo>
-        </TouchableOpacity>
-      ))}
-    </View>
+          {i18n.t(`projectDetails.status.plural.${key}`)}
+        </Typo>
+      </TouchableOpacity>
+    )
+  }
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.container}
+      contentContainerStyle={styles.tabBar}
+    >
+      {TABS.map(renderTab)}
+    </ScrollView>
   )
-}
+})
+
+ProjectTabs.displayName = 'ProjectTabs'
+
+export default ProjectTabs
 
 const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+    maxHeight: Sizes.height.h57 + Sizes.spacing.s15,
+    paddingBottom: Sizes.spacing.s11,
+    paddingHorizontal: Sizes.spacing.s3
+  },
   tabBar: {
     flexDirection: 'row',
     marginTop: Sizes.spacing.s21,
-    justifyContent: 'space-between'
+    gap: Sizes.spacing.s11
   },
   tabItem: {
-    flex: 1,
-    paddingVertical: Sizes.spacing.s7,
-    alignItems: 'center'
+    paddingHorizontal: Sizes.spacing.s21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Shapes.rounded.lg,
+    borderWidth: 1,
+    borderColor: 'transparent'
   },
-  tabItemActive: {
-    borderBottomWidth: 2
+  inactiveTab: {
+    backgroundColor: Colors.card,
+    borderColor: Colors.border
   }
 })
