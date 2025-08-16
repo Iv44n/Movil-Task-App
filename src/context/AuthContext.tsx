@@ -1,13 +1,16 @@
 import { supabase } from '@/lib/supabase'
-import { AuthSession, AuthUser } from '@supabase/supabase-js'
+import { AuthSession } from '@supabase/supabase-js'
 import { createContext, useEffect, useRef, useState, ReactNode } from 'react'
 import NetInfo from '@react-native-community/netinfo'
 import { AppState, AppStateStatus } from 'react-native'
 import * as QueryParams from 'expo-auth-session/build/QueryParams'
+import useCurrentUser from '@/hooks/auth/useCurrentUser'
+import { User } from '@/models'
+import upsertUserFromSession from '@/lib/helpers'
 
 interface SessionContextType {
   session: AuthSession | null
-  user: AuthUser | null
+  user: User | null
   isLoaded: boolean,
   createdSessionFromUrl: (url: string) => Promise<AuthSession | undefined | null>
 }
@@ -26,7 +29,7 @@ export const AuthContext = createContext<SessionContextType>({
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null)
-  const [user, setUser] = useState<AuthUser | null>(null)
+  const currentUser = useCurrentUser(session?.user?.id ?? null)
   const [isOnline, setIsOnline] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const appStateRef = useRef(AppState.currentState)
@@ -37,7 +40,6 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (isMounted) {
         setSession(session)
-        setUser(session?.user ?? null)
         setIsLoaded(true)
       }
     })
@@ -45,11 +47,10 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === EVENTS.SIGNED_IN) {
         setSession(session)
-        setUser(session?.user ?? null)
+        upsertUserFromSession(session)
       }
       if (event === EVENTS.SIGNED_OUT) {
         setSession(null)
-        setUser(null)
       }
     })
 
@@ -121,7 +122,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, isLoaded, createdSessionFromUrl }}>
+    <AuthContext.Provider value={{ session, user: currentUser, isLoaded, createdSessionFromUrl }}>
       {children}
     </AuthContext.Provider>
   )
