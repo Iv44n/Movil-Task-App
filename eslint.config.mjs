@@ -2,49 +2,45 @@
 import { defineConfig } from 'eslint/config'
 import expoConfig from 'eslint-config-expo/flat.js'
 import stylistic from '@stylistic/eslint-plugin'
-import stylisticTs from '@stylistic/eslint-plugin-ts'
-import stylisticJsx from '@stylistic/eslint-plugin-jsx'
 
 export default defineConfig([
   expoConfig,
   {
     files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx'],
-    ignores: ['dist/*', 'src/drizzle']
+    ignores: ['dist/*', 'src/drizzle', '.expo', 'node_modules', 'assets']
   },
   {
     plugins: {
-      '@stylistic': stylistic,
-      '@stylistic/ts': stylisticTs,
-      '@stylistic/jsx': stylisticJsx
+      '@stylistic': stylistic
     },
     rules: {
       '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
       '@stylistic/no-trailing-spaces': 'error',
       '@stylistic/eol-last': 'error',
       '@stylistic/jsx-quotes': ['error', 'prefer-single'],
-      '@stylistic/ts/indent': ['error', 2],
-      '@stylistic/ts/quotes': ['error', 'single'],
-      '@stylistic/ts/semi': ['error', 'never'],
-      '@stylistic/ts/comma-dangle': ['error', 'never'],
-      '@stylistic/ts/block-spacing': ['error', 'always'],
-      '@stylistic/ts/key-spacing': ['error', { beforeColon: false, afterColon: true }],
-      '@stylistic/ts/comma-spacing': ['error', { before: false, after: true }],
-      '@stylistic/ts/object-curly-spacing': ['error', 'always'],
-      '@stylistic/ts/brace-style': 'error',
-      '@stylistic/ts/function-call-spacing': ['error', 'never'],
-      '@stylistic/ts/padding-line-between-statements': [
+      '@stylistic/indent': ['error', 2],
+      '@stylistic/quotes': ['error', 'single'],
+      '@stylistic/semi': ['error', 'never'],
+      '@stylistic/comma-dangle': ['error', 'never'],
+      '@stylistic/block-spacing': ['error', 'always'],
+      '@stylistic/key-spacing': ['error', { beforeColon: false, afterColon: true }],
+      '@stylistic/comma-spacing': ['error', { before: false, after: true }],
+      '@stylistic/object-curly-spacing': ['error', 'always'],
+      '@stylistic/brace-style': 'error',
+      '@stylistic/function-call-spacing': ['error', 'never'],
+      '@stylistic/padding-line-between-statements': [
         'error',
         { blankLine: 'always', prev: ['case', 'default'], next: '*' }
       ],
-      '@stylistic/ts/space-infix-ops': 'error',
-      '@stylistic/ts/type-annotation-spacing': 'error',
-      '@stylistic/jsx/jsx-closing-bracket-location': 1,
-      '@stylistic/jsx/jsx-closing-tag-location': 1,
-      '@stylistic/jsx/jsx-curly-brace-presence': [
+      '@stylistic/space-infix-ops': 'error',
+      '@stylistic/type-annotation-spacing': 'error',
+      '@stylistic/jsx-closing-bracket-location': 1,
+      '@stylistic/jsx-closing-tag-location': 1,
+      '@stylistic/jsx-curly-brace-presence': [
         'error',
         { props: 'never', children: 'never', propElementValues: 'always' }
       ],
-      '@stylistic/jsx/jsx-curly-newline': 'error'
+      '@stylistic/jsx-curly-newline': 'error'
     }
   }
 ])
