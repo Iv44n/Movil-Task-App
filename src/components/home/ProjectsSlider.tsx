@@ -1,115 +1,127 @@
-import { useCallback, useRef, useState } from 'react'
-import {
-  Animated,
-  StyleSheet,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  TouchableOpacity,
-  ScrollView,
-  View
-} from 'react-native'
-import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { memo, useCallback, useEffect, useState } from 'react'
+import { VirtualizedList, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { BlurView } from 'expo-blur'
 import ProjectCard from '@/components/home/ProjectCard'
 import Typo from '@/components/shared/Typo'
-import { use$ } from '@legendapp/state/react'
-import { BlurView } from 'expo-blur'
-import { projectsStore$ } from '@/store/projects.store'
-import { useAuth } from '@/hooks/auth/useAuth'
-import { categoriesStore$ } from '@/store/categories.store'
+import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { Project } from '@/models'
 import i18n from '@/i18n'
+import { useDatabase } from '@nozbe/watermelondb/react'
+import { TABLE_NAMES } from '@/lib/schema'
+import { Q } from '@nozbe/watermelondb'
 
-function AddProjectButton({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
-  return (
-    <BlurView tint='dark' intensity={100} style={styles.blurContainer}>
-      <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddProjectModal(true)} style={styles.addButton}>
-        <Typo size={29} weight='500'>
-          +
-        </Typo>
-      </TouchableOpacity>
-    </BlurView>
-  )
+interface ProjectsSliderProps {
+  userId: string
+  setShowAddProjectModal: (value: boolean) => void
 }
 
-function EmptyState({ setShowAddProjectModal }: { readonly setShowAddProjectModal: (value: boolean) => void }) {
-  return (
-    <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddProjectModal(true)} style={styles.emptyContainer}>
-      <View style={styles.emptyContent}>
-        <Typo size={17} weight='500' color='secondary' style={styles.emptyText}>
-          {i18n.t('home.emptyState.title')}
-        </Typo>
-        <Typo
-          size={15}
-          weight='400'
-          color='primary'
-          style={styles.emptyLinkText}
-        >
-          {i18n.t('home.emptyState.subtitle')}
-        </Typo>
-      </View>
-    </TouchableOpacity>
-  )
-}
-
-export default function ProjectsSlider({ setShowAddProjectModal }: { setShowAddProjectModal: (value: boolean) => void }) {
-  const [showAdd, setShowAdd] = useState(false)
-  const scrollRef = useRef<ScrollView>(null)
-  const { user } = useAuth()
-
-  const projectsStore = use$(() => projectsStore$(user?.id || ''))
-  const categoriesStore = use$(() => categoriesStore$(user?.id || ''))
-
-  const onScrollEnd = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const x = e.nativeEvent.contentOffset.x
-      setShowAdd(x < 10)
-    },
-    []
-  )
-
-  if (!user?.id) {
-    return <EmptyState setShowAddProjectModal={setShowAddProjectModal} />
-  }
-
-  const { projects } = projectsStore
-  const { categories } = categoriesStore
-  const projectsArray = Object.values(projects)
-
-  if (projectsArray.length === 0) {
-    return <EmptyState setShowAddProjectModal={setShowAddProjectModal} />
-  }
-
-  return (
-    <Animated.ScrollView
-      ref={scrollRef}
-      horizontal
-      scrollEventThrottle={16}
-      showsHorizontalScrollIndicator={false}
-      onScrollEndDrag={onScrollEnd}
-      contentContainerStyle={styles.sliderContainer}
+const AddProjectButton = memo<{ onPress: () => void }>(({ onPress }) => (
+  <BlurView tint='dark' intensity={100} style={styles.blurContainer}>
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={onPress}
+      style={styles.addButton}
+      accessibilityLabel={i18n.t('home.addProject')}
     >
-      {showAdd && <AddProjectButton setShowAddProjectModal={setShowAddProjectModal} />}
+      <Typo size={29} weight='500'>+</Typo>
+    </TouchableOpacity>
+  </BlurView>
+))
+AddProjectButton.displayName = 'AddProjectButton'
 
-      {projectsArray.map((project) => {
-        const categoryName = categories[project.category_id]?.name || i18n.t('home.card.whitoutCategory')
-        return (
-          <ProjectCard
-            key={project.id}
-            taskCount={project.task_count}
-            completedTasks={project.completed_tasks}
-            name={project.name}
-            color={project.color}
-            id={project.id}
-            categoryName={categoryName}
-          />
-        )
-      })}
-    </Animated.ScrollView>
+const EmptyState = memo<{ onPress: () => void }>(({ onPress }) => (
+  <TouchableOpacity
+    activeOpacity={0.7}
+    onPress={onPress}
+    style={styles.emptyContainer}
+  >
+    <View style={styles.emptyContent}>
+      <Typo size={17} weight='500' color='secondary' style={styles.emptyText}>
+        {i18n.t('home.emptyState.title')}
+      </Typo>
+      <Typo size={15} weight='400' color='primary' style={styles.emptyLinkText}>
+        {i18n.t('home.emptyState.subtitle')}
+      </Typo>
+    </View>
+  </TouchableOpacity>
+))
+EmptyState.displayName = 'EmptyState'
+
+const ProjectsSlider = memo<ProjectsSliderProps>(({ setShowAddProjectModal, userId }) => {
+  const db = useDatabase()
+  const [projects, setProjects] = useState<Project[]>([])
+
+  useEffect(() => {
+    const subscription = db.collections
+      .get<Project>(TABLE_NAMES.PROJECTS)
+      .query(
+        Q.where('user_id', userId),
+        Q.sortBy('created_at', Q.desc)
+      )
+      .observe()
+      .subscribe(setProjects)
+
+    return () => subscription.unsubscribe()
+  }, [db, userId])
+
+  const handleAddPress = useCallback(() => {
+    setShowAddProjectModal(true)
+  }, [setShowAddProjectModal])
+
+  const renderProject = useCallback(({ item }: { item: Project }) => (
+    <ProjectCard
+      taskCount={0}
+      completedTasks={0}
+      name={item.name}
+      color={item.color}
+      id={item.id}
+      categoryId={item.categoryId}
+    />
+  ), [])
+
+  const keyExtractor = useCallback((item: Project) => item.id, [])
+  const getItemCount = useCallback((data: Project[]) => data.length, [])
+  const getItem = useCallback((data: Project[], index: number) => data[index], [])
+  const getItemLayout = useCallback((_: unknown, index: number) => ({
+    length: Sizes.width.w225 + Sizes.spacing.s11,
+    offset: (Sizes.width.w225 + Sizes.spacing.s11) * index,
+    index
+  }), [])
+
+  if (projects.length === 0) {
+    return <EmptyState onPress={handleAddPress} />
+  }
+
+  return (
+    <View style={styles.sliderContainer}>
+      <VirtualizedList
+        horizontal
+        data={projects}
+        renderItem={renderProject}
+        keyExtractor={keyExtractor}
+        getItemLayout={getItemLayout}
+        getItemCount={getItemCount}
+        getItem={getItem}
+        ListHeaderComponent={<AddProjectButton onPress={handleAddPress} />}
+        showsHorizontalScrollIndicator={false}
+        removeClippedSubviews
+        maxToRenderPerBatch={5}
+        windowSize={10}
+        initialNumToRender={3}
+        scrollEventThrottle={16}
+        updateCellsBatchingPeriod={50}
+      />
+    </View>
   )
-}
+})
+ProjectsSlider.displayName = 'ProjectsSlider'
+
+export default ProjectsSlider
 
 const styles = StyleSheet.create({
   sliderContainer: {
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingHorizontal: Sizes.spacing.s3
   },
   blurContainer: {
     justifyContent: 'center',
@@ -117,7 +129,7 @@ const styles = StyleSheet.create({
     marginRight: Sizes.spacing.s11
   },
   addButton: {
-    flex: 1,
+    height: Sizes.height.h191,
     width: Sizes.width.w33,
     justifyContent: 'center',
     alignItems: 'center',

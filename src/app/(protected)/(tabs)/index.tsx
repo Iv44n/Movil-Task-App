@@ -4,13 +4,12 @@ import Typo from '@/components/shared/Typo'
 import ProjectsSlider from '@/components/home/ProjectsSlider'
 import ProgressInfo from '@/components/home/ProgressInfo'
 import { useAuth } from '@/hooks/auth/useAuth'
-import { observer } from '@legendapp/state/react'
 import { useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import Header from '@/components/home/Header'
-import { AddProjectModal } from '@/components/home/AddProjectModal'
 import Icon from '@/components/icons/Icon'
 import i18n from '@/i18n'
+import AddProjectModal from '@/components/home/AddProjectModal'
 
 interface TodoItem {
   id: string
@@ -101,7 +100,7 @@ interface ToDoItemProps {
   onPressMenu?: () => void
 }
 
-const ToDoItem = observer(function ToDoItem({ title, subtitle, checked, onToggleChecked, onPressMenu }: ToDoItemProps) {
+function ToDoItem({ title, subtitle, checked, onToggleChecked, onPressMenu }: ToDoItemProps) {
   const [isChecked, setIsChecked] = useState(checked || false)
 
   return (
@@ -148,7 +147,7 @@ const ToDoItem = observer(function ToDoItem({ title, subtitle, checked, onToggle
       </TouchableOpacity>
     </View>
   )
-})
+}
 
 export default function Index() {
   const { user } = useAuth()
@@ -156,8 +155,8 @@ export default function Index() {
 
   return (
     <ScreenWrapper isScrollable>
-      <Header userName={user?.user_metadata.firstName} />
-      <ProjectsSlider setShowAddProjectModal={setShowAddProjectModal}/>
+      <Header userName={user?.firstName || ''} />
+      <ProjectsSlider setShowAddProjectModal={setShowAddProjectModal} userId={user?.id || ''}/>
       <ProgressInfo />
       <View
         style={{
