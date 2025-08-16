@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import {
   View,
   StyleSheet,
@@ -8,64 +8,66 @@ import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { CapitalizeWords } from '@/utils/utils'
 import Icon from '../icons/Icon'
-import Avatar from '../shared/Avatar'
 import { format, isPast, isToday } from '@/utils/date'
-import { ProjectTask } from '@/types/ProjectTask'
 import { StatusTask } from '@/constants/constants'
+import TaskChip from './TaskChip'
 
 interface Props {
-  task: ProjectTask
-  onPress?: () => void
-  onChangeStatus?: (id: string) => void
-  colorTheme?: string
+  id: string
+  title: string
+  priority: string
+  startDate: Date | null
+  dueDate: Date | null
+  status: StatusTask
+  onPressCard?: () => void
+  handleStatusChange: (taskId: string) => void
+  colorTheme: string
+  commentCount?: number
 }
 
 const DATE_FORMAT = 'MMM D'
 const LOCALE_DEFAULT = 'en-US'
 
-export default function TaskItem({ task, onPress, colorTheme = Colors.primary, onChangeStatus }: Props) {
-  const {
-    title,
-    description,
-    priority,
-    status,
-    start_date,
-    due_date
-  } = task
+export default memo(function TaskItem({
+  id,
+  title,
+  priority,
+  startDate,
+  dueDate,
+  onPressCard,
+  colorTheme = Colors.primary,
+  status,
+  handleStatusChange,
+  commentCount = 0
+}: Props) {
+  const formatDate = useCallback((date: Date | null) => {
+    return date ? format(date, { format: DATE_FORMAT, locale: LOCALE_DEFAULT }) : null
+  }, [])
 
-  const formattedStart = useMemo(
-    () => start_date && format(start_date, {
-      format: DATE_FORMAT,
-      locale: LOCALE_DEFAULT
-    }),
-    [start_date]
-  )
-  const formattedDue = useMemo(
-    () => due_date && format(due_date, {
-      format: DATE_FORMAT,
-      locale: LOCALE_DEFAULT
-    }),
-    [due_date]
-  )
+  const getDateLabel = useCallback((date: Date | null, type: 'start' | 'due') => {
+    if (!date) return null
 
-  const startLabel = useMemo(() => {
-    if (!start_date) return null
-    if (isToday(start_date)) return 'Start Today'
-    const verb = isPast(start_date) ? 'Started' : 'Start'
-    return `${verb} ${formattedStart}`
-  }, [start_date, formattedStart])
+    const isDateToday = isToday(date)
+    const isDatePast = isPast(date)
 
-  const dueLabel = useMemo(() => {
-    if (!due_date) return null
-    if (isToday(due_date)) return 'Due Today'
-    const verb = isPast(due_date) ? 'Overdue' : 'Due'
-    return `${verb} ${formattedDue}`
-  }, [due_date, formattedDue])
+    if (isDateToday) {
+      return type === 'start' ? 'Start Today' : 'Due Today'
+    }
+
+    const formatted = formatDate(date)
+    if (type === 'start') {
+      return `${isDatePast ? 'Started' : 'Start'} ${formatted}`
+    }
+    return `${isDatePast ? 'Overdue' : 'Due'} ${formatted}`
+  }, [formatDate])
+
+  const startLabel = useMemo(() => getDateLabel(startDate, 'start'), [startDate, getDateLabel])
+  const dueLabel = useMemo(() => getDateLabel(dueDate, 'due'), [dueDate, getDateLabel])
 
   return (
     <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.8}
+      onPress={onPressCard}
+      activeOpacity={0.7}
       style={styles.card}
     >
       <View style={styles.header}>
@@ -78,7 +80,7 @@ export default function TaskItem({ task, onPress, colorTheme = Colors.primary, o
           </Typo>
         </View>
 
-        <TouchableOpacity onPress={() => onChangeStatus?.(task.id)}>
+        <TouchableOpacity onPress={() => handleStatusChange(id)}>
           {status === StatusTask.COMPLETED ? (
             <Icon.CheckCircle size={31} color={colorTheme} />
           ) : (
@@ -87,58 +89,37 @@ export default function TaskItem({ task, onPress, colorTheme = Colors.primary, o
         </TouchableOpacity>
       </View>
 
-      <View style={styles.chipContainer}>
-        {startLabel && (
-          <View style={[styles.chip, { backgroundColor: colorTheme + '15' }]}>
-            <Typo size={13} weight='500' forceColor={colorTheme}>
-              {startLabel}
-            </Typo>
-          </View>
-        )}
-        {dueLabel && (
-          <View style={styles.chipError}>
-            <Typo size={13} weight='500' color='error'>
-              {dueLabel}
-            </Typo>
-          </View>
-        )}
-      </View>
-
-      {description && (
-        <Typo
-          size={14}
-          color='secondary'
-          numberOfLines={2}
-          ellipsizeMode='tail'
-          style={styles.description}
-        >
-          {description}
-        </Typo>
+      {(startLabel || dueLabel) && (
+        <View style={styles.chipContainer}>
+          {startLabel && (
+            <TaskChip
+              text={startLabel}
+              backgroundColor={colorTheme + '15'}
+              color={colorTheme}
+            />
+          )}
+          {dueLabel && (
+            <TaskChip
+              text={dueLabel}
+              backgroundColor={Colors.error + '15'}
+              color={Colors.error}
+            />
+          )}
+        </View>
       )}
 
       <View style={styles.footer}>
-        {/* to-do: implementar avatar de usuario que participan en la tarea */}
-        <View style={styles.avatarGroup}>
-          {[1, 2, 3].map((user) => (
-            <View key={user} style={styles.avatarWrapper}>
-              <Avatar size={31} uri={`https://i.pravatar.cc/150?u=${user}`} />
-            </View>
-          ))}
-        </View>
-
         <View style={styles.commentsContainer}>
           <Icon.ChatLine size={21} />
           <Typo size={13} weight='500' color='secondary' style={styles.commentsText}>
-            <Typo size={15} weight='600'>
-              2
-            </Typo>
-            {'  '}Comments
+            <Typo size={15} weight='600'>{commentCount}</Typo>
+            {' Comments'}
           </Typo>
         </View>
       </View>
     </TouchableOpacity>
   )
-}
+})
 
 const styles = StyleSheet.create({
   card: {
@@ -157,22 +138,6 @@ const styles = StyleSheet.create({
   },
   chipContainer: {
     flexDirection: 'row',
-    marginVertical: Sizes.spacing.s5
-  },
-  chip: {
-    borderRadius: Shapes.rounded.sm,
-    paddingHorizontal: Sizes.spacing.s15,
-    paddingVertical: Sizes.spacing.s5,
-    marginRight: Sizes.spacing.s11
-  },
-  chipError: {
-    backgroundColor: Colors.error + '15',
-    borderRadius: Shapes.rounded.sm,
-    paddingHorizontal: Sizes.spacing.s15,
-    paddingVertical: Sizes.spacing.s5,
-    marginRight: Sizes.spacing.s11
-  },
-  description: {
     marginVertical: Sizes.spacing.s5
   },
   footer: {
@@ -195,5 +160,8 @@ const styles = StyleSheet.create({
   },
   commentsText: {
     marginBottom: Sizes.spacing.s3
+  },
+  incompleteIcon: {
+    opacity: 0.3
   }
 })
