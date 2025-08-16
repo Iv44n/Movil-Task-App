@@ -1,14 +1,30 @@
 import Typo from '../shared/Typo'
 import { Sizes } from '@/constants/theme'
 import { View } from 'react-native'
-import { projectsStore$ } from '@/store/projects.store'
-import { use$ } from '@legendapp/state/react'
 import { useAuth } from '@/hooks/auth/useAuth'
 import i18n from '@/i18n'
+import { useEffect, useState } from 'react'
+import { useDatabase } from '@nozbe/watermelondb/react'
+import { TABLE_NAMES } from '@/lib/schema'
+import { Q } from '@nozbe/watermelondb'
+import { Project } from '@/models'
 
 export default function Header({ userName }: { userName: string }) {
   const { user } = useAuth()
-  const totalProjects = use$(() => Object.values(projectsStore$(user?.id || '').projects).length)
+  const database = useDatabase()
+  const [totalProjects, setTotalProjects] = useState(0)
+
+  useEffect(() => {
+    if (!user) return
+
+    const sb = database.collections
+      .get<Project>(TABLE_NAMES.PROJECTS)
+      .query(Q.where('user_id', user.id))
+      .observeCount()
+      .subscribe(setTotalProjects)
+
+    return () => sb.unsubscribe()
+  }, [database, user])
 
   return (
     <View style={{

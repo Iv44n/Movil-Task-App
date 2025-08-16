@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useState } from 'react'
-import { VirtualizedList, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { BlurView } from 'expo-blur'
 import ProjectCard from '@/components/home/ProjectCard'
 import Typo from '@/components/shared/Typo'
@@ -9,56 +9,61 @@ import i18n from '@/i18n'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { TABLE_NAMES } from '@/lib/schema'
 import { Q } from '@nozbe/watermelondb'
+import { LegendList } from '@legendapp/list'
 
 interface ProjectsSliderProps {
   userId: string
   setShowAddProjectModal: (value: boolean) => void
 }
 
-const AddProjectButton = memo<{ onPress: () => void }>(({ onPress }) => (
-  <BlurView tint='dark' intensity={100} style={styles.blurContainer}>
+const AddProjectButton = memo<{ onPress: () => void }>(function AddProjectButton({ onPress }) {
+  return (
+    <BlurView tint='dark' intensity={100} style={styles.blurContainer}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={onPress}
+        style={styles.addButton}
+        accessibilityLabel={i18n.t('home.addProject')}
+      >
+        <Typo size={29} weight='500'>+</Typo>
+      </TouchableOpacity>
+    </BlurView>
+  )
+})
+
+const EmptyState = memo<{ onPress: () => void }>(function EmptyState({ onPress }) {
+  return (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      style={styles.addButton}
-      accessibilityLabel={i18n.t('home.addProject')}
+      style={styles.emptyContainer}
     >
-      <Typo size={29} weight='500'>+</Typo>
+      <View style={styles.emptyContent}>
+        <Typo size={17} weight='500' color='secondary' style={styles.emptyText}>
+          {i18n.t('home.emptyState.title')}
+        </Typo>
+        <Typo size={15} weight='400' color='primary' style={styles.emptyLinkText}>
+          {i18n.t('home.emptyState.subtitle')}
+        </Typo>
+      </View>
     </TouchableOpacity>
-  </BlurView>
-))
-AddProjectButton.displayName = 'AddProjectButton'
+  )
+})
 
-const EmptyState = memo<{ onPress: () => void }>(({ onPress }) => (
-  <TouchableOpacity
-    activeOpacity={0.7}
-    onPress={onPress}
-    style={styles.emptyContainer}
-  >
-    <View style={styles.emptyContent}>
-      <Typo size={17} weight='500' color='secondary' style={styles.emptyText}>
-        {i18n.t('home.emptyState.title')}
-      </Typo>
-      <Typo size={15} weight='400' color='primary' style={styles.emptyLinkText}>
-        {i18n.t('home.emptyState.subtitle')}
-      </Typo>
-    </View>
-  </TouchableOpacity>
-))
-EmptyState.displayName = 'EmptyState'
-
-const ProjectsSlider = memo<ProjectsSliderProps>(({ setShowAddProjectModal, userId }) => {
+const ProjectsSlider = memo<ProjectsSliderProps>(function ProjectsSlider({ setShowAddProjectModal, userId }) {
   const db = useDatabase()
   const [projects, setProjects] = useState<Project[]>([])
 
   useEffect(() => {
+    const columns = ['task_count', 'completed_task_count', 'name', 'category_id']
+
     const subscription = db.collections
       .get<Project>(TABLE_NAMES.PROJECTS)
       .query(
         Q.where('user_id', userId),
         Q.sortBy('created_at', Q.desc)
       )
-      .observe()
+      .observeWithColumns(columns)
       .subscribe(setProjects)
 
     return () => subscription.unsubscribe()
@@ -70,8 +75,8 @@ const ProjectsSlider = memo<ProjectsSliderProps>(({ setShowAddProjectModal, user
 
   const renderProject = useCallback(({ item }: { item: Project }) => (
     <ProjectCard
-      taskCount={0}
-      completedTasks={0}
+      taskCount={item.taskCount}
+      completedTasks={item.completedTaskCount}
       name={item.name}
       color={item.color}
       id={item.id}
@@ -79,48 +84,30 @@ const ProjectsSlider = memo<ProjectsSliderProps>(({ setShowAddProjectModal, user
     />
   ), [])
 
-  const keyExtractor = useCallback((item: Project) => item.id, [])
-  const getItemCount = useCallback((data: Project[]) => data.length, [])
-  const getItem = useCallback((data: Project[], index: number) => data[index], [])
-  const getItemLayout = useCallback((_: unknown, index: number) => ({
-    length: Sizes.width.w225 + Sizes.spacing.s11,
-    offset: (Sizes.width.w225 + Sizes.spacing.s11) * index,
-    index
-  }), [])
-
   if (projects.length === 0) {
     return <EmptyState onPress={handleAddPress} />
   }
 
   return (
     <View style={styles.sliderContainer}>
-      <VirtualizedList
+      <LegendList
         horizontal
         data={projects}
+        extraData={projects}
         renderItem={renderProject}
-        keyExtractor={keyExtractor}
-        getItemLayout={getItemLayout}
-        getItemCount={getItemCount}
-        getItem={getItem}
+        keyExtractor={(item) => item.id}
         ListHeaderComponent={<AddProjectButton onPress={handleAddPress} />}
         showsHorizontalScrollIndicator={false}
-        removeClippedSubviews
-        maxToRenderPerBatch={5}
-        windowSize={10}
-        initialNumToRender={3}
-        scrollEventThrottle={16}
-        updateCellsBatchingPeriod={50}
+        recycleItems
       />
     </View>
   )
 })
-ProjectsSlider.displayName = 'ProjectsSlider'
 
 export default ProjectsSlider
 
 const styles = StyleSheet.create({
   sliderContainer: {
-    alignItems: 'center',
     paddingHorizontal: Sizes.spacing.s3
   },
   blurContainer: {
