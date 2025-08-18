@@ -27,6 +27,7 @@
     "expo-localization": "~16.1.6",
     "expo-router": "~5.1.4",
     "expo-secure-store": "~14.2.3",
+    "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.10",
     "expo-web-browser": "~14.2.0",
