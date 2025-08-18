@@ -1,8 +1,8 @@
 import { Colors, Sizes } from '@/constants/theme'
 import { StatusBar } from 'expo-status-bar'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context'
 
-export default function LayoutBase({ children }: React.PropsWithChildren) {
+export default function LayoutBase({ children, ...props }: SafeAreaViewProps) {
   return (
     <SafeAreaView
       style={{
@@ -10,6 +10,7 @@ export default function LayoutBase({ children }: React.PropsWithChildren) {
         backgroundColor: Colors.background,
         paddingHorizontal: Sizes.spacing.s9
       }}
+      {...props}
     >
       <StatusBar style='light'/>
       {children}
