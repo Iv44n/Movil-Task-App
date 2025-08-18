@@ -43,3 +43,8 @@ ios
 #env files
 .env
 .env.*.local
+
+# Expo
+.expo
+dist/
+web-build/

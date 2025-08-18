@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1b1a1a"
+      "backgroundColor": "#181818"
     },
     "ios": {
       "supportsTablet": true,
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#1b1a1a"
+        "backgroundColor": "#181818"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.app.kron"
@@ -30,7 +30,19 @@
       "expo-font",
       "expo-secure-store",
       "expo-web-browser",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-splash-screen", 
+        {
+         "backgroundColor": "#181818",
+          "image": "./assets/icon.png",
+          "dark": {
+            "image": "./assets/icon.png",
+            "backgroundColor": "#181818"
+          },
+          "imageWidth": 200
+        }
+      ]
     ],
     "extra": {
       "router": {},
