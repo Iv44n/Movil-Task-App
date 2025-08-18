@@ -1,12 +1,12 @@
 import { memo } from 'react'
-import { View, StyleSheet, TextStyle } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import Typo from '../shared/Typo'
-import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { Shapes, Sizes } from '@/constants/theme'
 
 interface TaskChipProps {
   text: string
-  color?: TextStyle['color']
-  backgroundColor?: TextStyle['color']
+  color?: string
+  backgroundColor?: string
 }
 
 const TaskChip = memo(function TaskChip({
@@ -21,7 +21,7 @@ const TaskChip = memo(function TaskChip({
 
   return (
     <View style={chipStyle}>
-      <Typo size={13} weight='500' color={color}>
+      <Typo size={13} weight='500' forceColor={color}>
         {text}
       </Typo>
     </View>
