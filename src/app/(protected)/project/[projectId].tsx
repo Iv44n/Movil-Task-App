@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { Q } from '@nozbe/watermelondb'
 import AddTaskModal from '@/components/projectDetails/AddTaskModal'
@@ -14,9 +14,9 @@ import { TABLE_NAMES } from '@/lib/schema'
 import i18n from '@/i18n'
 import { Project, Task } from '@/models'
 import { formatProjectName } from '@/utils/utils'
-import { ProjectContext } from '@/context/ProjectContext'
 import { Alert } from 'react-native'
 import { useAuth } from '@/hooks/auth/useAuth'
+import TaskList from '@/components/projectDetails/TaskList'
 
 type Status = StatusTask | 'all'
 
@@ -27,15 +27,15 @@ type FormData = {
   dueDate: Date | null
 }
 
-export default function ProjectLayout() {
-  const { id: projectId } = useLocalSearchParams() as { id?: string }
-  const router = useRouter()
-  const db = useDatabase()
+export default function ProjectScreen() {
+  const { projectId } = useLocalSearchParams() as { projectId?: string }
   const { user } = useAuth()
   const userId = user?.id
 
   if (!projectId || !userId) throw new Error('Project ID or User ID is required')
 
+  const db = useDatabase()
+  const router = useRouter()
   const [showOptions, setShowOptions] = useState(false)
   const [showAddTaskModal, setShowAddTaskModal] = useState(false)
   const [project, setProject] = useState<Project | null>(null)
@@ -60,7 +60,7 @@ export default function ProjectLayout() {
     if (router.canGoBack()) {
       router.back()
     } else {
-      router.replace('/(protected)/(tabs)')
+      router.replace('(protected)')
     }
   }, [router])
 
@@ -85,7 +85,7 @@ export default function ProjectLayout() {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete project'
       Alert.alert('Error', message)
-      console.error('Project deletion error on component ProjectLayout:', error)
+      console.error('Project deletion error on component ProjectScreen:', error)
     }
   }, [project, handleBack])
 
@@ -112,7 +112,7 @@ export default function ProjectLayout() {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to add task'
       Alert.alert('Error', message)
-      console.error('Task creation error on component ProjectLayout:', error)
+      console.error('Task creation error on component ProjectScreen:', error)
     }
   }, [db, projectId, userId, project])
 
@@ -147,19 +147,11 @@ export default function ProjectLayout() {
         color={projectColor}
       />
 
-      <ProjectContext.Provider
-        value={{
-          projectTasks: project.tasks,
-          tab,
-          colorTheme: projectColor        }}
-      >
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: 'transparent' }
-          }}
-        />
-      </ProjectContext.Provider>
+      <TaskList
+        tab={tab}
+        projectTasks={project.tasks}
+        colorTheme={projectColor}
+      />
 
       <OptionsModal
         visible={showOptions}
