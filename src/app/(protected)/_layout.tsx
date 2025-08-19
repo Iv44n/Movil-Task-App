@@ -16,12 +16,12 @@ export default function ProtectedLayout() {
       }}
     >
       <Stack.Screen
-        name='(tabs)'
+        name='project/[projectId]'
         options={{ animation: 'fade' }}
       />
       <Stack.Screen
-        name='project'
-        options={{ animation: 'fade' }}
+        name='project/task/[taskId]'
+        options={{ animation: 'fade_from_bottom', presentation: 'modal' }}
       />
       <Stack.Screen
         name='profile/language'
