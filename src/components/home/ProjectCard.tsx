@@ -3,7 +3,6 @@ import { TouchableOpacity, StyleSheet, View } from 'react-native'
 import { Link } from 'expo-router'
 import Icon from '@/components/icons/Icon'
 import Typo from '@/components/shared/Typo'
-import ProjectProgressBar from './ProjectProgressBar'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { formatProjectName } from '@/utils/utils'
 import i18n from '@/i18n'
@@ -11,6 +10,7 @@ import { useDatabase } from '@nozbe/watermelondb/react'
 import { Category } from '@/models'
 import { TABLE_NAMES } from '@/lib/schema'
 import { Q } from '@nozbe/watermelondb'
+import ProgressBar from '../shared/ProgressBar'
 
 interface ProjectCardProps {
   taskCount: number
@@ -59,10 +59,10 @@ const ProjectCard = memo<ProjectCardProps>(function ProjectCard({
   return (
     <View style={cardStyle}>
       <View>
-        <Typo size={11} weight='500' color='secondary'>
+        <Typo size={11} weight='500' forceColor={Colors.border + '90'}>
           {i18n.t('home.card.progress')}
         </Typo>
-        <ProjectProgressBar progress={progressPercentage} />
+        <ProgressBar progress={progressPercentage} />
       </View>
 
       <View style={styles.footerCard}>
@@ -88,7 +88,7 @@ const ProjectCard = memo<ProjectCardProps>(function ProjectCard({
           </View>
           <Typo
             size={15}
-            color='secondary'
+            forceColor={Colors.border + '90'}
             weight='500'
             style={styles.categoryText}
             ellipsizeMode='tail'
