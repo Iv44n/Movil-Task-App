@@ -1,6 +1,6 @@
 import { TABLE_NAMES } from '@/lib/schema'
 import { Model, Relation } from '@nozbe/watermelondb'
-import { date, field, immutableRelation, readonly, text } from '@nozbe/watermelondb/decorators'
+import { date, field, immutableRelation, readonly, text, writer } from '@nozbe/watermelondb/decorators'
 import Task from './Task'
 
 export default class Subtask extends Model {
@@ -18,4 +18,12 @@ export default class Subtask extends Model {
   @field('completed') completed!: boolean
 
   @immutableRelation(TABLE_NAMES.TASKS, 'task_id') task!: Relation<Task>
+
+  @writer async toggleCompleted(value?: boolean) {
+    if (this.completed === value) return
+
+    await this.update(s => {
+      s.completed = value ?? !s.completed
+    })
+  }
 }

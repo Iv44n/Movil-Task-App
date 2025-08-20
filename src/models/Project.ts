@@ -1,4 +1,4 @@
-import { Model, Q, Query, Relation } from '@nozbe/watermelondb'
+import { Model, Query, Relation } from '@nozbe/watermelondb'
 import { children, date, field, immutableRelation, readonly, relation, text, writer } from '@nozbe/watermelondb/decorators'
 import { TABLE_NAMES } from '@/lib/schema'
 import Category from './Category'
@@ -10,8 +10,7 @@ interface UpdateProjectParams {
   description?: string
   color?: string
   categoryId?: string
-  taskCount?: number
-  completedTaskCount?: number
+  progressPercentage?: number
 }
 
 export default class Project extends Model {
@@ -31,8 +30,7 @@ export default class Project extends Model {
   @text('description') description!: string
   @text('color') color!: string
   @text('category_id') categoryId!: string
-  @field('task_count') taskCount!: number
-  @field('completed_task_count') completedTaskCount!: number
+  @field('progress_percentage') progressPercentage!: number
 
   @immutableRelation(TABLE_NAMES.USERS, 'user_id') user!: Relation<User>
   @relation(TABLE_NAMES.CATEGORIES, 'category_id') category!: Relation<Category>
@@ -44,17 +42,12 @@ export default class Project extends Model {
       if (updates.description !== undefined) p.description = updates.description
       if (updates.color !== undefined) p.color = updates.color
       if (updates.categoryId !== undefined) p.categoryId = updates.categoryId
-      if (updates.taskCount !== undefined) p.taskCount = updates.taskCount
-      if (updates.completedTaskCount !== undefined) p.completedTaskCount = updates.completedTaskCount
+      if (updates.progressPercentage !== undefined) p.progressPercentage = updates.progressPercentage
     })
   }
 
   @writer async deleteProject() {
-    await this.collections
-      .get(TABLE_NAMES.TASKS)
-      .query(Q.where('project_id', this.id))
-      .destroyAllPermanently()
-
-    await this.destroyPermanently()
+    await this.tasks.destroyAllPermanently()
+    await super.destroyPermanently()
   }
 }

@@ -51,8 +51,7 @@ export default appSchema({
         { name: 'description', type: 'string', isOptional: true },
         { name: 'color', type: 'string' },
         { name: 'category_id', type: 'string' },
-        { name: 'task_count', type: 'number' },
-        { name: 'completed_task_count', type: 'number' },
+        { name: 'progress_percentage', type: 'number' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' }
       ]
@@ -71,6 +70,7 @@ export default appSchema({
         { name: 'priority', type: 'string' },
         { name: 'start_date', type: 'number', isOptional: true },
         { name: 'due_date', type: 'number', isOptional: true },
+        { name: 'progress_percentage', type: 'number' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' }
       ]
