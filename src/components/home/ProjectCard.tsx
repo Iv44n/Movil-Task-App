@@ -13,17 +13,15 @@ import { Q } from '@nozbe/watermelondb'
 import ProgressBar from '../shared/ProgressBar'
 
 interface ProjectCardProps {
-  taskCount: number
   name: string
   color: string
   categoryId: string
-  completedTasks: number
   id: string
+  progressPercentage: number
 }
 
 const ProjectCard = memo<ProjectCardProps>(function ProjectCard({
-  taskCount,
-  completedTasks,
+  progressPercentage,
   name,
   color,
   id,
@@ -46,10 +44,6 @@ const ProjectCard = memo<ProjectCardProps>(function ProjectCard({
   }, [categoryId, db])
 
   const { firstPart, remaining } = useMemo(() => formatProjectName(name), [name])
-  const progressPercentage = useMemo(() =>
-    taskCount === 0 ? 0 : Math.round((completedTasks / taskCount) * 100),
-  [taskCount, completedTasks]
-  )
 
   const cardStyle = useMemo(() => [
     styles.mainCard,

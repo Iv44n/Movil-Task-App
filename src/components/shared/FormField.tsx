@@ -17,6 +17,7 @@ interface FormFieldProps extends TextInputProps {
   label?: string
   error?: string | null
   containerStyle?: StyleProp<ViewStyle>
+  wrapperStyle?: StyleProp<ViewStyle>
   icon?: React.ReactNode
   onIconPress?: () => void
 }
@@ -25,6 +26,7 @@ const FormField = forwardRef<RNTextInput, FormFieldProps>(({
   label,
   error,
   containerStyle,
+  wrapperStyle,
   style,
   icon,
   onIconPress,
@@ -45,7 +47,7 @@ const FormField = forwardRef<RNTextInput, FormFieldProps>(({
         </Typo>
       )}
 
-      <View style={[styles.wrapper, { borderColor }]}>
+      <View style={[styles.wrapper, { borderColor }, wrapperStyle]}>
         <TextInput
           ref={ref}
           placeholderTextColor={Colors.secondary}

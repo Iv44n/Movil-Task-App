@@ -1,16 +1,14 @@
 import { memo, useCallback, useMemo } from 'react'
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity
-} from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { useRouter } from 'expo-router'
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { CapitalizeWords } from '@/utils/utils'
 import Icon from '../icons/Icon'
 import { format, isPast, isToday } from '@/utils/date'
-import { StatusTask } from '@/constants/constants'
 import TaskChip from './TaskChip'
+import ProgressBar from '../shared/ProgressBar'
+import i18n from '@/i18n'
 
 interface Props {
   id: string
@@ -18,15 +16,12 @@ interface Props {
   priority: string
   startDate: Date | null
   dueDate: Date | null
-  status: StatusTask
-  onPressCard?: () => void
-  handleStatusChange: (taskId: string) => void
   colorTheme: string
-  commentCount?: number
+  progressPercentage: number
 }
 
 const DATE_FORMAT = 'MMM D'
-const LOCALE_DEFAULT = 'en-US'
+const LOCALE_DEFAULT = i18n.locale
 
 export default memo(function TaskItem({
   id,
@@ -34,12 +29,10 @@ export default memo(function TaskItem({
   priority,
   startDate,
   dueDate,
-  onPressCard,
-  colorTheme = Colors.primary,
-  status,
-  handleStatusChange,
-  commentCount = 0
+  progressPercentage,
+  colorTheme = Colors.primary
 }: Props) {
+  const router = useRouter()
   const formatDate = useCallback((date: Date | null) => {
     return date ? format(date, { format: DATE_FORMAT, locale: LOCALE_DEFAULT }) : null
   }, [])
@@ -66,27 +59,46 @@ export default memo(function TaskItem({
 
   return (
     <TouchableOpacity
-      onPress={onPressCard}
+      onPress={() => router.push(`/project/task/${id}`)}
       activeOpacity={0.7}
       style={styles.card}
     >
       <View style={styles.header}>
-        <View>
-          <Typo size={13} weight='500' color='secondary' style={styles.priority}>
-            {CapitalizeWords(priority)}
+        <View style={{ maxWidth: '85%' }}>
+          <Typo size={13} weight='400' color='secondary' style={styles.priority}>
+            {CapitalizeWords(i18n.t(`priorityOptions.${priority}`))}
           </Typo>
-          <Typo size={20} weight='500' color='primary'>
+          <Typo
+            size={21}
+            weight='500'
+            color='primary'
+            ellipsizeMode='tail'
+            numberOfLines={2}
+          >
             {title}
           </Typo>
         </View>
 
-        <TouchableOpacity onPress={() => handleStatusChange(id)}>
-          {status === StatusTask.COMPLETED ? (
-            <Icon.CheckCircle size={31} color={colorTheme} />
-          ) : (
-            <Icon.Circle size={31} color={colorTheme} />
-          )}
+        <TouchableOpacity
+          onPress={() => console.log('show options')}
+          activeOpacity={0.7}
+          style={styles.iconBtn}
+        >
+          <Icon.HorizontalDotMenu size={23} style={{ marginTop: 0.5, marginRight: 0.8 }}/>
         </TouchableOpacity>
+      </View>
+
+      <View style={{ marginTop: Sizes.spacing.s11, marginBottom: Sizes.spacing.s7 }}>
+        <Typo size={12} weight='400' color='secondary'>
+          {i18n.t('projectDetails.taskCard.progress')}
+        </Typo>
+        <ProgressBar
+          progress={progressPercentage}
+          progressBarBackground={Colors.border}
+          progressBarFill={Colors.primary}
+          progressTextColor={Colors.primary}
+          maxWidth='40%'
+        />
       </View>
 
       {(startLabel || dueLabel) && (
@@ -107,16 +119,6 @@ export default memo(function TaskItem({
           )}
         </View>
       )}
-
-      <View style={styles.footer}>
-        <View style={styles.commentsContainer}>
-          <Icon.ChatLine size={21} />
-          <Typo size={13} weight='500' color='secondary' style={styles.commentsText}>
-            <Typo size={15} weight='600'>{commentCount}</Typo>
-            {' Comments'}
-          </Typo>
-        </View>
-      </View>
     </TouchableOpacity>
   )
 })
@@ -140,28 +142,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: Sizes.spacing.s5
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: Sizes.spacing.s21
-  },
-  avatarGroup: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  avatarWrapper: {
-    marginRight: -Sizes.spacing.s7
-  },
-  commentsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Sizes.spacing.s5
-  },
-  commentsText: {
-    marginBottom: Sizes.spacing.s3
-  },
-  incompleteIcon: {
-    opacity: 0.3
+  iconBtn: {
+    marginBottom: 'auto',
+    padding: Sizes.spacing.s9,
+    borderRadius: Shapes.rounded.circle,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.border + '40'
   }
 })

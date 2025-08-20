@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/auth/useAuth'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { TABLE_NAMES } from '@/lib/schema'
 import { todayEnd, todayStart } from '@/utils/date'
+import { useRouter } from 'expo-router'
 
 function usePriorityTasks({ userId }: { userId?: string }) {
   const db = useDatabase()
@@ -39,10 +40,15 @@ function usePriorityTasks({ userId }: { userId?: string }) {
   return tasks
 }
 
-const PriorityItem = memo(({ label, isCompleted }: { label: string, isCompleted: boolean }) => {
+const PriorityItem = memo(({ label, isCompleted, taskInfo }: { label: string, isCompleted: boolean, taskInfo: { taskId: string, projectId: string } }) => {
+  const router = useRouter()
   return(
     <View style={styles.priorityItem}>
-      <TouchableOpacity activeOpacity={0.7} style={{ flexDirection: 'row' }}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={{ flexDirection: 'row' }}
+        onPress={() => router.push(`(protected)/project/task/${taskInfo.taskId}`)}
+      >
         {isCompleted
           ? <Icon.CheckCircle size={19} color={Colors.secondary} />
           : <Icon.Circle size={19} color={Colors.primary}/>}
@@ -74,6 +80,7 @@ const PriorityTasksSection = () => {
       key={task.id}
       label={task.title}
       isCompleted={task.status === StatusTask.COMPLETED}
+      taskInfo={{ taskId: task.id, projectId: task.projectId }}
     />
   ), [])
 
@@ -92,7 +99,15 @@ const PriorityTasksSection = () => {
       >
         {i18n.t('home.progressInfo.priorityTasks')}
       </Typo>
-      <View style={[styles.taskList, tasks.length === 0 && styles.emptyContainer]}>
+      <View
+        style={[
+          styles.taskList,
+          tasks.length === 0 && styles.emptyContainer,
+          tasks.length < 4 && {
+            justifyContent: 'flex-start'
+          }
+        ]}
+      >
         {tasks.length === 0 ? emptyState : tasks.map(renderTask)}
       </View>
     </View>

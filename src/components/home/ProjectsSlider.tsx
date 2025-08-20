@@ -55,7 +55,7 @@ const ProjectsSlider = memo<ProjectsSliderProps>(function ProjectsSlider({ setSh
   const [projects, setProjects] = useState<Project[]>([])
 
   useEffect(() => {
-    const columns = ['task_count', 'completed_task_count', 'name', 'category_id']
+    const columns = ['progress_percentage', 'name', 'category_id']
 
     const subscription = db.collections
       .get<Project>(TABLE_NAMES.PROJECTS)
@@ -75,8 +75,7 @@ const ProjectsSlider = memo<ProjectsSliderProps>(function ProjectsSlider({ setSh
 
   const renderProject = useCallback(({ item }: { item: Project }) => (
     <ProjectCard
-      taskCount={item.taskCount}
-      completedTasks={item.completedTaskCount}
+      progressPercentage={item.progressPercentage}
       name={item.name}
       color={item.color}
       id={item.id}

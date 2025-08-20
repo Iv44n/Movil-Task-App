@@ -109,7 +109,7 @@ const TaskFormFields = memo(function TaskFormFields() {
                     value={key}
                     selected={isSelected}
                     color={config.color}
-                    label={i18n.t(`projectDetails.addTaskModal.priorityOptions.${key}`)}
+                    label={i18n.t(`priorityOptions.${key}`)}
                     onPress={(v) => onChange(v)}
                   />
                 )

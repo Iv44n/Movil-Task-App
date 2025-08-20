@@ -104,11 +104,14 @@ export default function ProjectScreen() {
           t.projectId = projectId
           t.startDate = startDate
           t.dueDate = dueDate
+          t.progressPercentage = 0
         })
       })
-      await project?.updateProject({
-        taskCount: project?.taskCount + 1
-      })
+      const taskLength = await project?.tasks.count || 0
+      const taskCompleted = await project?.tasks.extend(Q.where('status', StatusTask.COMPLETED)).count || 0
+      const progressPercentage = taskLength > 0 ? Math.round((taskCompleted / taskLength) * 100) : 0
+
+      await project?.updateProject({ progressPercentage })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to add task'
       Alert.alert('Error', message)

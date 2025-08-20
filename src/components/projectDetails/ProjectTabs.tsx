@@ -16,6 +16,7 @@ interface ProjectTabsProps {
 const TABS: readonly { key: Status }[] = [
   { key: 'all' },
   { key: StatusTask.PENDING },
+  { key: StatusTask.IN_PROGRESS },
   { key: StatusTask.COMPLETED }
 ] as const
 
@@ -40,7 +41,7 @@ const ProjectTabs = memo<ProjectTabsProps>(({
         ]}
       >
         <Typo
-          size={15}
+          size={14}
           weight='600'
           color={isActive ? 'black' : 'secondary'}
           style={{ textAlign: 'center' }}

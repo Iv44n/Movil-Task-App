@@ -75,8 +75,7 @@ const AddProjectModal = ({ visible, onClose }: AddProjectModalProps) => {
           project.description = description.trim()
           project.color = selectedColor
           project.categoryId = selectedCategoryId
-          project.taskCount = 0
-          project.completedTaskCount = 0
+          project.progressPercentage = 0
         })
       })
 

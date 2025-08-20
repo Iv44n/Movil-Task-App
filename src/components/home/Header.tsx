@@ -1,17 +1,19 @@
 import Typo from '../shared/Typo'
-import { Sizes } from '@/constants/theme'
-import { View } from 'react-native'
+import { Colors, Shapes, Sizes } from '@/constants/theme'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useAuth } from '@/hooks/auth/useAuth'
 import i18n from '@/i18n'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { TABLE_NAMES } from '@/lib/schema'
 import { Q } from '@nozbe/watermelondb'
 import { Project } from '@/models'
+import { useRouter } from 'expo-router'
 
 export default function Header({ userName }: { userName: string }) {
   const { user } = useAuth()
   const database = useDatabase()
+  const router = useRouter()
   const [totalProjects, setTotalProjects] = useState(0)
 
   useEffect(() => {
@@ -26,15 +28,22 @@ export default function Header({ userName }: { userName: string }) {
     return () => sb.unsubscribe()
   }, [database, user])
 
+  const getInitials = useCallback((firstName?: string, lastName?: string) => {
+    if (!firstName) return '?'
+    if (lastName) return `${firstName[0]}${lastName[0]}`
+    return firstName[0]
+  }, [])
+
   return (
     <View style={{
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'flex-start',
       marginBottom: Sizes.spacing.s21,
       marginTop: Sizes.spacing.s9
     }}
     >
-      <View>
+      <View style={{ flex: 1 }}>
         <Typo
           size={15}
           color='secondary'
@@ -57,13 +66,35 @@ export default function Header({ userName }: { userName: string }) {
           }
         </Typo>
       </View>
-      {/*       <View style={styles.iconContainer}>
-        <Ionicons
-          name='mail-outline'
-          size={24}
-          color={Colors.primary}
-        />
-      </View> */}
+
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => router.push('/profile')}
+        style={styles.avatarContainer}
+      >
+        <View style={styles.avatarInner}>
+          <Typo color='secondary' weight='700'>
+            {getInitials(user?.firstName, user?.lastName)}
+          </Typo>
+        </View>
+      </TouchableOpacity>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  avatarContainer: {
+    position: 'relative',
+    marginRight: 1
+  },
+  avatarInner: {
+    width: Sizes.width.w43,
+    height: Sizes.height.h43,
+    borderRadius: Shapes.rounded.circle,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.secondary
+  }
+})

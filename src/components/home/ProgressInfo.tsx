@@ -76,7 +76,7 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
 
 export default function ProgressInfo() {
   const { user } = useAuth()
-  const { completed, completedToday } = useProgress({ userId: user?.id ?? '' })
+  const { completed, inProgress } = useProgress({ userId: user?.id ?? '' })
 
   return (
     <View style={styles.container}>
@@ -95,9 +95,9 @@ export default function ProgressInfo() {
           />
 
           <ProgressSummary
-            label={i18n.t('home.progressInfo.doneToday')}
+            label={i18n.t('home.progressInfo.in_progress')}
             useIcon
-            count={completedToday}
+            count={inProgress}
           />
         </View>
       </View>

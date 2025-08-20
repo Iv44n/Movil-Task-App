@@ -37,6 +37,9 @@ export default function Layout() {
   useEffect(() => {
     async function initLanguage() {
       try {
+        /*    await database.write(async () => {
+          await database.unsafeResetDatabase()
+        }) */
         const storedLang = await AsyncStorage.getItem(LANG_STORAGE_KEY)
         i18n.locale = storedLang ?? getLocales()[0]?.languageCode ?? 'en'
       } catch (error) {

@@ -30,7 +30,7 @@ const TaskChip = memo(function TaskChip({
 
 const styles = StyleSheet.create({
   chip: {
-    borderRadius: Shapes.rounded.sm,
+    borderRadius: Shapes.rounded.lg,
     paddingHorizontal: Sizes.spacing.s15,
     paddingVertical: Sizes.spacing.s5,
     marginRight: Sizes.spacing.s11

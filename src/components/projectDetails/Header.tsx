@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginTop: Sizes.spacing.s9
   },
   iconBtn: {
     padding: Sizes.spacing.s11,
