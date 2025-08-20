@@ -1,4 +1,9 @@
 const es = {
+  priorityOptions: {
+    low: 'Baja',
+    medium: 'Media',
+    high: 'Alta'
+  },
   auth: {
     login: {
       title: 'Bienvenido de vuelta',
@@ -83,7 +88,7 @@ const es = {
       title: 'Tu progreso',
       priorityTasks: 'Tareas Prioritarias',
       completed: 'Completadas',
-      doneToday: 'Hechas Hoy',
+      in_progress: 'En Progreso',
       task: 'Tarea',
       tasks: 'Tareas'
     },
@@ -110,12 +115,16 @@ const es = {
       plural: {
         all: 'Todo',
         pending: 'Pendientes',
+        in_progress: 'En Progreso',
         completed: 'Completadas'
       }
     },
     options: {
       edit: 'Editar Proyecto',
       delete: 'Eliminar Proyecto'
+    },
+    taskCard: {
+      progress: 'Progreso'
     },
     addTaskModal: {
       title: 'Crear nueva tarea',
@@ -125,17 +134,28 @@ const es = {
       descriptionLabel: 'Descripción (opcional)',
       descriptionPlaceholder: 'Añadir más detalles...',
       priorityLabel: 'Prioridad',
-      priorityOptions: {
-        low: 'Baja',
-        medium: 'Media',
-        high: 'Alta'
-      },
       startDateLabel: 'Fecha de inicio',
       startDatePlaceholder: 'AAAA-MM-DD (opcional)',
       dueDateLabel: 'Fecha de vencimiento',
       dueDatePlaceholder: 'AAAA-MM-DD (opcional)',
       cancel: 'Cancelar',
       create: 'Crear tarea'
+    },
+    subTaskPage: {
+      emptyState: {
+        title: 'No hay subtareas todavía.',
+        subtext: 'Toca el botón + para añadir una subtarea'
+      },
+      info: {
+        startDateLabel: 'Inicio',
+        dueDateLabel: 'Fin',
+        priorityLabel: 'Prioridad',
+        subTaskLabel: 'Subtareas',
+        notSetDate: 'Sin Fecha'
+      },
+      list: {
+        newTask: 'Nueva Tarea'
+      }
     }
   },
   profile: {

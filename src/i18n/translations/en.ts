@@ -1,4 +1,9 @@
 const en = {
+  priorityOptions: {
+    low: 'Low',
+    medium: 'Medium',
+    high: 'High'
+  },
   auth: {
     login: {
       title: 'Welcome back',
@@ -83,7 +88,7 @@ const en = {
       title: 'Your progress',
       priorityTasks: 'Priority Tasks',
       completed: 'Completed',
-      doneToday: 'Done Today',
+      in_progress: 'In Progress',
       task: 'Task',
       tasks: 'Tasks'
     },
@@ -109,12 +114,16 @@ const en = {
       plural: {
         all: 'All',
         pending: 'Pending',
+        in_progress: 'In Progress',
         completed: 'Completed'
       }
     },
     options: {
       edit: 'Edit Project',
       delete: 'Delete Project'
+    },
+    taskCard: {
+      progress: 'Progress'
     },
     addTaskModal: {
       title: 'Create New Task',
@@ -124,17 +133,28 @@ const en = {
       descriptionLabel: 'Description (optional)',
       descriptionPlaceholder: 'Add more details...',
       priorityLabel: 'Priority',
-      priorityOptions: {
-        low: 'Low',
-        medium: 'Medium',
-        high: 'High'
-      },
       startDateLabel: 'Start Date',
       startDatePlaceholder: 'YYYY-MM-DD (optional)',
       dueDateLabel: 'Due Date',
       dueDatePlaceholder: 'YYYY-MM-DD (optional)',
       cancel: 'Cancel',
       create: 'Create Task'
+    },
+    subTaskPage: {
+      emptyState: {
+        title: 'No subtasks yet.',
+        subtext: 'Tap the + button to add a subtask'
+      },
+      info: {
+        startDateLabel: 'Start Date',
+        dueDateLabel: 'Due Date',
+        priorityLabel: 'Priority',
+        subTaskLabel: 'Subtasks',
+        notSetDate: 'Not Set'
+      },
+      list: {
+        newTask: 'New Task'
+      }
     }
   },
   profile: {
