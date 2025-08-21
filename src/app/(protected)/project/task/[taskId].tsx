@@ -12,6 +12,7 @@ import { CapitalizeWords } from '@/utils/utils'
 import SubtaskList from '@/components/projectDetails/SubtaskList'
 import i18n from '@/i18n'
 import { Priority } from '@/constants/constants'
+import format from '@/utils/formatDate'
 
 const getPriorityConfig = (priority: Priority) => {
   switch (priority.toLowerCase()) {
@@ -29,16 +30,6 @@ const getPriorityConfig = (priority: Priority) => {
   }
 }
 
-const formatDate = (date?: Date | null) =>
-  date
-    ? date.toLocaleDateString('es-ES', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    })
-    : i18n.t('projectDetails.subTaskPage.info.notSetDate')
-
 const LoadingView = () => (
   <View style={styles.loadingContainer}>
     <Typo size={16} color='secondary' style={{ marginTop: Sizes.spacing.s9 }}>
@@ -47,21 +38,32 @@ const LoadingView = () => (
   </View>
 )
 
-const DateItem = ({ icon, label, date }: { icon: ReactNode; label: string; date?: Date | null }) => (
-  <View style={styles.dateItem}>
-    <View style={styles.dateIconContainer}>
-      {icon}
+const FORMAT_TOKEN = 'ddd, DD MMM YYYY'
+
+const DateItem = ({ icon, label, date }: { icon: ReactNode; label: string; date?: Date | null }) => {
+  const locale = i18n.locale
+
+  const formatDate = (date?: Date | null) =>
+    date
+      ? format(date, { format: FORMAT_TOKEN, locale })
+      : i18n.t('projectDetails.subTaskPage.info.notSetDate')
+
+  return (
+    <View style={styles.dateItem}>
+      <View style={styles.dateIconContainer}>
+        {icon}
+      </View>
+      <View>
+        <Typo size={13} color='secondary' weight='500' style={styles.dateLabel}>
+          {label}
+        </Typo>
+        <Typo size={13} weight='500' color='primary'>
+          {formatDate(date)}
+        </Typo>
+      </View>
     </View>
-    <View>
-      <Typo size={13} color='secondary' weight='500' style={styles.dateLabel}>
-        {label}
-      </Typo>
-      <Typo size={13} weight='500' color='primary'>
-        {formatDate(date)}
-      </Typo>
-    </View>
-  </View>
-)
+  )
+}
 
 const PriorityBadge = ({ priority }: { priority: Priority }) => {
   const { color, icon, opacity } = useMemo(() => getPriorityConfig(priority), [priority])

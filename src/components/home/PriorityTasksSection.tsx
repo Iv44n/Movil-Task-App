@@ -31,7 +31,7 @@ function usePriorityTasks({ userId }: { userId?: string }) {
         Q.sortBy('due_date', Q.asc),
         Q.take(4)
       )
-      .observe()
+      .observeWithColumns(['title', 'status', 'priority', 'due_date'])
       .subscribe(setTasks)
 
     return () => subscription.unsubscribe()

@@ -9,9 +9,9 @@ const isPast = (date: string | Date) => {
 
 const isToday = (date: string | Date) => {
   if (typeof date === 'string') {
-    return new Date(date).getDate() === new Date().getDate()
+    return new Date(date).toDateString() === new Date().toDateString()
   }
-  return date.getDate() === new Date().getDate()
+  return date.toDateString() === new Date().toDateString()
 }
 
 const todayStart = () => {
