@@ -1,12 +1,11 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import Typo from '@/components/shared/Typo'
 import ScreenWrapper from '@/components/ScreenWrapper'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, ReactNode } from 'react'
 import { Task } from '@/models'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { TABLE_NAMES } from '@/lib/schema'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
 import { Colors, Sizes, Shapes } from '@/constants/theme'
 import Icon from '@/components/icons/Icon'
 import { CapitalizeWords } from '@/utils/utils'
@@ -14,19 +13,19 @@ import SubtaskList from '@/components/projectDetails/SubtaskList'
 import i18n from '@/i18n'
 import { Priority } from '@/constants/constants'
 
-const getPriorityConfig = (priority?: string) => {
-  switch (priority?.toLowerCase()) {
+const getPriorityConfig = (priority: Priority) => {
+  switch (priority.toLowerCase()) {
     case 'high':
-      return { color: Colors.error, icon: 'alert-circle', opacity: 0.1 }
+      return { color: Colors.error, icon: <Icon.DangerCircle size={17} color={Colors.error} />, opacity: 0.1 }
 
     case 'medium':
-      return { color: Colors.yellow, icon: 'time', opacity: 0.1 }
+      return { color: Colors.yellow, icon: <Icon.ClockCircle size={17} color={Colors.yellow} />, opacity: 0.1 }
 
     case 'low':
-      return { color: Colors.green, icon: 'checkmark-circle', opacity: 0.1 }
+      return { color: Colors.green, icon: <Icon.CheckCircle size={17} color={Colors.green} />, opacity: 0.1 }
 
     default:
-      return { color: Colors.secondary, icon: 'help-circle', opacity: 0.1 }
+      return { color: Colors.secondary, icon: <Icon.ClockCircle size={17} color={Colors.secondary} />, opacity: 0.1 }
   }
 }
 
@@ -42,19 +41,16 @@ const formatDate = (date?: Date | null) =>
 
 const LoadingView = () => (
   <View style={styles.loadingContainer}>
-    <View style={styles.loadingSpinner}>
-      <Ionicons name='hourglass' size={24} color={Colors.secondary} />
-    </View>
     <Typo size={16} color='secondary' style={{ marginTop: Sizes.spacing.s9 }}>
       Loading task...
     </Typo>
   </View>
 )
 
-const DateItem = ({ icon, label, date, color }: { icon: string; label: string; date?: Date | null; color: string }) => (
+const DateItem = ({ icon, label, date }: { icon: ReactNode; label: string; date?: Date | null }) => (
   <View style={styles.dateItem}>
     <View style={styles.dateIconContainer}>
-      <Ionicons name={icon as any} color={color} size={19} />
+      {icon}
     </View>
     <View>
       <Typo size={13} color='secondary' weight='500' style={styles.dateLabel}>
@@ -74,7 +70,7 @@ const PriorityBadge = ({ priority }: { priority: Priority }) => {
   return (
     <View style={styles.priorityBadge}>
       <View style={[styles.priorityIconContainer, { backgroundColor: bgColor }]}>
-        <Ionicons name={icon as any} color={color} size={17} />
+        {icon}
       </View>
       <Typo size={15} weight='600' color='primary' style={styles.priorityText}>
         {CapitalizeWords(i18n.t(`priorityOptions.${priority}`))}
@@ -111,7 +107,11 @@ export default function TaskScreen() {
           <Icon.ArrowLeft size={23} color={Colors.primary} />
         </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.7} style={styles.headerButton}>
-          <Ionicons name='create-outline' color={Colors.primary} size={23} />
+          <Icon.PenNewSquare
+            size={21}
+            color={Colors.primary}
+            style={{ margin: 1 }}
+          />
         </TouchableOpacity>
       </View>
 
@@ -125,17 +125,15 @@ export default function TaskScreen() {
         <View style={styles.infoCard}>
           <View style={styles.datesContainer}>
             <DateItem
-              icon='calendar-outline'
+              icon={<Icon.Calendar size={19} color={Colors.primary} />}
               label={i18n.t('projectDetails.subTaskPage.info.startDateLabel').toUpperCase()}
               date={task.startDate}
-              color={Colors.primary}
             />
             <View style={styles.dateDivider} />
             <DateItem
-              icon='flag-outline'
+              icon={<Icon.Flag size={19} color={Colors.error} />}
               label={i18n.t('projectDetails.subTaskPage.info.dueDateLabel').toUpperCase()}
               date={task.dueDate}
-              color={Colors.error}
             />
           </View>
 
@@ -165,10 +163,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  loadingSpinner: {
-    borderRadius: Shapes.rounded.circle,
-    backgroundColor: Colors.card
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -176,9 +170,10 @@ const styles = StyleSheet.create({
     paddingVertical: Sizes.spacing.s9
   },
   headerButton: {
-    padding: Sizes.spacing.s9,
-    borderRadius: Shapes.rounded.lg,
-    backgroundColor: Colors.card
+    padding: Sizes.spacing.s11,
+    borderRadius: Shapes.rounded.circle,
+    borderWidth: 1,
+    borderColor: Colors.border
   },
   titleContainer: {
     marginBottom: Sizes.spacing.s21
