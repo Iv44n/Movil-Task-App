@@ -21,7 +21,11 @@ interface Props {
 }
 
 const DATE_FORMAT = 'MMM D'
-const LOCALE_DEFAULT = i18n.locale
+
+enum TYPE_DATE {
+  START = 'start',
+  DUE = 'due'
+}
 
 export default memo(function TaskItem({
   id,
@@ -32,30 +36,40 @@ export default memo(function TaskItem({
   progressPercentage,
   colorTheme = Colors.primary
 }: Props) {
-  const router = useRouter()
-  const formatDate = useCallback((date: Date | null) => {
-    return date ? format(date, { format: DATE_FORMAT, locale: LOCALE_DEFAULT }) : null
-  }, [])
+  const LOCALE_DEFAULT = i18n.locale
 
-  const getDateLabel = useCallback((date: Date | null, type: 'start' | 'due') => {
+  const router = useRouter()
+  const formatDate = useCallback((date: Date) => {
+    return format(date, { format: DATE_FORMAT, locale: LOCALE_DEFAULT })
+  }, [LOCALE_DEFAULT])
+
+  const getDateLabel = useCallback((date: Date | null, type: TYPE_DATE) => {
     if (!date) return null
 
     const isDateToday = isToday(date)
     const isDatePast = isPast(date)
 
     if (isDateToday) {
-      return type === 'start' ? 'Start Today' : 'Due Today'
+      return type === TYPE_DATE.START
+        ? i18n.t('projectDetails.dateLabels.startToday')
+        : i18n.t('projectDetails.dateLabels.dueToday')
     }
 
     const formatted = formatDate(date)
-    if (type === 'start') {
-      return `${isDatePast ? 'Started' : 'Start'} ${formatted}`
+
+    if (type === TYPE_DATE.START) {
+      return isDatePast
+        ? i18n.t('projectDetails.dateLabels.started', { date: formatted })
+        : i18n.t('projectDetails.dateLabels.start', { date: formatted })
     }
-    return `${isDatePast ? 'Overdue' : 'Due'} ${formatted}`
+
+    return isDatePast
+      ? i18n.t('projectDetails.dateLabels.overdue', { date: formatted })
+      : i18n.t('projectDetails.dateLabels.due', { date: formatted })
   }, [formatDate])
 
-  const startLabel = useMemo(() => getDateLabel(startDate, 'start'), [startDate, getDateLabel])
-  const dueLabel = useMemo(() => getDateLabel(dueDate, 'due'), [dueDate, getDateLabel])
+  const startLabel = useMemo(() => getDateLabel(startDate, TYPE_DATE.START), [startDate, getDateLabel])
+  const dueLabel = useMemo(() => getDateLabel(dueDate, TYPE_DATE.DUE), [dueDate, getDateLabel])
 
   return (
     <TouchableOpacity

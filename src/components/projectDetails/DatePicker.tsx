@@ -11,6 +11,8 @@ import {
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import Icon from '../icons/Icon'
+import i18n from '@/i18n'
+import { CapitalizeWords } from '@/utils/utils'
 
 interface Props {
   label: string
@@ -90,9 +92,10 @@ export default function DatePicker({
   label,
   value,
   onChange,
-  placeholder = 'Seleccionar fecha',
-  yearRange = 10
+  placeholder = i18n.t('datePicker.placeholder'),
+  yearRange = 50
 }: Props) {
+  const locale = i18n.locale
   const [showModal, setShowModal] = useState<boolean>(false)
   const [tempDate, setTempDate] = useState<Date>(value || new Date())
 
@@ -104,10 +107,13 @@ export default function DatePicker({
   const minYear = useMemo(() => nowYear - yearRange, [nowYear, yearRange])
   const maxYear = useMemo(() => nowYear + yearRange, [nowYear, yearRange])
 
-  const months = useMemo<MonthItem[]>(() => [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-  ].map((name, index) => ({ name, value: index })), [])
+  const months = useMemo<MonthItem[]>(() =>{
+    return Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(2000, i, 1)
+      const name = new Intl.DateTimeFormat(locale, { month: 'long' }).format(date)
+      return { name: CapitalizeWords(name), value: i }
+    })
+  }, [locale])
 
   const days = useMemo<DayItem[]>(() => {
     const daysInMonth = new Date(tempDate.getFullYear(), tempDate.getMonth() + 1, 0).getDate()
@@ -185,8 +191,8 @@ export default function DatePicker({
 
   const formatDisplayDate = useCallback((date: Date | null) => {
     if (!date) return placeholder
-    return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
-  }, [placeholder])
+    return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
+  }, [placeholder, locale])
 
   return (
     <View>
@@ -203,13 +209,13 @@ export default function DatePicker({
 
             <View style={styles.headerRow}>
               <Pressable onPress={closePicker}>
-                <Icon.CloseCircle color={Colors.primary} />
+                <Icon.CloseCircle color={Colors.secondary} />
               </Pressable>
 
               <Typo size={16} weight='600'>{label}</Typo>
 
               <Pressable onPress={confirmPicker}>
-                <Icon.CheckCircle color={Colors.primary} />
+                <Icon.CheckCircle color={Colors.secondary} />
               </Pressable>
             </View>
 
@@ -219,7 +225,14 @@ export default function DatePicker({
 
             <View style={styles.pickersRow}>
               <View style={styles.col}>
-                <Typo size={13} weight='600' color='secondary' style={styles.colLabel}>Día</Typo>
+                <Typo
+                  size={13}
+                  weight='600'
+                  color='secondary'
+                  style={styles.colLabel}
+                >
+                  {i18n.t('datePicker.day')}
+                </Typo>
                 <PickerColumn
                   data={days}
                   selectedValue={tempDate.getDate()}
@@ -232,7 +245,14 @@ export default function DatePicker({
               </View>
 
               <View style={styles.col}>
-                <Typo size={13} weight='600' color='secondary' style={styles.colLabel}>Mes</Typo>
+                <Typo
+                  size={13}
+                  weight='600'
+                  color='secondary'
+                  style={styles.colLabel}
+                >
+                  {i18n.t('datePicker.month')}
+                </Typo>
                 <PickerColumn
                   data={months}
                   selectedValue={tempDate.getMonth()}
@@ -245,7 +265,14 @@ export default function DatePicker({
               </View>
 
               <View style={styles.col}>
-                <Typo size={13} weight='600' color='secondary' style={styles.colLabel}>Año</Typo>
+                <Typo
+                  size={13}
+                  weight='600'
+                  color='secondary'
+                  style={styles.colLabel}
+                >
+                  {i18n.t('datePicker.year')}
+                </Typo>
                 <PickerColumn
                   data={years}
                   selectedValue={tempDate.getFullYear()}
@@ -260,7 +287,7 @@ export default function DatePicker({
 
             {value && (
               <Pressable onPress={clearPicker} style={styles.clearRow}>
-                <Typo size={15} color='secondary'>Limpiar fecha</Typo>
+                <Typo size={15} color='secondary'>{i18n.t('datePicker.clearDate')}</Typo>
               </Pressable>
             )}
           </View>

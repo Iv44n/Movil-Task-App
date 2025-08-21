@@ -4,6 +4,13 @@ const es = {
     medium: 'Media',
     high: 'Alta'
   },
+  datePicker: {
+    placeholder: 'Selecciona una fecha',
+    day: 'Día',
+    month: 'Mes',
+    year: 'Año',
+    clearDate: 'Limpiar fecha'
+  },
   auth: {
     login: {
       title: 'Bienvenido de vuelta',
@@ -135,9 +142,7 @@ const es = {
       descriptionPlaceholder: 'Añadir más detalles...',
       priorityLabel: 'Prioridad',
       startDateLabel: 'Fecha de inicio',
-      startDatePlaceholder: 'AAAA-MM-DD (opcional)',
-      dueDateLabel: 'Fecha de vencimiento',
-      dueDatePlaceholder: 'AAAA-MM-DD (opcional)',
+      dueDateLabel: 'Fecha de fin',
       cancel: 'Cancelar',
       create: 'Crear tarea'
     },
@@ -156,6 +161,14 @@ const es = {
       list: {
         newTask: 'Nueva Tarea'
       }
+    },
+    dateLabels: {
+      startToday: 'Empieza hoy',
+      dueToday: 'Termina hoy',
+      started: 'Empezó el %{date}',
+      start: 'Empieza el %{date}',
+      overdue: 'Terminó el %{date}',
+      due: 'Termina el %{date}'
     }
   },
   profile: {

@@ -4,6 +4,13 @@ const en = {
     medium: 'Medium',
     high: 'High'
   },
+  datePicker: {
+    placeholder: 'Select a date',
+    day: 'Day',
+    month: 'Month',
+    year: 'Year',
+    clearDate: 'Clear Date'
+  },
   auth: {
     login: {
       title: 'Welcome back',
@@ -134,9 +141,7 @@ const en = {
       descriptionPlaceholder: 'Add more details...',
       priorityLabel: 'Priority',
       startDateLabel: 'Start Date',
-      startDatePlaceholder: 'YYYY-MM-DD (optional)',
       dueDateLabel: 'Due Date',
-      dueDatePlaceholder: 'YYYY-MM-DD (optional)',
       cancel: 'Cancel',
       create: 'Create Task'
     },
@@ -155,6 +160,14 @@ const en = {
       list: {
         newTask: 'New Task'
       }
+    },
+    dateLabels: {
+      startToday: 'Start Today',
+      dueToday: 'Due Today',
+      started: 'Started %{date}',
+      start: 'Start %{date}',
+      overdue: 'Ended %{date}',
+      due: 'Due %{date}'
     }
   },
   profile: {
