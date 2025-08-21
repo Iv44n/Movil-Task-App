@@ -23,6 +23,11 @@ import AltArrowRightIcon from './AltArrowRightIcon'
 import GlobalIcon from './GlobalIcon'
 import BellIcon from './BellIcon'
 import ShieldIcon from './ShieldIcon'
+import CalendarIcon from './CalendarIcon'
+import FlagIcon from './FlagIcon'
+import ClockCircleIcon from './ClockCircleIcon'
+import PenNewSquareIcon from './PenNewSquareIcon'
+import CloseCircleIcon from './CloseCircleIcon'
 
 const Icon = {
   Add: (props: React.ComponentProps<typeof AddIcon>) => <AddIcon {...props} />,
@@ -49,7 +54,12 @@ const Icon = {
   DangerCircle: (props: React.ComponentProps<typeof DangerCircleIcon>) => <DangerCircleIcon {...props} />,
   Global: (props: React.ComponentProps<typeof GlobalIcon>) => <GlobalIcon {...props} />,
   Bell: (props: React.ComponentProps<typeof BellIcon>) => <BellIcon {...props} />,
-  Shield: (props: React.ComponentProps<typeof ShieldIcon>) => <ShieldIcon {...props} />
+  Shield: (props: React.ComponentProps<typeof ShieldIcon>) => <ShieldIcon {...props} />,
+  Calendar: (props: React.ComponentProps<typeof CalendarIcon>) => <CalendarIcon {...props} />,
+  Flag: (props: React.ComponentProps<typeof FlagIcon>) => <FlagIcon {...props} />,
+  ClockCircle: (props: React.ComponentProps<typeof ClockCircleIcon>) => <ClockCircleIcon {...props} />,
+  PenNewSquare: (props: React.ComponentProps<typeof PenNewSquareIcon>) => <PenNewSquareIcon {...props} />,
+  CloseCircle: (props: React.ComponentProps<typeof CloseCircleIcon>) => <CloseCircleIcon {...props} />
 }
 
 export default Icon
