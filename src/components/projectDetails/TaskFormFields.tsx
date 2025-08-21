@@ -6,6 +6,7 @@ import { Priority } from '@/constants/constants'
 import { Sizes, Colors, Shapes } from '@/constants/theme'
 import { memo, useCallback, useMemo } from 'react'
 import i18n from '@/i18n'
+import DatePicker from './DatePicker'
 
 type FormDataForCreate = {
   title: string
@@ -18,11 +19,6 @@ const PRIORITY_CONFIG: Record<Priority, { color: string }> = {
   [Priority.LOW]: { color: '#10B981' },
   [Priority.MEDIUM]: { color: Colors.yellow },
   [Priority.HIGH]: { color: '#EF4444' }
-}
-
-function formatDateOnly(date: Date | null) {
-  if (!date) return ''
-  return date.toISOString().split('T')[0]
 }
 
 type PriorityOptionProps = {
@@ -125,12 +121,14 @@ const TaskFormFields = memo(function TaskFormFields() {
           name='startDate'
           control={control}
           render={({ field: { onChange, value } }) => (
-            <View style={styles.dateField}>
-              <FormField
+            <View>
+              <Typo size={14} weight='600' style={styles.label}>
+                {i18n.t('projectDetails.addTaskModal.startDateLabel')}
+              </Typo>
+              <DatePicker
+                value={value}
+                onChange={onChange}
                 label={i18n.t('projectDetails.addTaskModal.startDateLabel')}
-                placeholder={i18n.t('projectDetails.addTaskModal.startDatePlaceholder')}
-                value={formatDateOnly(value)}
-                onChangeText={(text) => onChange(text ? new Date(text) : null)}
               />
             </View>
           )}
@@ -140,12 +138,14 @@ const TaskFormFields = memo(function TaskFormFields() {
           name='dueDate'
           control={control}
           render={({ field: { onChange, value } }) => (
-            <View style={styles.dateField}>
-              <FormField
+            <View>
+              <Typo size={14} weight='600' style={styles.label}>
+                {i18n.t('projectDetails.addTaskModal.dueDateLabel')}
+              </Typo>
+              <DatePicker
                 label={i18n.t('projectDetails.addTaskModal.dueDateLabel')}
-                placeholder={i18n.t('projectDetails.addTaskModal.dueDatePlaceholder')}
-                value={formatDateOnly(value)}
-                onChangeText={(text) => onChange(text ? new Date(text) : null)}
+                value={value}
+                onChange={onChange}
               />
             </View>
           )}
@@ -173,13 +173,7 @@ const styles = StyleSheet.create({
   },
   dateRow: {
     marginTop: Sizes.spacing.s15,
-    flex: 1,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    gap: Sizes.spacing.s9
-  },
-  dateField: {
-    width: '49%'
+    gap: Sizes.spacing.s15
   }
 })
 
