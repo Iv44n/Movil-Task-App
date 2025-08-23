@@ -55,7 +55,7 @@ export default memo(function TaskItem({
         : i18n.t('projectDetails.dateLabels.dueToday')
     }
 
-    const formatted = formatDate(date)
+    const formatted = CapitalizeWords(formatDate(date))
 
     if (type === TYPE_DATE.START) {
       return isDatePast

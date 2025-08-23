@@ -58,7 +58,7 @@ const DateItem = ({ icon, label, date }: { icon: ReactNode; label: string; date?
           {label}
         </Typo>
         <Typo size={13} weight='500' color='primary'>
-          {formatDate(date)}
+          {CapitalizeWords(formatDate(date))}
         </Typo>
       </View>
     </View>
