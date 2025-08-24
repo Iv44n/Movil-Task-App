@@ -48,6 +48,7 @@ const EmptyStateComponent = memo<{ tab: Status }>(function EmptyStateComponent({
 
 const TaskList = memo(function TaskList({ tab, projectTasks, colorTheme }: { tab: Status, projectTasks: Query<Task>, colorTheme: string }) {
   const [tasks, setTasks] = useState<Task[]>([])
+  const [openOptionsId, setOpenOptionsId] = useState<string | null>(null)
   const listRef = useRef<LegendListRef>(null)
 
   useEffect(() => {
@@ -68,6 +69,23 @@ const TaskList = memo(function TaskList({ tab, projectTasks, colorTheme }: { tab
     return () => subscription.unsubscribe()
   }, [tab, projectTasks])
 
+  const handleOpenOptions = useCallback((id: string) => {
+    setOpenOptionsId(prev => prev === id ? null : id)
+  }, [])
+
+  const handleCloseOptions = useCallback(() => {
+    setOpenOptionsId(null)
+  }, [])
+
+  const handleDeleteTask = useCallback(async(id: string) => {
+    try {
+      const [task] = await projectTasks.extend(Q.where('id', id)).fetch()
+      await task.deleteTask()
+    } catch (error) {
+      console.error('TaskItem - Delete task failed:', error)
+    }
+  }, [projectTasks])
+
   const renderTaskItem = useCallback(
     ({ item }: { item: Task }) => (
       <TaskItem
@@ -78,9 +96,16 @@ const TaskList = memo(function TaskList({ tab, projectTasks, colorTheme }: { tab
         dueDate={item.dueDate}
         colorTheme={colorTheme}
         progressPercentage={item.progressPercentage}
+        isOptionsOpen={openOptionsId === item.id}
+        onOpenOptions={handleOpenOptions}
+        onCloseOptions={handleCloseOptions}
+        deleteTask={handleDeleteTask}
+        style={{
+          zIndex: openOptionsId === item.id ? 1 : 0
+        }}
       />
     ),
-    [colorTheme]
+    [colorTheme, openOptionsId, handleOpenOptions, handleCloseOptions, handleDeleteTask]
   )
 
   const emptyComponent = useMemo(() => <EmptyStateComponent tab={tab} />, [tab] )
@@ -99,7 +124,7 @@ const TaskList = memo(function TaskList({ tab, projectTasks, colorTheme }: { tab
       <LegendList
         ref={listRef}
         data={tasks}
-        extraData={tasks}
+        extraData={[openOptionsId, tasks]}
         keyExtractor={(item) => item.id}
         renderItem={renderTaskItem}
         contentContainerStyle={styles.list}

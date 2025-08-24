@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from 'react-native'
 import { useRouter } from 'expo-router'
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
@@ -18,6 +18,11 @@ interface Props {
   dueDate: Date | null
   colorTheme: string
   progressPercentage: number
+  isOptionsOpen: boolean
+  onOpenOptions: (id: string) => void
+  onCloseOptions: () => void
+  deleteTask: (id: string) => void
+  style?: StyleProp<ViewStyle>
 }
 
 const DATE_FORMAT = 'MMM D'
@@ -27,6 +32,11 @@ enum TYPE_DATE {
   DUE = 'due'
 }
 
+enum TASK_OPTIONS {
+  EDIT = 'edit',
+  DELETE = 'delete'
+}
+
 export default memo(function TaskItem({
   id,
   title,
@@ -34,7 +44,12 @@ export default memo(function TaskItem({
   startDate,
   dueDate,
   progressPercentage,
-  colorTheme = Colors.primary
+  colorTheme = Colors.primary,
+  isOptionsOpen,
+  onOpenOptions,
+  onCloseOptions,
+  deleteTask,
+  style
 }: Props) {
   const LOCALE_DEFAULT = i18n.locale
 
@@ -71,11 +86,50 @@ export default memo(function TaskItem({
   const startLabel = useMemo(() => getDateLabel(startDate, TYPE_DATE.START), [startDate, getDateLabel])
   const dueLabel = useMemo(() => getDateLabel(dueDate, TYPE_DATE.DUE), [dueDate, getDateLabel])
 
+  const handleToggleOptions = useCallback(() => {
+    if (isOptionsOpen) {
+      onCloseOptions()
+    } else {
+      onOpenOptions(id)
+    }
+  }, [isOptionsOpen, onCloseOptions, onOpenOptions, id])
+
+  const handleNavigate = useCallback(() => {
+    onCloseOptions()
+    router.push(`/project/task/${id}`)
+  }, [router, id, onCloseOptions])
+
+  const taskOptions = useMemo(() => [
+    {
+      type: TASK_OPTIONS.EDIT,
+      label: i18n.t('projectDetails.taskOptions.edit'),
+      icon: <Icon.PenNewSquare size={16} color={Colors.primary} />
+    },
+    {
+      type: TASK_OPTIONS.DELETE,
+      label: i18n.t('projectDetails.taskOptions.delete'),
+      icon: <Icon.Trash size={16} color={Colors.error}/>
+    }
+  ], [])
+
+  const handleOptionPress = useCallback((option: TASK_OPTIONS) => {
+    onCloseOptions()
+
+    if (option === TASK_OPTIONS.EDIT) {
+      router.push(`/project/task/${id}/edit`)
+    }
+
+    if (option === TASK_OPTIONS.DELETE) {
+      deleteTask(id)
+    }
+
+  }, [router, id, onCloseOptions, deleteTask])
+
   return (
     <TouchableOpacity
-      onPress={() => router.push(`/project/task/${id}`)}
+      onPress={handleNavigate}
       activeOpacity={0.7}
-      style={styles.card}
+      style={[styles.card, style]}
     >
       <View style={styles.header}>
         <View style={{ maxWidth: '85%' }}>
@@ -94,12 +148,41 @@ export default memo(function TaskItem({
         </View>
 
         <TouchableOpacity
-          onPress={() => console.log('show options')}
+          onPress={handleToggleOptions}
           activeOpacity={0.7}
           style={styles.iconBtn}
         >
           <Icon.HorizontalDotMenu size={23} style={{ marginTop: 0.5, marginRight: 0.8 }}/>
         </TouchableOpacity>
+
+        {isOptionsOpen && (
+          <View style={styles.taskItemOption}>
+            {taskOptions.map((option, index) =>(
+              <TouchableOpacity
+                key={option.type}
+                activeOpacity={0.6}
+                style={[
+                  styles.optionItem,
+                  index !== taskOptions.length - 1 && styles.optionDivider
+                ]}
+                onPress={() => handleOptionPress(option.type)}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {option.icon}
+                  <Typo
+                    size={13}
+                    weight='500'
+                    color='primary'
+                    style={{ marginLeft: Sizes.spacing.s9 }}
+                  >
+                    {option.label}
+                  </Typo>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
       </View>
 
       <View style={{ marginTop: Sizes.spacing.s11, marginBottom: Sizes.spacing.s7 }}>
@@ -163,5 +246,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     backgroundColor: Colors.border + '40'
+  },
+  taskItemOption: {
+    zIndex: 10,
+    position: 'absolute',
+    right: 0,
+    top: 50,
+    backgroundColor: Colors.background,
+    borderRadius: Shapes.rounded.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.border,
+    minWidth: '55%'
+  },
+  optionItem: {
+    borderRadius: Shapes.rounded.md,
+    paddingVertical: Sizes.spacing.s11,
+    paddingHorizontal: Sizes.spacing.s11,
+    backgroundColor: Colors.background
+  },
+  optionDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border
   }
+
 })
