@@ -132,6 +132,11 @@ const en = {
     taskCard: {
       progress: 'Progress'
     },
+    taskOptions: {
+      edit: 'Edit',
+      markAsCompleted: 'Mark as completed',
+      delete: 'Delete'
+    },
     addTaskModal: {
       title: 'Create New Task',
       taskTitleLabel: 'Task Title',

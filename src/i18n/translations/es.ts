@@ -133,6 +133,11 @@ const es = {
     taskCard: {
       progress: 'Progreso'
     },
+    taskOptions: {
+      edit: 'Editar',
+      markAsCompleted: 'Marcar como completada',
+      delete: 'Eliminar'
+    },
     addTaskModal: {
       title: 'Crear nueva tarea',
       taskTitleLabel: 'Título de la tarea',
