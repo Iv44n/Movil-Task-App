@@ -74,8 +74,8 @@ export default function ProjectScreen() {
 
   const handleEdit = useCallback(() => {
     setShowOptions(false)
-    // TODO: Navigate to edit
-  }, [])
+    router.push(`(protected)/project/${projectId}/edit`)
+  }, [projectId, router])
 
   const handleDelete = useCallback(async() => {
     try {

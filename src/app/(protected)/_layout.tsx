@@ -20,7 +20,7 @@ export default function ProtectedLayout() {
         options={{ animation: 'fade' }}
       />
       <Stack.Screen
-        name='project/task/[taskId]'
+        name='project/task/[id]'
         options={{ animation: 'fade_from_bottom', presentation: 'modal' }}
       />
       <Stack.Screen

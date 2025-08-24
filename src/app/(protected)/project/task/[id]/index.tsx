@@ -82,7 +82,7 @@ const PriorityBadge = ({ priority }: { priority: Priority }) => {
 }
 
 export default function TaskScreen() {
-  const { taskId } = useLocalSearchParams() as { taskId?: string }
+  const { id: taskId } = useLocalSearchParams() as { id?: string }
   if (!taskId) throw new Error('Task ID is required')
 
   const db = useDatabase()
@@ -108,7 +108,11 @@ export default function TaskScreen() {
         <TouchableOpacity activeOpacity={0.7} style={styles.headerButton} onPress={router.back}>
           <Icon.ArrowLeft size={23} color={Colors.primary} />
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} style={styles.headerButton}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.headerButton}
+          onPress={() => router.push(`(protected)/project/task/${taskId}/edit`)}
+        >
           <Icon.PenNewSquare
             size={21}
             color={Colors.primary}
