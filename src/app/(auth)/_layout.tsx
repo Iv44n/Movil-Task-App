@@ -1,16 +1,12 @@
-import { useAuth } from '@/hooks/auth/useAuth'
+import { useAuth } from '@clerk/clerk-expo'
 import { Redirect, Stack } from 'expo-router'
-import * as Linking from 'expo-linking'
 
 export default function AuthLayout () {
-  const url = Linking.useLinkingURL()
-  const { session, createdSessionFromUrl } = useAuth()
+  const { isSignedIn } = useAuth()
 
-  if (session) {
+  if (isSignedIn) {
     return <Redirect href='(protected)' />
   }
-
-  if (url) createdSessionFromUrl(url)
 
   return (
     <Stack

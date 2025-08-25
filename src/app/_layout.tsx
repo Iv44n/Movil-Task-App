@@ -12,6 +12,10 @@ import { Typography } from '@/constants/theme'
 import { useFonts } from 'expo-font'
 import { useWelcomeDone } from '@/hooks/useWelcomeDone'
 import * as SplashScreen from 'expo-splash-screen'
+import { ClerkProvider } from '@clerk/clerk-expo'
+import { tokenCache } from '@clerk/clerk-expo/token-cache'
+import { resourceCache } from '@clerk/clerk-expo/resource-cache'
+import { config } from '@/lib/config'
 
 SplashScreen.setOptions({
   fade: true,
@@ -63,21 +67,27 @@ export default function Layout() {
 
   return (
     <LayoutBase onLayout={onLayoutRootView}>
-      <DatabaseProvider database={database}>
-        <AuthContextProvider>
-          <Stack
-            initialRouteName={initialRouteRef.current}
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: 'transparent' }
-            }}
-          >
-            <Stack.Screen name='welcome' options={{ animation: 'fade' }} />
-            <Stack.Screen name='(auth)' options={{ animation: 'fade' }} />
-            <Stack.Screen name='(protected)' options={{ animation: 'fade' }} />
-          </Stack>
-        </AuthContextProvider>
-      </DatabaseProvider>
+      <ClerkProvider
+        publishableKey={config.clerkPublishableKey}
+        tokenCache={tokenCache}
+        __experimental_resourceCache={resourceCache}
+      >
+        <DatabaseProvider database={database}>
+          <AuthContextProvider>
+            <Stack
+              initialRouteName={initialRouteRef.current}
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: 'transparent' }
+              }}
+            >
+              <Stack.Screen name='welcome' options={{ animation: 'fade' }} />
+              <Stack.Screen name='(auth)' options={{ animation: 'fade' }} />
+              <Stack.Screen name='(protected)' options={{ animation: 'fade' }} />
+            </Stack>
+          </AuthContextProvider>
+        </DatabaseProvider>
+      </ClerkProvider>
     </LayoutBase>
   )
 }

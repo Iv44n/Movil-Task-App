@@ -5,10 +5,10 @@ import ScreenWrapper from '@/components/ScreenWrapper'
 import ActionButton from '@/components/shared/ActionButton'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
-import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/auth/useAuth'
 import { useRouter } from 'expo-router'
 import i18n from '@/i18n'
+import { useClerk } from '@clerk/clerk-expo'
 
 type MenuItemProps = {
   id: string
@@ -53,15 +53,16 @@ const MenuItem = ({
 
 export default function Profile() {
   const { user } = useAuth()
+  const{ signOut } = useClerk()
   const router = useRouter()
 
   const handleSignOut = useCallback(async () => {
     try {
-      await supabase.auth.signOut()
+      await signOut()
     } catch (error) {
       console.error(error)
     }
-  }, [])
+  }, [signOut])
 
   const displayName = useMemo(() => {
     const first = user?.firstName || ''
