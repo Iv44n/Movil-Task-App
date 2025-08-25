@@ -9,8 +9,10 @@ import Icon from '@/components/icons/Icon'
 import * as WebBrowser from 'expo-web-browser'
 import i18n from '@/i18n'
 import ActionButton from '../shared/ActionButton'
+import { useSSO } from '@clerk/clerk-expo'
+import * as AuthSession from 'expo-auth-session'
 
-type SocialStrategy = 'google'
+type SocialStrategy = 'oauth_google'
 
 interface SocialProvider {
   key: SocialStrategy
@@ -19,18 +21,23 @@ interface SocialProvider {
 
 const providers: SocialProvider[] = [
   {
-    key: 'google',
+    key: 'oauth_google',
     Icon: Icon.Google
   }
 ]
 
 export const useWarmUpBrowser = () => {
   useEffect(() => {
-    // Preloads the browser for Android devices to reduce authentication load time
-    // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
-    void WebBrowser.warmUpAsync()
+    const warmUp = async () => {
+      try {
+        await WebBrowser.warmUpAsync()
+      } catch (e) {
+        console.warn('Failed to warm up browser', e)
+      }
+    }
+    warmUp()
+
     return () => {
-      // Cleanup: closes browser when component unmounts
       void WebBrowser.coolDownAsync()
     }
   }, [])
@@ -40,21 +47,28 @@ WebBrowser.maybeCompleteAuthSession()
 
 export default function SocialAuth() {
   useWarmUpBrowser()
+  const { startSSOFlow } = useSSO()
 
-  const onPress = useCallback(async(strategy: SocialStrategy) => {
-    console.log('onPress', strategy)
-  }, [])
+  const onPress = useCallback(async (strategy: SocialStrategy) => {
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({
+        strategy,
+        redirectUrl: AuthSession.makeRedirectUri({ path: '(protected)' })
+      })
+
+      if (createdSessionId) {
+        await setActive!({ session: createdSessionId })
+      }
+    } catch (error) {
+      console.error('SSO error', error)
+    }
+  }, [startSSOFlow])
 
   return (
     <View style={styles.container}>
       <View style={styles.dividerRow}>
         <View style={styles.dividerLine} />
-        <Typo
-          size={15}
-          weight='500'
-          color='secondary'
-          style={styles.dividerText}
-        >
+        <Typo size={15} weight='500' color='secondary' style={styles.dividerText}>
           {i18n.t('auth.dividerText')}
         </Typo>
         <View style={styles.dividerLine} />
