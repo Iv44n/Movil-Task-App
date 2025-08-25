@@ -98,9 +98,6 @@ const en = {
       in_progress: 'In Progress',
       task: 'Task',
       tasks: 'Tasks'
-    },
-    toDoList: {
-      title: 'To Do List'
     }
   },
   projectDetails: {

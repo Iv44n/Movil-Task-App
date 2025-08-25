@@ -98,9 +98,6 @@ const es = {
       in_progress: 'En Progreso',
       task: 'Tarea',
       tasks: 'Tareas'
-    },
-    toDoList: {
-      title: 'Lista de Tareas'
     }
   },
   projectDetails: {
