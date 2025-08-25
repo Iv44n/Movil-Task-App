@@ -43,6 +43,16 @@ const en = {
       },
       promptText: 'Already have an account?',
       actionText: 'Sign In'
+    },
+    verifyEmail: {
+      title: 'Verify Email',
+      subtitle: 'Please enter the verification code sent to %{emailAddress}',
+      verificationFailed: 'Verification Failed',
+      anErrorOccurred: 'An error occurred',
+      incompleteCode: 'Incomplete code',
+      pleaseEnterFullCode: 'Please enter the full verification code.',
+      verifying: 'Verifying...',
+      verify: 'Verify'
     }
   },
   home: {

@@ -43,6 +43,16 @@ const es = {
       },
       promptText: '¿Ya tienes una cuenta?',
       actionText: 'Iniciar sesión'
+    },
+    verifyEmail: {
+      title: 'Verificar correo electrónico',
+      subtitle: 'Por favor, introduce el código de verificación enviado a %{emailAddress}',
+      verificationFailed: 'La verificación ha fallado',
+      anErrorOccurred: 'Ha ocurrido un error',
+      incompleteCode: 'Código incompleto',
+      pleaseEnterFullCode: 'Por favor, introduce el código de verificación completo.',
+      verifying: 'Verificando...',
+      verify: 'Verificar'
     }
   },
   home: {
