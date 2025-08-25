@@ -55,7 +55,7 @@ const ProjectsSlider = memo<ProjectsSliderProps>(function ProjectsSlider({ setSh
   const [projects, setProjects] = useState<Project[]>([])
 
   useEffect(() => {
-    const columns = ['progress_percentage', 'name', 'category_id']
+    const columns = ['progress_percentage', 'name', 'category_id', 'color']
 
     const subscription = db.collections
       .get<Project>(TABLE_NAMES.PROJECTS)

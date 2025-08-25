@@ -6,6 +6,15 @@ import User from './User'
 import Subtask from './Subtask'
 import { Priority, StatusTask } from '@/constants/constants'
 
+interface UpdateTaskParams {
+  title?: string
+  status?: StatusTask
+  priority?: Priority
+  startDate?: Date | null
+  dueDate?: Date | null
+  progressPercentage?: number
+}
+
 export default class Task extends Model {
   static table = 'tasks'
 
@@ -30,6 +39,17 @@ export default class Task extends Model {
   @immutableRelation(TABLE_NAMES.USERS, 'user_id') user!: Relation<User>
   @immutableRelation(TABLE_NAMES.PROJECTS, 'project_id') project!: Relation<Project>
   @children(TABLE_NAMES.SUBTASKS) subtasks!: Query<Subtask>
+
+  @writer async updateTask(updates: UpdateTaskParams) {
+    return await this.update(p => {
+      if (updates.title !== undefined) p.title = updates.title
+      if (updates.status !== undefined) p.status = updates.status
+      if (updates.priority !== undefined) p.priority = updates.priority
+      if (updates.startDate !== undefined) p.startDate = updates.startDate
+      if (updates.dueDate !== undefined) p.dueDate = updates.dueDate
+      if (updates.progressPercentage !== undefined) p.progressPercentage = updates.progressPercentage
+    })
+  }
 
   @writer async setStatus(newStatus: StatusTask) {
     if (this.status === newStatus) return this
