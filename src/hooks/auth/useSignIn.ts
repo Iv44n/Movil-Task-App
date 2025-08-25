@@ -1,10 +1,10 @@
-import { supabase } from '@/lib/supabase'
-import { AuthError } from '@supabase/supabase-js'
 import { useCallback, useState } from 'react'
+import { useSignIn as ClerkSignIn, isClerkAPIResponseError } from '@clerk/clerk-expo'
 
 type Error =  { message: string; code?: string } | null
 
 export default function useSignIn() {
+  const { isLoaded, signIn: clerkSignIn, setActive } = ClerkSignIn()
   const [signInLoading, setSignInLoading] = useState(false)
   const [signInError, setSignInError] = useState<Error>(null)
 
@@ -13,25 +13,25 @@ export default function useSignIn() {
     setSignInError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: identifier,
-        password
-      })
+      if (!isLoaded) return
 
-      if (error) {
-        throw error
+      const signInAttempt = await clerkSignIn.create({ identifier, password })
+
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId })
+      } else {
+        console.error(JSON.stringify(signInAttempt, null, 2))
       }
-
-      return { data, error: null }
     } catch (err: any) {
-      const message = err instanceof AuthError ? err.message : 'Error desconocido'
-      const code = err instanceof AuthError ? err.code : undefined
+      const isClerkError = isClerkAPIResponseError(err)
+      const message = isClerkError ? err.errors[0].message : 'Error desconocido'
+      const code = isClerkError ? err.errors[0].code : undefined
+
       setSignInError({ message, code })
-      return { data: null, error: err }
     } finally {
       setSignInLoading(false)
     }
-  }, [])
+  }, [clerkSignIn, isLoaded, setActive])
 
   return {
     signInLoading,

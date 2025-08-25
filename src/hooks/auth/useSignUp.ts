@@ -1,7 +1,5 @@
-import { supabase } from '@/lib/supabase'
-import { AuthError } from '@supabase/supabase-js'
 import { useCallback, useState } from 'react'
-import { makeRedirectUri } from 'expo-auth-session'
+import { useSignUp as ClerkSignUp, isClerkAPIResponseError } from '@clerk/clerk-expo'
 
 type Error =  { message: string; code?: string } | null
 
@@ -12,11 +10,12 @@ interface SignUpCreateParams {
   emailAddress: string
 }
 
-const redirectUri = makeRedirectUri()
-
 export default function useSignUp() {
+  const { isLoaded, signUp: clerkSignUp, setActive } = ClerkSignUp()
+
   const [signUpLoading, setSignUpLoading] = useState(false)
   const [signUpError, setSignUpError] = useState<Error>(null)
+  const [pendingVerification, setPendingVerification] = useState(false)
 
   const signUp = useCallback(
     async ({ firstName, lastName, password, emailAddress }: SignUpCreateParams) => {
@@ -24,45 +23,61 @@ export default function useSignUp() {
       setSignUpError(null)
 
       try {
-        const { data, error } = await supabase.auth.signUp({
-          email: emailAddress,
+        if (!isLoaded) return
+
+        await clerkSignUp.create({
+          emailAddress,
           password,
-          options: {
-            data: { firstName, lastName },
-            emailRedirectTo: redirectUri
-          }
+          firstName,
+          lastName
         })
 
-        if (error) {
-          throw error
-        }
-
-        if (
-          data.user?.identities &&
-          data.user.identities.length === 0 &&
-          data.user.user_metadata.email_verified === undefined
-        ) {
-          throw new AuthError('Email already registered or pending verification')
-        }
-
-        return { user: data.user, session: data.session, error: null }
-
+        await clerkSignUp.prepareEmailAddressVerification({ strategy: 'email_code' })
+        setPendingVerification(true)
       } catch (err: any) {
-        const message = err instanceof AuthError ? err.message : 'Error desconocido'
-        const code = err instanceof AuthError ? err.code : undefined
+        const isClerkError = isClerkAPIResponseError(err)
+        const message = isClerkError ? err.errors[0].message : 'Error desconocido'
+        const code = isClerkError ? err.errors[0].code : undefined
 
         setSignUpError({ message, code })
-        return { user: null, session: null, error: { message, code } }
       } finally {
         setSignUpLoading(false)
       }
-    },
-    []
-  )
+    }, [clerkSignUp, isLoaded])
+
+  const onVerify = useCallback(async (code: string) => {
+    setSignUpLoading(true)
+    setSignUpError(null)
+
+    try {
+      if (!isLoaded) return
+
+      const signUpAttempt = await clerkSignUp.attemptEmailAddressVerification({
+        code
+      })
+
+      if (signUpAttempt.status === 'complete') {
+        await setActive({ session: signUpAttempt.createdSessionId })
+        setPendingVerification(false)
+      } else {
+
+      }
+    } catch (err: any) {
+      const isClerkError = isClerkAPIResponseError(err)
+      const message = isClerkError ? err.errors[0].message : 'Error desconocido'
+      const code = isClerkError ? err.errors[0].code : undefined
+
+      setSignUpError({ message, code })
+    } finally {
+      setSignUpLoading(false)
+    }
+  }, [clerkSignUp, isLoaded, setActive])
 
   return {
     signUpLoading,
     signUpError,
-    signUp
+    pendingVerification,
+    signUp,
+    onVerify
   }
 }
