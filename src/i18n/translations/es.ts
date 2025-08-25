@@ -130,6 +130,18 @@ const es = {
       edit: 'Editar Proyecto',
       delete: 'Eliminar Proyecto'
     },
+    editProject: {
+      title: 'Editar Proyecto',
+      actions: {
+        update: 'Actualizar Proyecto'
+      }
+    },
+    editTask: {
+      title: 'Editar Tarea',
+      actions: {
+        update: 'Actualizar Tarea'
+      }
+    },
     taskCard: {
       progress: 'Progreso'
     },
@@ -175,6 +187,10 @@ const es = {
       overdue: 'Terminó el %{date}',
       due: 'Termina el %{date}'
     }
+  },
+  errors: {
+    title: 'Error',
+    updateTaskFailed: 'Error al actualizar la tarea'
   },
   profile: {
     header: 'Perfil',

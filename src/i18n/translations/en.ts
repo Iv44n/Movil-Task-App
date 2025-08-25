@@ -129,6 +129,18 @@ const en = {
       edit: 'Edit Project',
       delete: 'Delete Project'
     },
+    editProject: {
+      title: 'Edit Project',
+      actions: {
+        update: 'Update Project'
+      }
+    },
+    editTask: {
+      title: 'Edit Task',
+      actions: {
+        update: 'Update Task'
+      }
+    },
     taskCard: {
       progress: 'Progress'
     },
@@ -174,6 +186,10 @@ const en = {
       overdue: 'Ended %{date}',
       due: 'Due %{date}'
     }
+  },
+  errors: {
+    title: 'Error',
+    updateTaskFailed: 'Failed to update task'
   },
   profile: {
     header: 'Profile',
