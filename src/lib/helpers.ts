@@ -1,14 +1,19 @@
-import { AuthSession } from '@supabase/supabase-js'
 import { database } from './watermelon'
 import { User } from '@/models'
 import { TABLE_NAMES } from './schema'
 import { Q } from '@nozbe/watermelondb'
 
-async function upsertUserFromSession(session: AuthSession | null) {
-  if (!session?.user) return
-  const { user_metadata, ...user } = session.user
+interface UserData {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+}
 
-  const isMetadataValid = user_metadata?.firstName as string | undefined && user_metadata?.lastName as string | undefined
+async function upsertUserFromSession(user: UserData | null) {
+  if (!user) return
+
+  const isMetadataValid = user.firstName.trim() !== '' && user.lastName.trim() !== ''
   if (!isMetadataValid || !user.email) return
 
   const { email } = user
@@ -21,15 +26,15 @@ async function upsertUserFromSession(session: AuthSession | null) {
 
       if (existing) {
         await existing.update(u => {
-          u.firstName = user_metadata.firstName
-          u.lastName = user_metadata.lastName
+          u.firstName = user.firstName
+          u.lastName = user.lastName
           u.email = email
         })
       } else {
         await userCollection.create(u => {
           u._raw.id = user.id
-          u.firstName = user_metadata.firstName
-          u.lastName = user_metadata.lastName
+          u.firstName = user.firstName
+          u.lastName = user.lastName
           u.email = email
         })
       }
