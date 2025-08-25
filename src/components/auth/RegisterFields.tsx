@@ -13,11 +13,12 @@ import ActionButton from '@/components/shared/ActionButton'
 import AuthPrompt from './AuthPrompt'
 import Icon from '@/components/icons/Icon'
 import i18n from '@/i18n'
+import VerifyEmailForm from './VerifyEmailForm'
 
 interface FormData {
   firstName: string
   lastName: string
-  emailAddress: string
+  email: string
   password: string
 }
 
@@ -30,15 +31,15 @@ const PASSWORD_RULES = {
 export default function UserRegister() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
-  const { signUp, signUpLoading, signUpError } = useSignUp()
+  const { signUp, signUpLoading, signUpError, pendingVerification } = useSignUp()
 
-  const { control, handleSubmit, formState: { errors }, clearErrors } = useForm<FormData>({
+  const { control, handleSubmit, formState: { errors }, clearErrors, getValues } = useForm<FormData>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     defaultValues: {
       firstName: '',
       lastName: '',
-      emailAddress: '',
+      email: '',
       password: ''
     }
   })
@@ -51,23 +52,10 @@ export default function UserRegister() {
     const dataTrimmed = {
       firstName: data.firstName.trim(),
       lastName: data.lastName.trim(),
-      emailAddress: data.emailAddress.trim(),
+      emailAddress: data.email.trim(),
       password: data.password.trim()
     }
-    const result = await signUp(dataTrimmed)
-
-    if(!result) return
-
-    if(result.user?.identities?.[0].identity_data?.email_verified === false) {
-      Alert.alert(
-        'Check your email',
-        `We have sent a verification email to ${dataTrimmed.emailAddress}`,
-        [
-          { text: 'ok', style: 'cancel' }
-        ],
-        { userInterfaceStyle: 'dark' }
-      )
-    }
+    await signUp(dataTrimmed)
   }, [signUp])
 
   useEffect(() => {
@@ -83,6 +71,22 @@ export default function UserRegister() {
       )
     }
   }, [signUpError])
+
+  if (pendingVerification) {
+    return (
+      <View
+        style={{
+          minWidth: '110%',
+          minHeight: '110%',
+          flex: 1,
+          zIndex: 100,
+          position: 'absolute'
+        }}
+      >
+        <VerifyEmailForm emailAddress={getValues('email')} />
+      </View>
+    )
+  }
 
   return (
     <>
@@ -131,19 +135,19 @@ export default function UserRegister() {
         </View>
 
         <Controller
-          name='emailAddress'
+          name='email'
           control={control}
           rules={{ required: 'Email address is required' }}
           render={({ field: { onChange, value } }) => (
             <FormField
               autoCapitalize='none'
-              error={errors.emailAddress?.message}
+              error={errors.email?.message}
               placeholder={i18n.t('auth.register.form.emailAddress')}
               inputMode='email'
               value={value}
               onChangeText={(value) => {
                 onChange(value)
-                clearErrors('emailAddress')
+                clearErrors('email')
               }}
             />
           )}
@@ -177,6 +181,7 @@ export default function UserRegister() {
         <ActionButton
           onPress={handleSubmit(onSubmit)}
           style={{ marginTop: Sizes.spacing.s15 }}
+          disabled={signUpLoading}
         >
           {signUpLoading
             ? i18n.t('auth.register.actions.signUpLoading')

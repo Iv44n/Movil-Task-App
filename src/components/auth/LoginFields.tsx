@@ -17,7 +17,7 @@ import Icon from '../icons/Icon'
 import i18n from '@/i18n'
 
 interface FormData {
-  username: string
+  email: string
   password: string
 }
 
@@ -27,18 +27,17 @@ export default function LoginFields() {
   const { signIn, signInLoading, signInError } = useSignIn()
 
   const { control, handleSubmit, formState: { errors }, clearErrors } = useForm<FormData>({
-    defaultValues: { username: '', password: '' },
+    defaultValues: { email: '', password: '' },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit'
   })
 
-  const onSubmit = useCallback(async ({ username, password }: FormData) => {
-    await signIn(username.trim(), password.trim())
+  const onSubmit = useCallback(async ({ email, password }: FormData) => {
+    await signIn(email.trim(), password.trim())
   }, [signIn])
 
   useEffect(() => {
     if (signInError) {
-      // TODO: Improve error alert UI/UX
       Alert.alert(
         'Login Failed',
         signInError.message,
@@ -54,18 +53,19 @@ export default function LoginFields() {
     <>
       <KeyboardAvoidingView>
         <Controller
-          name='username'
+          name='email'
           control={control}
-          rules={{ required: 'Username is required' }}
+          rules={{ required: 'Email address is required' }}
           render={({ field: { onChange, value } }) => (
             <FormField
               autoCapitalize='none'
-              error={errors.username?.message}
+              error={errors.email?.message}
               placeholder={i18n.t('auth.login.form.emailAddress')}
               value={value}
+              inputMode='email'
               onChangeText={(value) => {
                 onChange(value)
-                clearErrors('username')
+                clearErrors('email')
               }}
             />
           )}
