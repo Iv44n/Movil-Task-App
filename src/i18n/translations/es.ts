@@ -1,4 +1,7 @@
 const es = {
+  common: {
+    ok: 'Aceptar'
+  },
   priorityOptions: {
     low: 'Baja',
     medium: 'Media',
@@ -15,10 +18,17 @@ const es = {
     login: {
       title: 'Bienvenido de vuelta',
       subtitle: 'Hoy es un nuevo día. Es tu día. Tú lo moldeas. Inicia sesión para empezar a gestionar tus proyectos.',
+      loginFailed: 'Error al iniciar sesión',
+      errors: {
+        invalidCredentials: 'El correo electrónico o la contraseña no son válidos',
+        userNotFound: 'Usuario no encontrado'
+      },
       form: {
         emailAddress: 'Correo Electrónico',
         password: 'Contraseña',
-        forgotPassword: '¿Olvidaste tu contraseña?'
+        forgotPassword: '¿Olvidaste tu contraseña?',
+        emailRequired: 'El correo electrónico es obligatorio',
+        passwordRequired: 'La contraseña es obligatoria'
       },
       actions: {
         signInLoading: 'Cargando...',
@@ -31,11 +41,22 @@ const es = {
     register: {
       title: 'Registrarse',
       subtitle: 'Comienza a construir tus propios proyectos. Regístrate para continuar.',
+      registerFailed: 'Error al registrarse',
+      errors: {
+        emailExists: 'El correo electrónico ya existe',
+        passwordTooWeak: 'La contraseña es demasiado débil',
+        passwordTooShort: 'La contraseña es demasiado corta'
+      },
       form: {
         firstName: 'Nombre',
         lastName: 'Apellido',
         emailAddress: 'Correo Electrónico',
-        password: 'Elige una contraseña segura'
+        password: 'Elige una contraseña segura',
+        firstNameRequired: 'El nombre es obligatorio',
+        lastNameRequired: 'El apellido es obligatorio',
+        emailRequired: 'El correo electrónico es obligatorio',
+        passwordRequired: 'La contraseña es obligatoria',
+        passwordMinLength: 'La contraseña debe tener al menos 6 caracteres'
       },
       actions: {
         signUpLoading: 'Cargando...',

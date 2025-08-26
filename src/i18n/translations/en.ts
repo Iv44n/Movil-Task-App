@@ -1,4 +1,7 @@
 const en = {
+  common: {
+    ok: 'OK'
+  },
   priorityOptions: {
     low: 'Low',
     medium: 'Medium',
@@ -15,13 +18,20 @@ const en = {
     login: {
       title: 'Welcome back',
       subtitle: 'Today is a new day. It\'s your day. You shape it. Sign in to start managing your projects.',
+      loginFailed: 'Login Failed',
+      errors: {
+        invalidCredentials: 'Email or password is invalid',
+        userNotFound: 'User not found'
+      },
       form: {
         emailAddress: 'Email Address',
         password: 'Password',
-        forgotPassword: 'Forgot Password?'
+        forgotPassword: 'Forgot Password?',
+        emailRequired: 'Email address is required',
+        passwordRequired: 'Password is required'
       },
       actions: {
-        signInLoading: 'Loading...',
+        signInLoading: 'Loading...', 
         signIn: 'Sign In'
       },
       promptText: 'Don\'t have an account?',
@@ -31,11 +41,22 @@ const en = {
     register: {
       title: 'Create an account',
       subtitle: 'Start building your own projects. Sign up to continue.',
+      registerFailed: 'Register Failed',
+      errors: {
+        emailExists: 'Email already exists',
+        passwordTooWeak: 'Password is too weak',
+        passwordTooShort: 'Password is too short'
+      },
       form: {
         firstName: 'First Name',
         lastName: 'Last Name',
         emailAddress: 'Email Address',
-        password: 'Choose a secure password'
+        password: 'Choose a secure password',
+        firstNameRequired: 'First name is required',
+        lastNameRequired: 'Last name is required',
+        emailRequired: 'Email address is required',
+        passwordRequired: 'Password is required',
+        passwordMinLength: 'Password must be at least 6 characters long'
       },
       actions: {
         signUpLoading: 'Loading...',
@@ -51,7 +72,7 @@ const en = {
       anErrorOccurred: 'An error occurred',
       incompleteCode: 'Incomplete code',
       pleaseEnterFullCode: 'Please enter the full verification code.',
-      verifying: 'Verifying...',
+      verifying: 'Verifying...', 
       verify: 'Verify'
     }
   },
