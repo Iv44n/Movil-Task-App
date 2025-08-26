@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "kron",
-    "slug": "kron",
+    "name": "Provement",
+    "slug": "provement",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "scheme": "kron",
+    "scheme": "provement",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/icon.png",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.app.kron"
+      "bundleIdentifier": "com.app.provement"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +23,7 @@
         "backgroundColor": "#181818"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.app.kron"
+      "package": "com.app.provement"
     },
     "plugins": [
       "expo-router",
@@ -32,9 +32,9 @@
       "expo-web-browser",
       "expo-localization",
       [
-        "expo-splash-screen", 
+        "expo-splash-screen",
         {
-         "backgroundColor": "#181818",
+          "backgroundColor": "#181818",
           "image": "./assets/icon.png",
           "dark": {
             "image": "./assets/icon.png",
@@ -47,9 +47,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "089cf7eb-58aa-4ff8-862b-75fb2235c5e9"
+        "projectId": "18dfbec8-6d81-408d-9361-e9e6d5f6fa8b"
       }
     },
-    "owner": "ivan.ia"
+    "owner": "iv4n.dev"
   }
 }
