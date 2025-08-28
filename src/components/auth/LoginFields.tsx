@@ -21,6 +21,12 @@ interface FormData {
   password: string
 }
 
+enum ErrorCodes {
+  STRATEGY_FOR_USER_INVALID = 'strategy_for_user_invalid',
+  FORM_IDENTIFIER_NOT_FOUND = 'form_identifier_not_found',
+  FORM_PASSWORD_INCORRECT = 'form_password_incorrect'
+}
+
 export default function LoginFields() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
@@ -38,11 +44,30 @@ export default function LoginFields() {
 
   useEffect(() => {
     if (signInError) {
+      let message = ''
+      switch (signInError.code) {
+        case ErrorCodes.STRATEGY_FOR_USER_INVALID:
+          message = i18n.t('auth.login.errors.invalidCredentials')
+          break
+
+        case ErrorCodes.FORM_IDENTIFIER_NOT_FOUND:
+          message = i18n.t('auth.login.errors.userNotFound')
+          break
+
+        case ErrorCodes.FORM_PASSWORD_INCORRECT:
+          message = i18n.t('auth.login.errors.invalidCredentials')
+          break
+
+        default:
+          message = signInError.message
+          break
+      }
+
       Alert.alert(
-        'Login Failed',
-        signInError.message,
+        i18n.t('auth.login.loginFailed'),
+        message,
         [
-          { text: 'ok', style: 'cancel' }
+          { text: i18n.t('common.ok'), style: 'cancel' }
         ],
         { userInterfaceStyle: 'dark' }
       )
@@ -55,7 +80,7 @@ export default function LoginFields() {
         <Controller
           name='email'
           control={control}
-          rules={{ required: 'Email address is required' }}
+          rules={{ required: i18n.t('auth.login.form.emailRequired') }}
           render={({ field: { onChange, value } }) => (
             <FormField
               autoCapitalize='none'
@@ -75,7 +100,7 @@ export default function LoginFields() {
           <Controller
             name='password'
             control={control}
-            rules={{ required: 'Password is required' }}
+            rules={{ required: i18n.t('auth.login.form.passwordRequired') }}
             render={({ field: { onChange, value } }) => (
               <FormField
                 autoCapitalize='none'

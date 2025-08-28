@@ -22,10 +22,10 @@ interface FormData {
   password: string
 }
 
-const PASSWORD_RULES = {
-  required: 'Password is required',
-  minLength: { value: 6, message: 'Password must be at least 6 characters long' },
-  maxLength: { value: 20, message: 'Password must be at most 20 characters long' }
+enum ErrorCodes {
+  FORM_IDENTIFIER_EXISTS = 'form_identifier_exists',
+  FORM_PASSWORD_PWNED = 'form_password_pwned',
+  FORM_PASSWORD_LENGTH_TOO_SHORT = 'form_password_length_too_short'
 }
 
 export default function UserRegister() {
@@ -60,12 +60,31 @@ export default function UserRegister() {
 
   useEffect(() => {
     if (signUpError) {
+      let message = ''
+      switch (signUpError.code) {
+        case ErrorCodes.FORM_IDENTIFIER_EXISTS:
+          message = i18n.t('auth.register.errors.emailExists')
+          break
+
+        case ErrorCodes.FORM_PASSWORD_PWNED:
+          message = i18n.t('auth.register.errors.passwordTooWeak')
+          break
+
+        case ErrorCodes.FORM_PASSWORD_LENGTH_TOO_SHORT:
+          message = i18n.t('auth.register.errors.passwordTooShort')
+          break
+
+        default:
+          message = signUpError.message
+          break
+      }
+
       // TODO: Improve error alert UI/UX
       Alert.alert(
-        'Register Failed',
-        signUpError.message,
+        i18n.t('auth.register.registerFailed'),
+        message,
         [
-          { text: 'ok', style: 'cancel' }
+          { text: i18n.t('common.ok'), style: 'cancel' }
         ],
         { userInterfaceStyle: 'dark' }
       )
@@ -100,7 +119,7 @@ export default function UserRegister() {
           <Controller
             name='firstName'
             control={control}
-            rules={{ required: 'First name is required' }}
+            rules={{ required: i18n.t('auth.register.form.firstNameRequired') }}
             render={({ field: { onChange, value } }) => (
               <FormField
                 error={errors.firstName?.message}
@@ -118,7 +137,7 @@ export default function UserRegister() {
           <Controller
             name='lastName'
             control={control}
-            rules={{ required: 'Last name is required' }}
+            rules={{ required: i18n.t('auth.register.form.lastNameRequired') }}
             render={({ field: { onChange, value } }) => (
               <FormField
                 error={errors.lastName?.message}
@@ -137,7 +156,7 @@ export default function UserRegister() {
         <Controller
           name='email'
           control={control}
-          rules={{ required: 'Email address is required' }}
+          rules={{ required: i18n.t('auth.register.form.emailRequired') }}
           render={({ field: { onChange, value } }) => (
             <FormField
               autoCapitalize='none'
@@ -156,7 +175,10 @@ export default function UserRegister() {
         <Controller
           name='password'
           control={control}
-          rules={PASSWORD_RULES}
+          rules={ {
+            required: i18n.t('auth.register.form.passwordRequired'),
+            minLength: { value: 6, message: i18n.t('auth.register.form.passwordMinLength') }
+          }}
           render={({ field: { onChange, value } }) => (
             <FormField
               autoCapitalize='none'

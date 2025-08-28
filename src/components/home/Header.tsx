@@ -1,6 +1,6 @@
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useAuth } from '@/hooks/auth/useAuth'
 import i18n from '@/i18n'
 import { useCallback, useEffect, useState } from 'react'
@@ -72,11 +72,18 @@ export default function Header({ userName }: { userName: string }) {
         onPress={() => router.push('/profile')}
         style={styles.avatarContainer}
       >
-        <View style={styles.avatarInner}>
-          <Typo color='secondary' weight='700'>
-            {getInitials(user?.firstName, user?.lastName)}
-          </Typo>
-        </View>
+        {user?.profileImageUrl ? (
+          <Image
+            source={{ uri: user.profileImageUrl }}
+            style={styles.avatarImage}
+          />
+        ) : (
+          <View style={styles.avatarInner}>
+            <Typo color='secondary' weight='700'>
+              {getInitials(user?.firstName, user?.lastName)}
+            </Typo>
+          </View>
+        )}
       </TouchableOpacity>
     </View>
   )
@@ -96,5 +103,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderWidth: 1,
     borderColor: Colors.secondary
+  },
+  avatarImage: {
+    width: Sizes.width.w41,
+    height: Sizes.height.h41 + 1,
+    borderRadius: Shapes.rounded.circle
   }
 })
