@@ -114,8 +114,8 @@ export default function Profile() {
 
   const userInfo = useMemo(() => (
     <View style={styles.userContainer}>
-      {user?.profileImageLocalPath ? (
-        <Image source={{ uri: user.profileImageLocalPath }} style={styles.avatarImage} />
+      {user?.profileImageUrl ? (
+        <Image source={{ uri: user.profileImageUrl }} style={styles.avatarImage} />
       ) : (
         <View style={styles.avatarDefault}>
           <Icon.User color={Colors.primary} />
@@ -129,7 +129,7 @@ export default function Profile() {
         </Typo>
       </View>
     </View>
-  ), [user?.profileImageLocalPath, displayName, displayEmail])
+  ), [user?.profileImageUrl, displayName, displayEmail])
 
   return (
     <ScreenWrapper style={styles.screen}>
