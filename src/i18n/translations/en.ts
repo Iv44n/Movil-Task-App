@@ -31,7 +31,7 @@ const en = {
         passwordRequired: 'Password is required'
       },
       actions: {
-        signInLoading: 'Loading...', 
+        signInLoading: 'Loading...',
         signIn: 'Sign In'
       },
       promptText: 'Don\'t have an account?',
@@ -72,8 +72,28 @@ const en = {
       anErrorOccurred: 'An error occurred',
       incompleteCode: 'Incomplete code',
       pleaseEnterFullCode: 'Please enter the full verification code.',
-      verifying: 'Verifying...', 
+      verifying: 'Verifying...',
       verify: 'Verify'
+    },
+    forgotPassword: {
+      title: 'Forgot Password?',
+      subtitle: 'Enter your email address to receive a password reset code.',
+      emailSent: 'Password reset code sent',
+      form: {
+        emailAddress: 'Email Address',
+        password: 'New Password',
+        code: 'Reset Code',
+        emailRequired: 'Email address is required',
+        passwordRequired: 'Password is required',
+        codeRequired: 'Reset code is required'
+      },
+      actions: {
+        sendCode: 'Send Code',
+        resetting: 'Resetting...',
+        reset: 'Reset Password'
+      },
+      promptText: 'Remembered your password?',
+      actionText: 'Sign In'
     }
   },
   home: {

@@ -8,6 +8,7 @@ interface UserData {
   email: string
   firstName: string
   lastName: string
+  profileImageUrl?: string
 }
 
 async function upsertUserFromSession(user: UserData | null) {
@@ -29,6 +30,7 @@ async function upsertUserFromSession(user: UserData | null) {
           u.firstName = user.firstName
           u.lastName = user.lastName
           u.email = email
+          u.profileImageUrl = user.profileImageUrl || null
         })
       } else {
         await userCollection.create(u => {
@@ -36,6 +38,7 @@ async function upsertUserFromSession(user: UserData | null) {
           u.firstName = user.firstName
           u.lastName = user.lastName
           u.email = email
+          u.profileImageUrl = user.profileImageUrl || null
         })
       }
     } catch (error) {

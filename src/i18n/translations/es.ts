@@ -74,6 +74,26 @@ const es = {
       pleaseEnterFullCode: 'Por favor, introduce el código de verificación completo.',
       verifying: 'Verificando...',
       verify: 'Verificar'
+    },
+    forgotPassword: {
+      title: '¿Olvidaste tu contraseña?',
+      subtitle: 'Ingresa tu correo electrónico para recibir un código de restablecimiento.',
+      emailSent: 'Código de restablecimiento de contraseña enviado',
+      form: {
+        emailAddress: 'Correo Electrónico',
+        password: 'Nueva Contraseña',
+        code: 'Código de Restablecimiento',
+        emailRequired: 'El correo electrónico es obligatorio',
+        passwordRequired: 'La contraseña es obligatoria',
+        codeRequired: 'El código de restablecimiento es obligatorio'
+      },
+      actions: {
+        sendCode: 'Enviar Código',
+        resetting: 'Restableciendo...',
+        reset: 'Restablecer Contraseña'
+      },
+      promptText: '¿Recordaste tu contraseña?',
+      actionText: 'Iniciar Sesión'
     }
   },
   home: {
