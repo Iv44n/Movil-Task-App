@@ -9,9 +9,10 @@ type AuthLayoutProps = {
   title: string
   subtitle: string
   children: React.ReactNode
+  showSocialAuth?: boolean
 }
 
-export default function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
+export default function AuthLayout({ title, subtitle, children, showSocialAuth = true }: AuthLayoutProps) {
   return (
     <ScreenWrapper style={{ justifyContent: 'center', paddingHorizontal: Sizes.spacing.s15 }}>
       <View style={{ marginBottom: Sizes.spacing.s33 }}>
@@ -21,7 +22,7 @@ export default function AuthLayout({ title, subtitle, children }: AuthLayoutProp
         </Typo>
       </View>
       {children}
-      <SocialAuth />
+      {showSocialAuth && <SocialAuth />}
     </ScreenWrapper>
   )
 }
