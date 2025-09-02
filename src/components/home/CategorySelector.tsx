@@ -8,9 +8,9 @@ import { Colors, Sizes } from '@/constants/theme'
 import i18n from '@/i18n'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { Category } from '@/models'
-import { useAuth } from '@/hooks/auth/useAuth'
 import { TABLE_NAMES } from '@/lib/schema'
 import { Q } from '@nozbe/watermelondb'
+import useUser from '@/hooks/auth/useUser'
 
 interface CategorySelectorProps {
   onSelect: (categoryId: string | null) => void
@@ -24,7 +24,7 @@ const CategorySelector = memo<CategorySelectorProps>(({
   selectedCategoryId
 }) => {
   const db = useDatabase()
-  const { user } = useAuth()
+  const { user } = useUser()
   const [categories, setCategories] = useState<Category[]>([])
   const [showAddModal, setShowAddModal] = useState(false)
 

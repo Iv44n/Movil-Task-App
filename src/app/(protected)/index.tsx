@@ -3,14 +3,14 @@ import { Sizes } from '@/constants/theme'
 import Typo from '@/components/shared/Typo'
 import ProjectsSlider from '@/components/home/ProjectsSlider'
 import ProgressInfo from '@/components/home/ProgressInfo'
-import { useAuth } from '@/hooks/auth/useAuth'
 import { useState } from 'react'
 import { View } from 'react-native'
 import Header from '@/components/home/Header'
 import AddProjectModal from '@/components/home/AddProjectModal'
+import useUser from '@/hooks/auth/useUser'
 
 export default function Index() {
-  const { user } = useAuth()
+  const { user } = useUser()
   const [showAddProjectModal, setShowAddProjectModal] = useState(false)
 
   return (

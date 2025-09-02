@@ -15,8 +15,8 @@ import i18n from '@/i18n'
 import { Project, Task } from '@/models'
 import { formatProjectName } from '@/utils/utils'
 import { Alert } from 'react-native'
-import { useAuth } from '@/hooks/auth/useAuth'
 import TaskList from '@/components/projectDetails/TaskList'
+import useUser from '@/hooks/auth/useUser'
 
 type Status = StatusTask | 'all'
 
@@ -29,7 +29,7 @@ type FormData = {
 
 export default function ProjectScreen() {
   const { projectId } = useLocalSearchParams() as { projectId?: string }
-  const { user } = useAuth()
+  const { user } = useUser()
   const userId = user?.id
 
   if (!projectId || !userId) throw new Error('Project ID or User ID is required')

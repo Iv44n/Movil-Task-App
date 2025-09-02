@@ -5,13 +5,13 @@ import {
 import { Colors } from '@/constants/theme'
 import { useCallback } from 'react'
 import { useRouter } from 'expo-router'
-import { useAuth } from '@/hooks/auth/useAuth'
 import i18n from '@/i18n'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { Project } from '@/models'
 import { TABLE_NAMES } from '@/lib/schema'
 import FormModal from '../shared/FormModal'
 import ProjectFormFields from './ProjectFormFields'
+import useUser from '@/hooks/auth/useUser'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -39,7 +39,7 @@ const PROJECT_COLORS = [
 const AddProjectModal = ({ visible, onClose }: AddProjectModalProps) => {
   const router = useRouter()
   const db = useDatabase()
-  const { user } = useAuth()
+  const { user } = useUser()
 
   const methods = useForm<FormData>({
     defaultValues: {

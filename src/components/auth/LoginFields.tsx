@@ -129,7 +129,7 @@ export default function LoginFields() {
               alignItems: 'flex-end'
             }}
             onPress={() => {
-              router.replace('/forgot-password')
+              router.push('/(auth)/forgot-password')
             }}
           >
             <Typo

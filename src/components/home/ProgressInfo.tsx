@@ -5,7 +5,7 @@ import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import useProgress from '@/hooks/data/useProgress'
 import i18n from '@/i18n'
-import { useAuth } from '@/hooks/auth/useAuth'
+import useUser from '@/hooks/auth/useUser'
 import PriorityTasksSection from './PriorityTasksSection'
 
 interface ProgressSummaryProps {
@@ -75,7 +75,7 @@ const ProgressSummary = ({ label, percent = 0, count, total = 0, useIcon = false
 }
 
 export default function ProgressInfo() {
-  const { user } = useAuth()
+  const { user } = useUser()
   const { completed, inProgress } = useProgress({ userId: user?.id ?? '' })
 
   return (

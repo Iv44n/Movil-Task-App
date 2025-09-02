@@ -7,7 +7,7 @@ import { Priority, StatusTask } from '@/constants/constants'
 import { Task } from '@/models'
 import i18n from '@/i18n'
 import Icon from '../icons/Icon'
-import { useAuth } from '@/hooks/auth/useAuth'
+import useUser from '@/hooks/auth/useUser'
 import { useDatabase } from '@nozbe/watermelondb/react'
 import { TABLE_NAMES } from '@/lib/schema'
 import { todayEnd, todayStart } from '@/utils/date'
@@ -72,7 +72,7 @@ const PriorityItem = memo(({ label, isCompleted, taskInfo }: { label: string, is
 PriorityItem.displayName = 'PriorityItem'
 
 const PriorityTasksSection = () => {
-  const { user } = useAuth()
+  const { user } = useUser()
   const tasks = usePriorityTasks({ userId: user?.id })
 
   const renderTask = useCallback((task: Task) => (

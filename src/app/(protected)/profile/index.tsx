@@ -5,10 +5,10 @@ import ScreenWrapper from '@/components/ScreenWrapper'
 import ActionButton from '@/components/shared/ActionButton'
 import Typo from '@/components/shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
-import { useAuth } from '@/hooks/auth/useAuth'
 import { useRouter } from 'expo-router'
 import i18n from '@/i18n'
 import { useClerk } from '@clerk/clerk-expo'
+import useUser from '@/hooks/auth/useUser'
 
 type MenuItemProps = {
   id: string
@@ -52,7 +52,7 @@ const MenuItem = ({
 }
 
 export default function Profile() {
-  const { user } = useAuth()
+  const { user } = useUser()
   const{ signOut } = useClerk()
   const router = useRouter()
 
@@ -77,23 +77,23 @@ export default function Profile() {
       id: 'account',
       label: i18n.t('profile.menu.account.title'),
       subtitle: i18n.t('profile.menu.account.subtitle'),
-      onPress: () => console.log('Account'),
+      onPress: () => router.push('/profile/account'),
       icon: <Icon.User size={23} color={Colors.secondary} />
     },
-    {
+    /*   {
       id: 'notifications',
       label: i18n.t('profile.menu.notifications.title'),
       subtitle: i18n.t('profile.menu.notifications.subtitle'),
       onPress: () => console.log('Notifications'),
       icon: <Icon.Bell size={23} color={Colors.secondary} />
-    },
-    {
+    }, */
+    /*     {
       id: 'security',
       label: i18n.t('profile.menu.security.title'),
       subtitle: i18n.t('profile.menu.security.subtitle'),
       onPress: () => console.log('Security'),
       icon: <Icon.Shield size={23} color={Colors.secondary} />
-    },
+    }, */
     {
       id: 'language',
       label: i18n.t('profile.menu.language.title'),

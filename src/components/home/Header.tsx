@@ -1,7 +1,7 @@
 import Typo from '../shared/Typo'
 import { Colors, Shapes, Sizes } from '@/constants/theme'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { useAuth } from '@/hooks/auth/useAuth'
+import useUser from '@/hooks/auth/useUser'
 import i18n from '@/i18n'
 import { useCallback, useEffect, useState } from 'react'
 import { useDatabase } from '@nozbe/watermelondb/react'
@@ -11,7 +11,7 @@ import { Project } from '@/models'
 import { useRouter } from 'expo-router'
 
 export default function Header({ userName }: { userName: string }) {
-  const { user } = useAuth()
+  const { user } = useUser()
   const database = useDatabase()
   const router = useRouter()
   const [totalProjects, setTotalProjects] = useState(0)
