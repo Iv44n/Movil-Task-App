@@ -1,10 +1,10 @@
 import { User } from '@/models'
 import { useUser } from '@clerk/clerk-expo'
-import { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
-import { addNetworkStateListener } from 'expo-network'
+import { createContext, ReactNode, useCallback, useEffect, useState, useMemo } from 'react'
 import { TABLE_NAMES } from '@/lib/schema'
 import { Q } from '@nozbe/watermelondb'
 import { useDatabase } from '@nozbe/watermelondb/react'
+import useNetworkState from '@/hooks/useNetworkState'
 
 interface ConnectedAccount {
   id: string
@@ -17,103 +17,172 @@ interface UserContextType {
   connectedAccounts: ConnectedAccount[]
   isOnline: boolean
   refreshUser: () => Promise<void>
-  updateProfile: (data: { firstName?: string, lastName?: string }) => Promise<void>
+  updateProfile: (data: UpdateProfileData) => Promise<void>
   deleteAccount: () => Promise<void>
 }
+
+type UpdateProfileData = {
+  firstName?: string
+  lastName?: string
+}
+
+const OFFLINE_ERROR = 'You need to be online to perform this action'
 
 export const UserContext = createContext<UserContextType | null>(null)
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const db = useDatabase()
-  const { user: ClerkUser } = useUser()
+  const { user: clerkUser, isLoaded } = useUser()
 
   const [user, setUser] = useState<User | null>(null)
-  const [isOnline, setIsOnline] = useState(false)
-  const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccount[]>([])
+  const isOnline = useNetworkState()
 
-  const userCollection = db.collections.get<User>(TABLE_NAMES.USERS)
+  const userCollection = useMemo(
+    () => db.collections.get<User>(TABLE_NAMES.USERS),
+    [db]
+  )
+  const connectedAccounts = useMemo((): ConnectedAccount[] => {
+    if (!clerkUser?.externalAccounts) return []
 
-  useEffect(() => {
-    const subscription = addNetworkStateListener(({ isConnected }) => setIsOnline(isConnected ?? false))
-    return () => subscription.remove()
-  }, [])
+    return clerkUser.externalAccounts.map(acc => ({
+      id: acc.id,
+      provider: acc.provider,
+      emailAddress: acc.emailAddress
+    }))
+  }, [clerkUser?.externalAccounts])
 
-  useEffect(() => {
-    if (ClerkUser) {
-      const subscription = userCollection
-        .query(Q.where('id', ClerkUser.id), Q.take(1))
-        .observeWithColumns(['id', 'email', 'first_name', 'last_name'])
-        .subscribe((user) => {
-          if (user.length > 0) {
-            setUser(user[0])
-            setConnectedAccounts(
-              ClerkUser.externalAccounts
-                .map(acc =>
-                  ({ id: acc.id, provider: acc.provider, emailAddress: acc.emailAddress })
-                )
-            )
-          }
+  const ensureLocalUser = useCallback(async (): Promise<User | null> => {
+    if (!clerkUser) return null
+
+    try {
+      return await db.write(async () => {
+        const [existingUser] = await userCollection
+          .query(Q.where('id', clerkUser.id))
+          .fetch()
+
+        if (existingUser) return existingUser
+
+        return await userCollection.create(newUser => {
+          newUser._raw.id = clerkUser.id
+          newUser.email = clerkUser.emailAddresses[0]?.emailAddress ?? ''
+          newUser.firstName = clerkUser.firstName ?? ''
+          newUser.lastName = clerkUser.lastName ?? ''
+          newUser.profileImageUrl = clerkUser.imageUrl ?? ''
         })
-
-      return () => subscription.unsubscribe()
+      })
+    } catch (error) {
+      console.error('Error ensuring local user:', error)
+      return null
     }
-  }, [user, ClerkUser, userCollection])
+  }, [clerkUser, db, userCollection])
+
+  useEffect(() => {
+    if (!isLoaded) return
+
+    if (!clerkUser) {
+      setUser(null)
+      return
+    }
+
+    let subscription: { unsubscribe: () => void } | null = null
+
+    const setupUserSubscription = async () => {
+      try {
+        const localUser = await ensureLocalUser()
+
+        if (!localUser) {
+          return
+        }
+
+        subscription = userCollection
+          .query(Q.where('id', clerkUser.id))
+          .observe()
+          .subscribe(rows => {
+            setUser(rows[0] ?? null)
+          })
+      } catch (error) {
+        console.error('Error setting up user subscription:', error)
+      }
+    }
+
+    setupUserSubscription()
+
+    return () => {
+      subscription?.unsubscribe()
+    }
+  }, [clerkUser, isLoaded, userCollection, ensureLocalUser])
 
   const refreshUser = useCallback(async () => {
-    if (!isOnline || !ClerkUser) return
+    if (!isOnline) {
+      throw new Error(OFFLINE_ERROR)
+    }
+
+    if (!clerkUser) return
+
+    const localUser = await ensureLocalUser()
+    if (!localUser) return
 
     await db.write(async () => {
-      const existingUser = await userCollection.query(Q.where('id', ClerkUser.id), Q.take(1)).fetch()
-      if (existingUser.length > 0) {
-        await existingUser[0].update((user) => {
-          user._raw.id = ClerkUser.id
-          user.firstName = ClerkUser.firstName || ''
-          user.lastName = ClerkUser.lastName || ''
-          user.email = ClerkUser.emailAddresses[0].emailAddress
-          user.profileImageUrl = ClerkUser.imageUrl
-        })
-      } else {
-        await userCollection.create((user) => {
-          user._raw.id = ClerkUser.id
-          user.email = ClerkUser.emailAddresses[0].emailAddress
-          user.firstName = ClerkUser.firstName || ''
-          user.lastName = ClerkUser.lastName || ''
-          user.profileImageUrl = ClerkUser.imageUrl
-        })
-      }
+      await localUser.update(updatedUser => {
+        updatedUser.firstName = clerkUser.firstName ?? ''
+        updatedUser.lastName = clerkUser.lastName ?? ''
+        updatedUser.email = clerkUser.emailAddresses[0]?.emailAddress ?? ''
+        updatedUser.profileImageUrl = clerkUser.imageUrl ?? ''
+      })
     })
-  }, [ClerkUser, isOnline, db, userCollection])
+  }, [clerkUser, isOnline, db, ensureLocalUser])
 
-  const updateProfile = useCallback(async (data: { firstName?: string, lastName?: string }) => {
-    if (!user || !ClerkUser) return
-    if (!isOnline) throw new Error('You need to be online to update your profile')
+  const updateProfile = useCallback(
+    async (data: UpdateProfileData) => {
+      if (!user || !clerkUser) {
+        throw new Error('User not found')
+      }
 
-    await ClerkUser.update(data)
-    await refreshUser()
-  }, [user, ClerkUser, isOnline, refreshUser])
+      if (!isOnline) {
+        throw new Error(OFFLINE_ERROR)
+      }
+
+      await clerkUser.update(data)
+      await refreshUser()
+    },
+    [user, clerkUser, isOnline, refreshUser]
+  )
 
   const deleteAccount = useCallback(async () => {
-    if (!user || !ClerkUser) return
-    if (!isOnline) throw new Error('You need to be online to delete your account')
+    if (!user || !clerkUser) {
+      throw new Error('User not found')
+    }
 
-    await ClerkUser.delete()
+    if (!isOnline) {
+      throw new Error(OFFLINE_ERROR)
+    }
+
+    await clerkUser.delete()
     await db.write(async () => {
       await user.destroyPermanently()
-      setUser(null)
     })
-  }, [user, ClerkUser, isOnline, db])
+    setUser(null)
+  }, [user, clerkUser, isOnline, db])
+
+  const contextValue = useMemo((): UserContextType => ({
+    user,
+    isOnline,
+    connectedAccounts,
+    refreshUser,
+    updateProfile,
+    deleteAccount
+  }), [
+    user,
+    isOnline,
+    connectedAccounts,
+    refreshUser,
+    updateProfile,
+    deleteAccount
+  ])
 
   return (
-    <UserContext value={{
-      user,
-      isOnline,
-      connectedAccounts,
-      refreshUser,
-      updateProfile,
-      deleteAccount
-    }}
-    >
+    <UserContext.Provider value={contextValue}>
       {children}
-    </UserContext>
+    </UserContext.Provider>
   )
 }
