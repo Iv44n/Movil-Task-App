@@ -17,6 +17,7 @@ import { formatProjectName } from '@/utils/utils'
 import { Alert } from 'react-native'
 import TaskList from '@/components/projectDetails/TaskList'
 import useUser from '@/hooks/auth/useUser'
+import useRevenueCat from '@/hooks/useRevenueCat'
 
 type Status = StatusTask | 'all'
 
@@ -40,6 +41,7 @@ export default function ProjectScreen() {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false)
   const [project, setProject] = useState<Project | null>(null)
   const [tab, setTab] = useState<Status>('all')
+  const { isPro } = useRevenueCat()
 
   const projectQuery = useMemo(
     () => db.collections
@@ -95,6 +97,9 @@ export default function ProjectScreen() {
 
   const handleAddTask = useCallback(async ({ title, priority, startDate, dueDate }: FormData) => {
     try {
+      const canAddTask = isPro || (await project?.tasks.count ?? 0) < 5
+      if (!canAddTask) return router.push('(protected)/subscription')
+
       await db.write(async () => {
         await db.collections.get<Task>(TABLE_NAMES.TASKS).create(t => {
           t.userId = userId
@@ -117,7 +122,7 @@ export default function ProjectScreen() {
       Alert.alert('Error', message)
       console.error('Task creation error on component ProjectScreen:', error)
     }
-  }, [db, projectId, userId, project])
+  }, [db, projectId, userId, project, isPro, router])
 
   const { firstPart, remaining } = useMemo(
     () => formatProjectName(project?.name || ''),

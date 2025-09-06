@@ -12,6 +12,8 @@ import { TABLE_NAMES } from '@/lib/schema'
 import FormModal from '../shared/FormModal'
 import ProjectFormFields from './ProjectFormFields'
 import useUser from '@/hooks/auth/useUser'
+import useRevenueCat from '@/hooks/useRevenueCat'
+import { Q } from '@nozbe/watermelondb'
 
 interface AddProjectModalProps {
   readonly visible: boolean;
@@ -40,6 +42,7 @@ const AddProjectModal = ({ visible, onClose }: AddProjectModalProps) => {
   const router = useRouter()
   const db = useDatabase()
   const { user } = useUser()
+  const { isPro } = useRevenueCat()
 
   const methods = useForm<FormData>({
     defaultValues: {
@@ -68,6 +71,12 @@ const AddProjectModal = ({ visible, onClose }: AddProjectModalProps) => {
     const projectsCollection = db.collections.get<Project>(TABLE_NAMES.PROJECTS)
 
     try {
+      const projectCount = await projectsCollection.query(Q.where('user_id', user.id)).fetchCount()
+
+      if (!isPro && projectCount >= 4) {
+        return router.push('(protected)/subscription')
+      }
+
       const newProject = await db.write(async () => {
         return await projectsCollection.create((project) => {
           project.userId = user.id
@@ -87,7 +96,7 @@ const AddProjectModal = ({ visible, onClose }: AddProjectModalProps) => {
       Alert.alert('Failed to create project', message)
       console.error('Failed to create project on component AddProjectModal', error)
     }
-  }, [user?.id, db, methods, onClose, router])
+  }, [user?.id, db, methods, onClose, router, isPro])
 
   if (!user?.id) return null
 
