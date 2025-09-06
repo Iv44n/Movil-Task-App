@@ -16,6 +16,10 @@ export default function ProtectedLayout() {
       }}
     >
       <Stack.Screen
+        name='subscription'
+        options={{ animation: 'fade_from_bottom', presentation: 'modal' }}
+      />
+      <Stack.Screen
         name='project/[projectId]'
         options={{ animation: 'fade' }}
       />
